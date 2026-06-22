@@ -1,0 +1,225 @@
+{
+  "schema_version": "1.0",
+  "trip_title": "意法瑞 8 日轻松自驾",
+  "start_date": "2024-07-01",
+  "end_date": "2024-07-08",
+  "travelers": [
+    "adult",
+    "adult",
+    "child_4yo"
+  ],
+  "budget_cny": 30000,
+  "transport": "self-drive",
+  "style_theme": "pastel-pixel",
+  "lang": "zh-CN",
+  "days": [
+    {
+      "day": 1,
+      "date": "2024-07-01",
+      "summary": "米兰抵达与城市地标",
+      "stops": [
+        {
+          "id": "milan-duomo",
+          "name": "米兰大教堂",
+          "name_en": "Milan Cathedral",
+          "city": "Milan",
+          "country": "IT",
+          "lat": 45.4641,
+          "lon": 9.1919,
+          "crs": "wgs84",
+          "category": "landmark",
+          "duration_min": 120,
+          "description": "米兰市中心的代表性地标，适合作为行程开场。",
+          "notes": "亲子出行建议避开正午排队高峰。",
+          "source": "wikipedia",
+          "source_url": "https://en.wikipedia.org/wiki/Milan_Cathedral",
+          "official_url": "https://www.duomomilano.it/",
+          "navigation_url": null,
+          "info_missing": false
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "date": "2024-07-02",
+      "summary": "科莫湖区慢节奏",
+      "stops": [
+        {
+          "id": "lake-como",
+          "name": "科莫湖",
+          "name_en": "Lake Como",
+          "city": "Como",
+          "country": "IT",
+          "lat": 45.984,
+          "lon": 9.257,
+          "crs": "wgs84",
+          "category": "nature",
+          "duration_min": 180,
+          "description": "湖区风景适合轻松散步、拍照和短途船游。",
+          "notes": "带小孩建议保留午休时间。",
+          "source": "wikipedia",
+          "source_url": "https://en.wikipedia.org/wiki/Lake_Como",
+          "official_url": null,
+          "navigation_url": null,
+          "info_missing": false
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "date": "2024-07-03",
+      "summary": "卢塞恩老城与湖景",
+      "stops": [
+        {
+          "id": "chapel-bridge",
+          "name": "卡佩尔廊桥",
+          "name_en": "Chapel Bridge",
+          "city": "Lucerne",
+          "country": "CH",
+          "lat": 47.0517,
+          "lon": 8.3073,
+          "crs": "wgs84",
+          "category": "landmark",
+          "duration_min": 90,
+          "description": "卢塞恩老城的标志性步行景点。",
+          "notes": "安排在傍晚更适合拍照。",
+          "source": "wikipedia",
+          "source_url": "https://en.wikipedia.org/wiki/Chapel_Bridge",
+          "official_url": null,
+          "navigation_url": null,
+          "info_missing": false
+        }
+      ]
+    },
+    {
+      "day": 4,
+      "date": "2024-07-04",
+      "summary": "因特拉肯山景日",
+      "stops": [
+        {
+          "id": "harder-kulm",
+          "name": "哈德昆观景台",
+          "name_en": "Harder Kulm",
+          "city": "Interlaken",
+          "country": "CH",
+          "lat": 46.6976,
+          "lon": 7.8517,
+          "crs": "wgs84",
+          "category": "viewpoint",
+          "duration_min": 150,
+          "description": "因特拉肯附近的山景观景点，适合看湖泊与群山。",
+          "notes": "天气不好时改为镇上散步。",
+          "source": "wikipedia",
+          "source_url": "https://en.wikipedia.org/wiki/Harder_Kulm",
+          "official_url": null,
+          "navigation_url": null,
+          "info_missing": false
+        }
+      ]
+    },
+    {
+      "day": 5,
+      "date": "2024-07-05",
+      "summary": "日内瓦湖畔",
+      "stops": [
+        {
+          "id": "jet-deau",
+          "name": "日内瓦大喷泉",
+          "name_en": "Jet d'Eau",
+          "city": "Geneva",
+          "country": "CH",
+          "lat": 46.2074,
+          "lon": 6.1559,
+          "crs": "wgs84",
+          "category": "landmark",
+          "duration_min": 80,
+          "description": "日内瓦湖畔的代表性城市景观。",
+          "notes": "可与湖边散步安排在同一段。",
+          "source": "wikipedia",
+          "source_url": "https://en.wikipedia.org/wiki/Jet_d%27Eau",
+          "official_url": null,
+          "navigation_url": null,
+          "info_missing": false
+        }
+      ]
+    },
+    {
+      "day": 6,
+      "date": "2024-07-06",
+      "summary": "安纳西法国小城",
+      "stops": [
+        {
+          "id": "annecy-old-town",
+          "name": "安纳西老城",
+          "name_en": "Annecy Old Town",
+          "city": "Annecy",
+          "country": "FR",
+          "lat": 45.8992,
+          "lon": 6.1294,
+          "crs": "wgs84",
+          "category": "experience",
+          "duration_min": 180,
+          "description": "运河、老城街巷和湖边步道适合轻松游览。",
+          "notes": "适合安排慢午餐和短距离散步。",
+          "source": "demo_static_cache",
+          "source_url": null,
+          "official_url": null,
+          "navigation_url": null,
+          "info_missing": false
+        }
+      ]
+    },
+    {
+      "day": 7,
+      "date": "2024-07-07",
+      "summary": "里昂老城短停",
+      "stops": [
+        {
+          "id": "vieux-lyon",
+          "name": "里昂老城",
+          "name_en": "Vieux Lyon",
+          "city": "Lyon",
+          "country": "FR",
+          "lat": 45.7637,
+          "lon": 4.8278,
+          "crs": "wgs84",
+          "category": "landmark",
+          "duration_min": 150,
+          "description": "里昂历史城区，适合安排半天城市漫步。",
+          "notes": "自驾建议提前确认停车点。",
+          "source": "wikipedia",
+          "source_url": "https://en.wikipedia.org/wiki/Vieux_Lyon",
+          "official_url": null,
+          "navigation_url": null,
+          "info_missing": false
+        }
+      ]
+    },
+    {
+      "day": 8,
+      "date": "2024-07-08",
+      "summary": "返回米兰与收尾",
+      "stops": [
+        {
+          "id": "sforza-castle",
+          "name": "斯福尔扎城堡",
+          "name_en": "Sforza Castle",
+          "city": "Milan",
+          "country": "IT",
+          "lat": 45.4705,
+          "lon": 9.1794,
+          "crs": "wgs84",
+          "category": "museum",
+          "duration_min": 120,
+          "description": "米兰市区适合收尾游览的城堡与博物馆区域。",
+          "notes": "按返程航班时间灵活取舍。",
+          "source": "wikipedia",
+          "source_url": "https://en.wikipedia.org/wiki/Sforza_Castle",
+          "official_url": null,
+          "navigation_url": null,
+          "info_missing": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "schema_version": "1.0",
+  "trip_title": "北京 3 日亲子慢游",
+  "start_date": "2024-10-01",
+  "end_date": "2024-10-03",
+  "travelers": [
+    "adult",
+    "adult",
+    "child_6yo"
+  ],
+  "budget_cny": null,
+  "transport": "public-transit",
+  "style_theme": "pastel-pixel",
+  "lang": "zh-CN",
+  "days": [
+    {
+      "day": 1,
+      "date": "2024-10-01",
+      "summary": "中轴线与轻松登高",
+      "stops": [
+        {
+          "id": "forbidden-city",
+          "name": "故宫博物院",
+          "name_en": "The Palace Museum",
+          "city": "北京",
+          "country": "CN",
+          "lat": 39.9163,
+          "lon": 116.3972,
+          "crs": "gcj02",
+          "category": "museum",
+          "duration_min": 180,
+          "description": "北京代表性博物馆，适合作为亲子历史启蒙的核心点。",
+          "notes": "务必提前预约，现场以官方公告为准。",
+          "source": "official_site",
+          "source_url": "https://www.dpm.org.cn/",
+          "official_url": "https://www.dpm.org.cn/",
+          "navigation_url": null,
+          "info_missing": false
+        },
+        {
+          "id": "jingshan-park",
+          "name": "景山公园",
+          "name_en": "Jingshan Park",
+          "city": "北京",
+          "country": "CN",
+          "lat": 39.9251,
+          "lon": 116.3967,
+          "crs": "gcj02",
+          "category": "viewpoint",
+          "duration_min": 80,
+          "description": "故宫附近的登高视角，适合用短步行串联。",
+          "notes": "孩子体力不足时可跳过登高。",
+          "source": "demo_static_cache",
+          "source_url": null,
+          "official_url": null,
+          "navigation_url": null,
+          "info_missing": false
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "date": "2024-10-02",
+      "summary": "动物园与皇家园林",
+      "stops": [
+        {
+          "id": "beijing-zoo",
+          "name": "北京动物园",
+          "name_en": "Beijing Zoo",
+          "city": "北京",
+          "country": "CN",
+          "lat": 39.9389,
+          "lon": 116.3364,
+          "crs": "gcj02",
+          "category": "experience",
+          "duration_min": 180,
+          "description": "适合亲子游的动物主题景点。",
+          "notes": "上午安排更从容，注意孩子午休。",
+          "source": "official_site",
+          "source_url": "https://www.bjzoo.com/",
+          "official_url": "https://www.bjzoo.com/",
+          "navigation_url": null,
+          "info_missing": false
+        },
+        {
+          "id": "summer-palace",
+          "name": "颐和园",
+          "name_en": "Summer Palace",
+          "city": "北京",
+          "country": "CN",
+          "lat": 39.9999,
+          "lon": 116.2755,
+          "crs": "gcj02",
+          "category": "landmark",
+          "duration_min": 180,
+          "description": "湖区和园林空间适合放慢节奏游览。",
+          "notes": "不建议把全园逛完，选核心路线即可。",
+          "source": "official_site",
+          "source_url": "https://www.summerpalace-china.com/",
+          "official_url": "https://www.summerpalace-china.com/",
+          "navigation_url": null,
+          "info_missing": false
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "date": "2024-10-03",
+      "summary": "孩子友好博物馆与街区",
+      "stops": [
+        {
+          "id": "beijing-planetarium",
+          "name": "北京天文馆",
+          "name_en": "Beijing Planetarium",
+          "city": "北京",
+          "country": "CN",
+          "lat": 39.9386,
+          "lon": 116.3372,
+          "crs": "gcj02",
+          "category": "museum",
+          "duration_min": 150,
+          "description": "适合亲子科普的室内备选点。",
+          "notes": "展映场次请以官网为准。",
+          "source": "official_site",
+          "source_url": "https://www.bjp.org.cn/",
+          "official_url": "https://www.bjp.org.cn/",
+          "navigation_url": null,
+          "info_missing": false
+        },
+        {
+          "id": "nanluoguxiang",
+          "name": "南锣鼓巷",
+          "name_en": "Nanluoguxiang",
+          "city": "北京",
+          "country": "CN",
+          "lat": 39.9408,
+          "lon": 116.4031,
+          "crs": "gcj02",
+          "category": "experience",
+          "duration_min": 90,
+          "description": "街区信息变化较快，适合作为轻量散步收尾。",
+          "notes": "节假日人多，注意儿童安全。",
+          "source": "info_missing",
+          "source_url": null,
+          "official_url": null,
+          "navigation_url": null,
+          "info_missing": true
+        }
+      ]
+    }
+  ]
+}

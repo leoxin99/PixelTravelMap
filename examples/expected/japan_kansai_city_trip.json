@@ -1,0 +1,219 @@
+{
+  "schema_version": "1.0",
+  "trip_title": "日本关西 5 日城市初游",
+  "start_date": "2024-11-01",
+  "end_date": "2024-11-05",
+  "travelers": ["adult"],
+  "budget_cny": null,
+  "transport": "public-transit",
+  "style_theme": "pastel-pixel",
+  "lang": "zh-CN",
+  "days": [
+    {
+      "day": 1,
+      "date": "2024-11-01",
+      "summary": "大阪城与夜景街区",
+      "stops": [
+        {
+          "id": "osaka-castle",
+          "name": "大阪城",
+          "name_en": "Osaka Castle",
+          "city": "Osaka",
+          "country": "JP",
+          "lat": 34.6873,
+          "lon": 135.5262,
+          "crs": "wgs84",
+          "category": "landmark",
+          "duration_min": 150,
+          "description": "大阪代表性城郭景点，适合第一次到访安排。",
+          "notes": "与周边公园一起游览更轻松。",
+          "source": "wikipedia",
+          "source_url": "https://en.wikipedia.org/wiki/Osaka_Castle",
+          "official_url": "https://www.osakacastle.net/",
+          "navigation_url": null,
+          "info_missing": false
+        },
+        {
+          "id": "dotonbori",
+          "name": "道顿堀",
+          "name_en": "Dotonbori",
+          "city": "Osaka",
+          "country": "JP",
+          "lat": 34.6687,
+          "lon": 135.5013,
+          "crs": "wgs84",
+          "category": "food",
+          "duration_min": 120,
+          "description": "大阪夜间街区和美食聚集地。",
+          "notes": "晚餐时段人多，注意保管随身物品。",
+          "source": "wikipedia",
+          "source_url": "https://en.wikipedia.org/wiki/D%C5%8Dtonbori",
+          "official_url": null,
+          "navigation_url": null,
+          "info_missing": false
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "date": "2024-11-02",
+      "summary": "京都清水寺与街巷",
+      "stops": [
+        {
+          "id": "kiyomizu-dera",
+          "name": "清水寺",
+          "name_en": "Kiyomizu-dera",
+          "city": "Kyoto",
+          "country": "JP",
+          "lat": 34.9949,
+          "lon": 135.785,
+          "crs": "wgs84",
+          "category": "landmark",
+          "duration_min": 150,
+          "description": "京都代表性寺院之一，适合与东山街区串联。",
+          "notes": "坡道较多，建议穿舒适鞋。",
+          "source": "wikipedia",
+          "source_url": "https://en.wikipedia.org/wiki/Kiyomizu-dera",
+          "official_url": "https://www.kiyomizudera.or.jp/",
+          "navigation_url": null,
+          "info_missing": false
+        },
+        {
+          "id": "ninenzaka",
+          "name": "二年坂",
+          "name_en": "Ninenzaka",
+          "city": "Kyoto",
+          "country": "JP",
+          "lat": 34.9981,
+          "lon": 135.7807,
+          "crs": "wgs84",
+          "category": "experience",
+          "duration_min": 80,
+          "description": "清水寺周边传统街巷，适合拍照和短暂停留。",
+          "notes": "商业信息变化较快，具体店铺请现场确认。",
+          "source": "demo_static_cache",
+          "source_url": null,
+          "official_url": null,
+          "navigation_url": null,
+          "info_missing": false
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "date": "2024-11-03",
+      "summary": "伏见稻荷与奈良",
+      "stops": [
+        {
+          "id": "fushimi-inari",
+          "name": "伏见稻荷大社",
+          "name_en": "Fushimi Inari Taisha",
+          "city": "Kyoto",
+          "country": "JP",
+          "lat": 34.9671,
+          "lon": 135.7727,
+          "crs": "wgs84",
+          "category": "landmark",
+          "duration_min": 150,
+          "description": "以连续鸟居景观闻名的京都神社。",
+          "notes": "早到可以避开最拥挤时段。",
+          "source": "wikipedia",
+          "source_url": "https://en.wikipedia.org/wiki/Fushimi_Inari-taisha",
+          "official_url": "https://inari.jp/",
+          "navigation_url": null,
+          "info_missing": false
+        },
+        {
+          "id": "nara-park",
+          "name": "奈良公园",
+          "name_en": "Nara Park",
+          "city": "Nara",
+          "country": "JP",
+          "lat": 34.6851,
+          "lon": 135.8431,
+          "crs": "wgs84",
+          "category": "nature",
+          "duration_min": 160,
+          "description": "奈良代表性公园区域，适合半日往返。",
+          "notes": "与动物互动需遵守现场提示。",
+          "source": "wikipedia",
+          "source_url": "https://en.wikipedia.org/wiki/Nara_Park",
+          "official_url": null,
+          "navigation_url": null,
+          "info_missing": false
+        }
+      ]
+    },
+    {
+      "day": 4,
+      "date": "2024-11-04",
+      "summary": "岚山与金阁寺",
+      "stops": [
+        {
+          "id": "arashiyama-bamboo",
+          "name": "岚山竹林",
+          "name_en": "Arashiyama Bamboo Grove",
+          "city": "Kyoto",
+          "country": "JP",
+          "lat": 35.017,
+          "lon": 135.671,
+          "crs": "wgs84",
+          "category": "nature",
+          "duration_min": 100,
+          "description": "京都西部适合拍照的竹林步道。",
+          "notes": "清晨体验更好。",
+          "source": "demo_static_cache",
+          "source_url": null,
+          "official_url": null,
+          "navigation_url": null,
+          "info_missing": false
+        },
+        {
+          "id": "kinkakuji",
+          "name": "金阁寺",
+          "name_en": "Kinkaku-ji",
+          "city": "Kyoto",
+          "country": "JP",
+          "lat": 35.0394,
+          "lon": 135.7292,
+          "crs": "wgs84",
+          "category": "landmark",
+          "duration_min": 90,
+          "description": "京都北部代表性寺院景点。",
+          "notes": "与岚山同日会有移动成本，注意别排太满。",
+          "source": "wikipedia",
+          "source_url": "https://en.wikipedia.org/wiki/Kinkaku-ji",
+          "official_url": "https://www.shokoku-ji.jp/kinkakuji/",
+          "navigation_url": null,
+          "info_missing": false
+        }
+      ]
+    },
+    {
+      "day": 5,
+      "date": "2024-11-05",
+      "summary": "神户港区收尾",
+      "stops": [
+        {
+          "id": "kobe-harborland",
+          "name": "神户临海乐园",
+          "name_en": "Kobe Harborland",
+          "city": "Kobe",
+          "country": "JP",
+          "lat": 34.6785,
+          "lon": 135.1814,
+          "crs": "wgs84",
+          "category": "experience",
+          "duration_min": 150,
+          "description": "神户港区的休闲商业与夜景区域。",
+          "notes": "适合作为返程前轻松收尾。",
+          "source": "demo_static_cache",
+          "source_url": null,
+          "official_url": null,
+          "navigation_url": null,
+          "info_missing": false
+        }
+      ]
+    }
+  ]
+}
