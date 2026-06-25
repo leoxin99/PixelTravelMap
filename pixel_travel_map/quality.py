@@ -210,3 +210,44 @@ def check_artifact(html_path: Path, max_bytes: int = 2_000_000) -> list[str]:
             errors.append(f"artifact missing required snippet: {snippet}")
 
     return errors
+
+
+def check_svg_artifact(svg_path: Path, max_bytes: int = 2_000_000) -> list[str]:
+    """Check that a poster SVG is offline and contains the expected sections."""
+
+    errors: list[str] = []
+    if not svg_path.exists():
+        return [f"missing artifact: {svg_path}"]
+
+    size = svg_path.stat().st_size
+    if size > max_bytes:
+        errors.append(f"artifact is {size} bytes, expected <= {max_bytes}")
+
+    svg = svg_path.read_text(encoding="utf-8")
+    forbidden_patterns = {
+        r"<script\b": "script tag",
+        r"\bhref=[\"']https?://": "remote href",
+        r"\bxlink:href=[\"']https?://": "remote xlink href",
+        r"@import": "CSS import",
+        r"\burl\([\"']?https?://": "remote CSS url",
+        r"\bfetch\s*\(": "fetch call",
+        r"\bXMLHttpRequest\b": "XMLHttpRequest usage",
+    }
+    for pattern, label in forbidden_patterns.items():
+        if re.search(pattern, svg, flags=re.IGNORECASE):
+            errors.append(f"artifact contains forbidden {label}")
+
+    required_snippets = [
+        'id="pixel-travel-poster"',
+        "PixelTravelMap",
+        "完整行程",
+        "atlas-grid",
+        "scale-bar",
+        "poster-day",
+        "route-arrow",
+    ]
+    for snippet in required_snippets:
+        if snippet not in svg:
+            errors.append(f"artifact missing required snippet: {snippet}")
+
+    return errors

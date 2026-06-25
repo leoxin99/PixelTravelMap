@@ -22,19 +22,22 @@ jobs:
 
       - name: Regenerate demo artifacts
         run: |
-          python scripts/generate_map.py --input examples/inputs/italy_france_switzerland_self_drive.txt --output dist/italy_france_switzerland_demo.html --dump-json dist/italy_france_switzerland_demo.json
-          python scripts/generate_map.py --input examples/inputs/japan_kansai_city_trip.txt --output dist/japan_kansai_demo.html --dump-json dist/japan_kansai_demo.json
-          python scripts/generate_map.py --input examples/inputs/beijing_family_trip.txt --output dist/beijing_family_demo.html --dump-json dist/beijing_family_demo.json
+          python scripts/generate_map.py --input examples/inputs/italy_france_switzerland_self_drive.txt --output dist/italy_france_switzerland_demo.html --dump-json dist/italy_france_switzerland_demo.json --poster-svg dist/italy_france_switzerland_demo_poster.svg
+          python scripts/generate_map.py --input examples/inputs/japan_kansai_city_trip.txt --output dist/japan_kansai_demo.html --dump-json dist/japan_kansai_demo.json --poster-svg dist/japan_kansai_demo_poster.svg
+          python scripts/generate_map.py --input examples/inputs/beijing_family_trip.txt --output dist/beijing_family_demo.html --dump-json dist/beijing_family_demo.json --poster-svg dist/beijing_family_demo_poster.svg
 
       - name: Verify regenerated artifacts are committed
         run: |
           git diff --exit-code -- \
             dist/italy_france_switzerland_demo.html \
             dist/italy_france_switzerland_demo.json \
+            dist/italy_france_switzerland_demo_poster.svg \
             dist/japan_kansai_demo.html \
             dist/japan_kansai_demo.json \
+            dist/japan_kansai_demo_poster.svg \
             dist/beijing_family_demo.html \
-            dist/beijing_family_demo.json
+            dist/beijing_family_demo.json \
+            dist/beijing_family_demo_poster.svg
 
       - name: Check regenerated demo artifacts
         run: python scripts/check_project.py

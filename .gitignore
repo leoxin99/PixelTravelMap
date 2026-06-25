@@ -30,3 +30,4 @@ Thumbs.db
 # Keep canonical demo artifacts in dist/, but ignore ad hoc drafts.
 dist/ambiguous*
 dist/*_from_json_demo.*
+dist/*_coordinate_demo*

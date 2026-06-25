@@ -1,0 +1,139 @@
+<svg id="pixel-travel-poster" xmlns="http://www.w3.org/2000/svg" width="1600" height="1130" viewBox="0 0 1600 1130" role="img" aria-label="北京 3 日亲子慢游 poster">
+  <defs>
+    <pattern id="atlas-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(49,61,76,0.12)" stroke-width="1"/>
+    </pattern>
+    <marker id="route-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" class="arrow-head"/>
+    </marker>
+  </defs>
+  <style>
+    .poster-bg { fill: #f6ecd9; }
+    .poster-frame { fill: #fffaf0; stroke: #313d4c; stroke-width: 4; }
+    .poster-kicker { fill: #7a3e9d; font: 700 22px "Courier New", monospace; }
+    .poster-title { fill: #26313d; font: 700 42px "Courier New", monospace; }
+    .poster-meta { fill: #697386; font: 700 20px "Courier New", monospace; }
+    .section-title { fill: #26313d; font: 700 28px "Courier New", monospace; }
+    .distance-note { fill: #697386; font: 700 16px "Courier New", monospace; }
+    .atlas-water { fill: #d9edf0; }
+    .atlas-frame-inner { fill: rgba(255,255,255,0.25); stroke: #313d4c; stroke-width: 2; }
+    .map-title, .north { fill: #26313d; font: 700 18px "Courier New", monospace; }
+    .route { fill: none; stroke: #d64f3f; stroke-width: 4; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 12 7; }
+    .arrow-head { fill: #d64f3f; }
+    .distance-label { paint-order: stroke; stroke: #fffaf0; stroke-width: 5; fill: #313d4c; font: 700 13px "Courier New", monospace; }
+    .city-label { paint-order: stroke; stroke: #fffaf0; stroke-width: 6; fill: #7a3e9d; font: 700 17px "Courier New", monospace; }
+    .marker-halo { fill: rgba(31,122,140,0.14); }
+    .marker-box { fill: #1f7a8c; stroke: #313d4c; stroke-width: 2; }
+    .marker-num { fill: #fffaf0; font: 700 16px "Courier New", monospace; }
+    .poi-label { paint-order: stroke; stroke: #fffaf0; stroke-width: 5; fill: #26313d; font: 700 15px "Courier New", monospace; }
+    .poi-day { paint-order: stroke; stroke: #fffaf0; stroke-width: 4; fill: #697386; font: 700 11px "Courier New", monospace; }
+    .scale-bar line { stroke: #313d4c; stroke-width: 3; }
+    .scale-bar text { fill: #313d4c; font: 700 13px "Courier New", monospace; }
+    .poster-day rect { fill: #ffffff; stroke: #313d4c; stroke-width: 2; }
+    .poster-day-num { fill: #1f7a8c; font: 700 20px "Courier New", monospace; }
+    .poster-day-title { fill: #26313d; font: 700 18px "Courier New", monospace; }
+    .poster-day-stops { fill: #697386; font: 700 16px "Courier New", monospace; }
+</style>
+  <rect width="1600" height="1130" class="poster-bg"/>
+  <rect x="64" y="56" width="1472" height="1018" class="poster-frame"/>
+  <text x="120" y="112" class="poster-kicker">PixelTravelMap · offline atlas poster</text>
+  <text x="120" y="154" class="poster-title">北京 3 日亲子慢游</text>
+  <text x="120" y="194" class="poster-meta">2024-10-01 - 2024-10-03 · 3 days · 1 cities · 6 stops · 29 km straight-line route</text>
+  
+  <g transform="translate(140,150)">
+    <g class="poster-map-view">
+      <rect width="1320" height="560" class="atlas-water"/>
+      <rect width="1320" height="560" fill="url(#atlas-grid)"/>
+      <rect x="28" y="28" width="1264" height="504" class="atlas-frame-inner"/>
+      <text x="48" y="56" class="map-title">总览地图</text>
+      <text x="1272" y="56" class="north" text-anchor="end">N ↑</text>
+      <polyline class="route" points="776,544 768,496 504,416 240,72 512,424 800,408" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      <text class="distance-label" x="772" y="510" text-anchor="middle">1 km</text><text class="distance-label" x="636" y="446" text-anchor="middle">5 km</text><text class="distance-label" x="372" y="234" text-anchor="middle">9 km</text><text class="distance-label" x="376" y="238" text-anchor="middle">9 km</text><text class="distance-label" x="656" y="406" text-anchor="middle">6 km</text>
+      <text class="city-label" x="600" y="40" text-anchor="middle">北京 · CN</text>
+      <g class="marker-layer" data-view="overview">
+        
+            <g class="marker marker-museum" aria-label="故宫博物院">
+              <circle class="marker-halo" cx="776" cy="544" r="18"/>
+              <rect class="marker-box" x="761" y="529" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="776" y="549" text-anchor="middle">1</text>
+              <text class="poi-label" x="800" y="536">故宫博物院</text>
+              <text class="poi-day" x="800" y="554">Day 1 · 北京</text>
+            </g>
+            
+            <g class="marker marker-viewpoint" aria-label="景山公园">
+              <circle class="marker-halo" cx="768" cy="496" r="18"/>
+              <rect class="marker-box" x="753" y="481" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="768" y="501" text-anchor="middle">2</text>
+              <text class="poi-label" x="792" y="488">景山公园</text>
+              <text class="poi-day" x="792" y="506">Day 1 · 北京</text>
+            </g>
+            
+            <g class="marker marker-experience" aria-label="北京动物园">
+              <circle class="marker-halo" cx="504" cy="416" r="18"/>
+              <rect class="marker-box" x="489" y="401" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="504" y="421" text-anchor="middle">3</text>
+              <text class="poi-label" x="528" y="408">北京动物园</text>
+              <text class="poi-day" x="528" y="426">Day 2 · 北京</text>
+            </g>
+            
+            <g class="marker marker-landmark" aria-label="颐和园">
+              <circle class="marker-halo" cx="240" cy="72" r="18"/>
+              <rect class="marker-box" x="225" y="57" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="240" y="77" text-anchor="middle">4</text>
+              <text class="poi-label" x="264" y="64">颐和园</text>
+              <text class="poi-day" x="264" y="82">Day 2 · 北京</text>
+            </g>
+            
+            <g class="marker marker-museum" aria-label="北京天文馆">
+              <circle class="marker-halo" cx="512" cy="424" r="18"/>
+              <rect class="marker-box" x="497" y="409" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="512" y="429" text-anchor="middle">5</text>
+              <text class="poi-label" x="536" y="416">北京天文馆</text>
+              <text class="poi-day" x="536" y="434">Day 3 · 北京</text>
+            </g>
+            
+            <g class="marker marker-experience" aria-label="南锣鼓巷">
+              <circle class="marker-halo" cx="800" cy="408" r="18"/>
+              <rect class="marker-box" x="785" y="393" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="800" y="413" text-anchor="middle">6</text>
+              <text class="poi-label" x="824" y="400">南锣鼓巷</text>
+              <text class="poi-day" x="824" y="418">Day 3 · 北京</text>
+            </g>
+            
+      </g>
+      
+      <g class="scale-bar">
+        <line x1="48" y1="512" x2="115" y2="512" />
+        <line x1="48" y1="504" x2="48" y2="520" />
+        <line x1="115" y1="504" x2="115" y2="520" />
+        <text x="82" y="498" text-anchor="middle">≈ 1 km</text>
+      </g>
+
+    </g>
+  </g>
+
+  <text x="120" y="752" class="section-title">完整行程</text>
+  <text x="1460" y="752" class="distance-note" text-anchor="end">距离为经纬度直线近似值</text>
+  
+  <g class="poster-day" transform="translate(120,790)">
+    <rect width="1360" height="50" rx="4"/>
+    <text x="20" y="24" class="poster-day-num">Day 1</text>
+    <text x="112" y="24" class="poster-day-title">2024-10-01 · 中轴线与轻松登高</text>
+    <text x="112" y="40" class="poster-day-stops">故宫博物院 (北京, 180m) · 景山公园 (北京, 80m)</text>
+  </g>
+
+  <g class="poster-day" transform="translate(120,848)">
+    <rect width="1360" height="50" rx="4"/>
+    <text x="20" y="24" class="poster-day-num">Day 2</text>
+    <text x="112" y="24" class="poster-day-title">2024-10-02 · 动物园与皇家园林</text>
+    <text x="112" y="40" class="poster-day-stops">北京动物园 (北京, 180m) · 颐和园 (北京, 180m)</text>
+  </g>
+
+  <g class="poster-day" transform="translate(120,906)">
+    <rect width="1360" height="50" rx="4"/>
+    <text x="20" y="24" class="poster-day-num">Day 3</text>
+    <text x="112" y="24" class="poster-day-title">2024-10-03 · 孩子友好博物馆与街区</text>
+    <text x="112" y="40" class="poster-day-stops">北京天文馆 (北京, 150m) · 南锣鼓巷 (北京, 90m)</text>
+  </g>
+
+</svg>

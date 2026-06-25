@@ -17,7 +17,7 @@ Keep these files and folders:
 - `schemas/`
 - `examples/`
 - `docs/`
-- `dist/` demo HTML and JSON artifacts
+- `dist/` demo HTML, JSON, and SVG poster artifacts
 
 Do not commit:
 
@@ -26,6 +26,7 @@ Do not commit:
 - Editor state
 - Logs and scratch files
 - Ad hoc `dist/ambiguous*` and `dist/*_from_json_demo.*` artifacts
+- Locally generated custom-coordinate artifacts such as `dist/*_coordinate_demo*`
 - API keys, private trip notes, or unpublished user data
 
 ## Local Verification
@@ -33,9 +34,9 @@ Do not commit:
 Run from `PixelTravelMap/`:
 
 ```powershell
-python scripts/generate_map.py --input examples/inputs/italy_france_switzerland_self_drive.txt --output dist/italy_france_switzerland_demo.html --dump-json dist/italy_france_switzerland_demo.json
-python scripts/generate_map.py --input examples/inputs/japan_kansai_city_trip.txt --output dist/japan_kansai_demo.html --dump-json dist/japan_kansai_demo.json
-python scripts/generate_map.py --input examples/inputs/beijing_family_trip.txt --output dist/beijing_family_demo.html --dump-json dist/beijing_family_demo.json
+python scripts/generate_map.py --input examples/inputs/italy_france_switzerland_self_drive.txt --output dist/italy_france_switzerland_demo.html --dump-json dist/italy_france_switzerland_demo.json --poster-svg dist/italy_france_switzerland_demo_poster.svg
+python scripts/generate_map.py --input examples/inputs/japan_kansai_city_trip.txt --output dist/japan_kansai_demo.html --dump-json dist/japan_kansai_demo.json --poster-svg dist/japan_kansai_demo_poster.svg
+python scripts/generate_map.py --input examples/inputs/beijing_family_trip.txt --output dist/beijing_family_demo.html --dump-json dist/beijing_family_demo.json --poster-svg dist/beijing_family_demo_poster.svg
 python scripts/check_project.py
 ```
 
@@ -72,6 +73,7 @@ The public demos will use URLs like:
 
 ```text
 https://<your-github-username>.github.io/PixelTravelMap/dist/italy_france_switzerland_demo.html
+https://<your-github-username>.github.io/PixelTravelMap/dist/italy_france_switzerland_demo_poster.svg
 https://<your-github-username>.github.io/PixelTravelMap/dist/japan_kansai_demo.html
 https://<your-github-username>.github.io/PixelTravelMap/dist/beijing_family_demo.html
 ```
@@ -85,13 +87,14 @@ to it so interviewers can inspect the schema, quality gates, and renderer.
 ```text
 PixelTravelMap - schema-first AI travel artifact generator.
 Built a no-key local MVP that converts natural-language trip prompts into
-validated itinerary JSON and renders offline interactive pixel-map HTML demos.
+validated itinerary JSON and renders offline interactive HTML atlas plus SVG
+poster demos.
 ```
 
 ## Suggested Resume Bullet
 
 ```text
-Built PixelTravelMap, a local AI travel artifact MVP that transforms natural-language trip plans into validated itinerary JSON and deterministic offline HTML maps with clickable POIs, citations, city filters, and artifact quality checks.
+Built PixelTravelMap, a local AI travel artifact MVP that transforms natural-language trip plans into validated itinerary JSON and deterministic offline HTML/SVG maps with coordinate-projected POIs, route distances, citations, city detail views, and artifact quality checks.
 ```
 
 ## After Publishing

@@ -1,0 +1,190 @@
+<svg id="pixel-travel-poster" xmlns="http://www.w3.org/2000/svg" width="1600" height="1130" viewBox="0 0 1600 1130" role="img" aria-label="意法瑞 8 日轻松自驾 poster">
+  <defs>
+    <pattern id="atlas-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(49,61,76,0.12)" stroke-width="1"/>
+    </pattern>
+    <marker id="route-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" class="arrow-head"/>
+    </marker>
+  </defs>
+  <style>
+    .poster-bg { fill: #f6ecd9; }
+    .poster-frame { fill: #fffaf0; stroke: #313d4c; stroke-width: 4; }
+    .poster-kicker { fill: #7a3e9d; font: 700 22px "Courier New", monospace; }
+    .poster-title { fill: #26313d; font: 700 42px "Courier New", monospace; }
+    .poster-meta { fill: #697386; font: 700 20px "Courier New", monospace; }
+    .section-title { fill: #26313d; font: 700 28px "Courier New", monospace; }
+    .distance-note { fill: #697386; font: 700 16px "Courier New", monospace; }
+    .atlas-water { fill: #d9edf0; }
+    .atlas-frame-inner { fill: rgba(255,255,255,0.25); stroke: #313d4c; stroke-width: 2; }
+    .map-title, .north { fill: #26313d; font: 700 18px "Courier New", monospace; }
+    .route { fill: none; stroke: #d64f3f; stroke-width: 4; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 12 7; }
+    .arrow-head { fill: #d64f3f; }
+    .distance-label { paint-order: stroke; stroke: #fffaf0; stroke-width: 5; fill: #313d4c; font: 700 13px "Courier New", monospace; }
+    .city-label { paint-order: stroke; stroke: #fffaf0; stroke-width: 6; fill: #7a3e9d; font: 700 17px "Courier New", monospace; }
+    .marker-halo { fill: rgba(31,122,140,0.14); }
+    .marker-box { fill: #1f7a8c; stroke: #313d4c; stroke-width: 2; }
+    .marker-num { fill: #fffaf0; font: 700 16px "Courier New", monospace; }
+    .poi-label { paint-order: stroke; stroke: #fffaf0; stroke-width: 5; fill: #26313d; font: 700 15px "Courier New", monospace; }
+    .poi-day { paint-order: stroke; stroke: #fffaf0; stroke-width: 4; fill: #697386; font: 700 11px "Courier New", monospace; }
+    .scale-bar line { stroke: #313d4c; stroke-width: 3; }
+    .scale-bar text { fill: #313d4c; font: 700 13px "Courier New", monospace; }
+    .poster-day rect { fill: #ffffff; stroke: #313d4c; stroke-width: 2; }
+    .poster-day-num { fill: #1f7a8c; font: 700 20px "Courier New", monospace; }
+    .poster-day-title { fill: #26313d; font: 700 18px "Courier New", monospace; }
+    .poster-day-stops { fill: #697386; font: 700 16px "Courier New", monospace; }
+</style>
+  <rect width="1600" height="1130" class="poster-bg"/>
+  <rect x="64" y="56" width="1472" height="1018" class="poster-frame"/>
+  <text x="120" y="112" class="poster-kicker">PixelTravelMap · offline atlas poster</text>
+  <text x="120" y="154" class="poster-title">意法瑞 8 日轻松自驾</text>
+  <text x="120" y="194" class="poster-meta">2024-07-01 - 2024-07-08 · 8 days · 7 cities · 8 stops · 867 km straight-line route</text>
+  
+  <g transform="translate(140,150)">
+    <g class="poster-map-view">
+      <rect width="1320" height="560" class="atlas-water"/>
+      <rect width="1320" height="560" fill="url(#atlas-grid)"/>
+      <rect x="28" y="28" width="1264" height="504" class="atlas-frame-inner"/>
+      <text x="48" y="56" class="map-title">总览地图</text>
+      <text x="1272" y="56" class="north" text-anchor="end">N ↑</text>
+      <polyline class="route" points="952,544 968,392 776,80 680,184 344,328 336,416 72,456 952,536" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      <text class="distance-label" x="960" y="458" text-anchor="middle">58 km</text><text class="distance-label" x="872" y="226" text-anchor="middle">139 km</text><text class="distance-label" x="728" y="122" text-anchor="middle">52 km</text><text class="distance-label" x="512" y="246" text-anchor="middle">141 km</text><text class="distance-label" x="340" y="362" text-anchor="middle">34 km</text><text class="distance-label" x="204" y="426" text-anchor="middle">102 km</text><text class="distance-label" x="512" y="486" text-anchor="middle">340 km</text>
+      <text class="city-label" x="952" y="504" text-anchor="middle">Milan · IT</text><text class="city-label" x="968" y="360" text-anchor="middle">Como · IT</text><text class="city-label" x="776" y="48" text-anchor="middle">Lucerne · CH</text><text class="city-label" x="680" y="152" text-anchor="middle">Interlaken · CH</text><text class="city-label" x="344" y="296" text-anchor="middle">Geneva · CH</text><text class="city-label" x="336" y="384" text-anchor="middle">Annecy · FR</text><text class="city-label" x="72" y="424" text-anchor="middle">Lyon · FR</text>
+      <g class="marker-layer" data-view="overview">
+        
+            <g class="marker marker-landmark" aria-label="米兰大教堂">
+              <circle class="marker-halo" cx="952" cy="544" r="18"/>
+              <rect class="marker-box" x="937" y="529" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="952" y="549" text-anchor="middle">1</text>
+              <text class="poi-label" x="976" y="536">米兰大教堂</text>
+              <text class="poi-day" x="976" y="554">Day 1 · Milan</text>
+            </g>
+            
+            <g class="marker marker-nature" aria-label="科莫湖">
+              <circle class="marker-halo" cx="968" cy="392" r="18"/>
+              <rect class="marker-box" x="953" y="377" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="968" y="397" text-anchor="middle">2</text>
+              <text class="poi-label" x="992" y="384">科莫湖</text>
+              <text class="poi-day" x="992" y="402">Day 2 · Como</text>
+            </g>
+            
+            <g class="marker marker-landmark" aria-label="卡佩尔廊桥">
+              <circle class="marker-halo" cx="776" cy="80" r="18"/>
+              <rect class="marker-box" x="761" y="65" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="776" y="85" text-anchor="middle">3</text>
+              <text class="poi-label" x="800" y="72">卡佩尔廊桥</text>
+              <text class="poi-day" x="800" y="90">Day 3 · Lucerne</text>
+            </g>
+            
+            <g class="marker marker-viewpoint" aria-label="哈德昆观景台">
+              <circle class="marker-halo" cx="680" cy="184" r="18"/>
+              <rect class="marker-box" x="665" y="169" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="680" y="189" text-anchor="middle">4</text>
+              <text class="poi-label" x="704" y="176">哈德昆观景台</text>
+              <text class="poi-day" x="704" y="194">Day 4 · Interlaken</text>
+            </g>
+            
+            <g class="marker marker-landmark" aria-label="日内瓦大喷泉">
+              <circle class="marker-halo" cx="344" cy="328" r="18"/>
+              <rect class="marker-box" x="329" y="313" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="344" y="333" text-anchor="middle">5</text>
+              <text class="poi-label" x="368" y="320">日内瓦大喷泉</text>
+              <text class="poi-day" x="368" y="338">Day 5 · Geneva</text>
+            </g>
+            
+            <g class="marker marker-experience" aria-label="安纳西老城">
+              <circle class="marker-halo" cx="336" cy="416" r="18"/>
+              <rect class="marker-box" x="321" y="401" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="336" y="421" text-anchor="middle">6</text>
+              <text class="poi-label" x="360" y="408">安纳西老城</text>
+              <text class="poi-day" x="360" y="426">Day 6 · Annecy</text>
+            </g>
+            
+            <g class="marker marker-landmark" aria-label="里昂老城">
+              <circle class="marker-halo" cx="72" cy="456" r="18"/>
+              <rect class="marker-box" x="57" y="441" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="72" y="461" text-anchor="middle">7</text>
+              <text class="poi-label" x="96" y="448">里昂老城</text>
+              <text class="poi-day" x="96" y="466">Day 7 · Lyon</text>
+            </g>
+            
+            <g class="marker marker-museum" aria-label="斯福尔扎城堡">
+              <circle class="marker-halo" cx="952" cy="536" r="18"/>
+              <rect class="marker-box" x="937" y="521" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="952" y="541" text-anchor="middle">8</text>
+              <text class="poi-label" x="976" y="528">斯福尔扎城堡</text>
+              <text class="poi-day" x="976" y="546">Day 8 · Milan</text>
+            </g>
+            
+      </g>
+      
+      <g class="scale-bar">
+        <line x1="48" y1="512" x2="124" y2="512" />
+        <line x1="48" y1="504" x2="48" y2="520" />
+        <line x1="124" y1="504" x2="124" y2="520" />
+        <text x="86" y="498" text-anchor="middle">≈ 20 km</text>
+      </g>
+
+    </g>
+  </g>
+
+  <text x="120" y="752" class="section-title">完整行程</text>
+  <text x="1460" y="752" class="distance-note" text-anchor="end">距离为经纬度直线近似值</text>
+  
+  <g class="poster-day" transform="translate(120,790)">
+    <rect width="1360" height="34" rx="4"/>
+    <text x="20" y="18" class="poster-day-num">Day 1</text>
+    <text x="112" y="18" class="poster-day-title">2024-07-01 · 米兰抵达与城市地标</text>
+    <text x="112" y="34" class="poster-day-stops">米兰大教堂 (Milan, 120m)</text>
+  </g>
+
+  <g class="poster-day" transform="translate(120,832)">
+    <rect width="1360" height="34" rx="4"/>
+    <text x="20" y="18" class="poster-day-num">Day 2</text>
+    <text x="112" y="18" class="poster-day-title">2024-07-02 · 科莫湖区慢节奏</text>
+    <text x="112" y="34" class="poster-day-stops">科莫湖 (Como, 180m)</text>
+  </g>
+
+  <g class="poster-day" transform="translate(120,874)">
+    <rect width="1360" height="34" rx="4"/>
+    <text x="20" y="18" class="poster-day-num">Day 3</text>
+    <text x="112" y="18" class="poster-day-title">2024-07-03 · 卢塞恩老城与湖景</text>
+    <text x="112" y="34" class="poster-day-stops">卡佩尔廊桥 (Lucerne, 90m)</text>
+  </g>
+
+  <g class="poster-day" transform="translate(120,916)">
+    <rect width="1360" height="34" rx="4"/>
+    <text x="20" y="18" class="poster-day-num">Day 4</text>
+    <text x="112" y="18" class="poster-day-title">2024-07-04 · 因特拉肯山景日</text>
+    <text x="112" y="34" class="poster-day-stops">哈德昆观景台 (Interlaken, 150m)</text>
+  </g>
+
+  <g class="poster-day" transform="translate(120,958)">
+    <rect width="1360" height="34" rx="4"/>
+    <text x="20" y="18" class="poster-day-num">Day 5</text>
+    <text x="112" y="18" class="poster-day-title">2024-07-05 · 日内瓦湖畔</text>
+    <text x="112" y="34" class="poster-day-stops">日内瓦大喷泉 (Geneva, 80m)</text>
+  </g>
+
+  <g class="poster-day" transform="translate(120,1000)">
+    <rect width="1360" height="34" rx="4"/>
+    <text x="20" y="18" class="poster-day-num">Day 6</text>
+    <text x="112" y="18" class="poster-day-title">2024-07-06 · 安纳西法国小城</text>
+    <text x="112" y="34" class="poster-day-stops">安纳西老城 (Annecy, 180m)</text>
+  </g>
+
+  <g class="poster-day" transform="translate(120,1042)">
+    <rect width="1360" height="34" rx="4"/>
+    <text x="20" y="18" class="poster-day-num">Day 7</text>
+    <text x="112" y="18" class="poster-day-title">2024-07-07 · 里昂老城短停</text>
+    <text x="112" y="34" class="poster-day-stops">里昂老城 (Lyon, 150m)</text>
+  </g>
+
+  <g class="poster-day" transform="translate(120,1084)">
+    <rect width="1360" height="34" rx="4"/>
+    <text x="20" y="18" class="poster-day-num">Day 8</text>
+    <text x="112" y="18" class="poster-day-title">2024-07-08 · 返回米兰与收尾</text>
+    <text x="112" y="34" class="poster-day-stops">斯福尔扎城堡 (Milan, 120m)</text>
+  </g>
+
+</svg>

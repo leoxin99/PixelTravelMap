@@ -7,21 +7,20 @@
   <style>
 
     :root {
-      --paper: #f7ead7;
-      --paper-2: #fff8e8;
-      --ink: #2f3542;
+      --paper: #f6ecd9;
+      --paper-2: #fffaf0;
+      --ink: #26313d;
       --muted: #697386;
-      --water: #9fd3e6;
-      --land: #b7d88a;
-      --land-2: #d6c07a;
-      --mountain: #7b6d63;
-      --route: #e86f51;
-      --marker: #d83f45;
-      --marker-2: #ffd166;
-      --panel: #fffdf4;
-      --line: #3c4250;
-      --focus: #1f7a8c;
-      --shadow: rgba(47, 53, 66, 0.24);
+      --water: #d9edf0;
+      --grid: rgba(38,49,61,0.12);
+      --route: #d64f3f;
+      --route-soft: #f2a35f;
+      --marker: #1f7a8c;
+      --marker-2: #f5c542;
+      --panel: #fffdf7;
+      --line: #313d4c;
+      --focus: #7a3e9d;
+      --shadow: rgba(38, 49, 61, 0.22);
     }
     * { box-sizing: border-box; }
     body {
@@ -29,18 +28,18 @@
       min-height: 100vh;
       color: var(--ink);
       background:
-        linear-gradient(90deg, rgba(47,53,66,0.05) 1px, transparent 1px),
-        linear-gradient(rgba(47,53,66,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(38,49,61,0.04) 1px, transparent 1px),
+        linear-gradient(rgba(38,49,61,0.04) 1px, transparent 1px),
         var(--paper);
       background-size: 18px 18px;
       font-family: "Courier New", ui-monospace, monospace;
       letter-spacing: 0;
     }
     button, a { font: inherit; }
-    .app-shell { width: min(1440px, 100%); margin: 0 auto; padding: 18px; }
+    .app-shell { width: min(1480px, 100%); margin: 0 auto; padding: 18px; }
     .topbar {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 16px;
       padding: 10px 0 18px;
@@ -53,10 +52,11 @@
       text-transform: uppercase;
     }
     h1, h2, h3, p { margin-top: 0; }
-    h1 { margin-bottom: 0; font-size: clamp(24px, 4vw, 40px); line-height: 1.1; }
+    h1 { margin-bottom: 6px; font-size: clamp(24px, 4vw, 40px); line-height: 1.1; }
     h2 { margin-bottom: 12px; font-size: 18px; }
     h3 { margin-bottom: 6px; font-size: 15px; }
     h3 span { color: var(--muted); font-size: 12px; font-weight: 400; }
+    .atlas-note { max-width: 760px; margin-bottom: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
     .toolbar { display: flex; gap: 8px; align-items: center; }
     .icon-button, .text-button, .city-pill {
       border: 2px solid var(--line);
@@ -69,7 +69,7 @@
     .text-button { min-height: 38px; padding: 0 14px; font-weight: 700; }
     .workspace {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 360px;
+      grid-template-columns: minmax(0, 1fr) 380px;
       gap: 18px;
       align-items: start;
     }
@@ -86,7 +86,7 @@
       align-items: center;
       padding: 12px;
       border-bottom: 3px solid var(--line);
-      background: #f2d38b;
+      background: #ebd78f;
       font-weight: 700;
     }
     .city-pills { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
@@ -101,39 +101,66 @@
       display: block;
       width: 100%;
       height: auto;
-      max-height: calc(100vh - 210px);
-      min-height: 360px;
-      shape-rendering: crispEdges;
-      image-rendering: pixelated;
+      max-height: calc(100vh - 230px);
+      min-height: 400px;
+      shape-rendering: geometricPrecision;
     }
-    .water { fill: var(--water); }
-    .land { stroke: var(--line); stroke-width: 3; }
-    .land-a { fill: var(--land); }
-    .land-b { fill: var(--land-2); opacity: 0.94; }
-    .mountains {
-      fill: none;
-      stroke: var(--mountain);
-      stroke-width: 5;
-      stroke-linejoin: bevel;
-    }
+    .atlas-water { fill: var(--water); }
+    .atlas-frame-inner { fill: rgba(255,255,255,0.24); stroke: var(--line); stroke-width: 2; }
+    .map-title { fill: var(--ink); font-size: 18px; font-weight: 700; }
+    .north { fill: var(--line); font-size: 18px; font-weight: 700; }
     .route {
       fill: none;
       stroke: var(--route);
-      stroke-width: 5;
-      stroke-linejoin: bevel;
-      stroke-linecap: square;
-      stroke-dasharray: 10 8;
+      stroke-width: 4;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      stroke-dasharray: 12 7;
     }
-    .city-route { display: none; stroke: var(--focus); }
+    .arrow-head { fill: var(--route); }
+    .distance-label {
+      paint-order: stroke;
+      stroke: var(--paper-2);
+      stroke-width: 5;
+      fill: var(--line);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .city-label {
+      paint-order: stroke;
+      stroke: var(--paper-2);
+      stroke-width: 6;
+      fill: var(--focus);
+      font-size: 17px;
+      font-weight: 700;
+    }
     .marker { cursor: pointer; outline: none; }
-    .marker-shadow { fill: rgba(47, 53, 66, 0.25); }
-    .marker-box { fill: var(--marker); stroke: var(--line); stroke-width: 3; }
-    .marker text { fill: #fff8e8; font-size: 16px; font-weight: 700; pointer-events: none; }
+    .marker.context { opacity: 0.45; }
+    .marker-halo { fill: rgba(31, 122, 140, 0.14); }
+    .marker-box { fill: var(--marker); stroke: var(--line); stroke-width: 2; }
+    .marker-num { fill: #fffaf0; font-size: 16px; font-weight: 700; pointer-events: none; }
+    .poi-label {
+      paint-order: stroke;
+      stroke: var(--paper-2);
+      stroke-width: 5;
+      fill: var(--ink);
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .poi-day {
+      paint-order: stroke;
+      stroke: var(--paper-2);
+      stroke-width: 4;
+      fill: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
     .marker.active .marker-box,
     .marker:focus .marker-box { fill: var(--marker-2); }
-    .marker.active text,
-    .marker:focus text { fill: var(--ink); }
-    .marker.hidden, .schedule-item.hidden { display: none; }
+    .marker.active .marker-num,
+    .marker:focus .marker-num { fill: var(--ink); }
+    .scale-bar line { stroke: var(--line); stroke-width: 3; }
+    .scale-bar text { fill: var(--line); font-size: 13px; font-weight: 700; }
     .stats-bar {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -165,6 +192,7 @@
       cursor: pointer;
     }
     .schedule-item.active { background: #e9f6f9; border-color: var(--focus); }
+    .schedule-item.focus-city:not(.in-city) { opacity: 0.45; }
     .schedule-index {
       display: grid;
       place-items: center;
@@ -199,11 +227,11 @@
       font-size: 12px;
     }
     .empty-state { color: var(--muted); }
-    @media (max-width: 900px) {
+    @media (max-width: 980px) {
       .app-shell { padding: 12px; }
-      .topbar { align-items: flex-start; }
+      .topbar { align-items: flex-start; flex-direction: column; }
       .workspace { grid-template-columns: 1fr; }
-      .pixel-map { min-height: 300px; max-height: none; }
+      .pixel-map { min-height: 320px; max-height: none; }
       .side-panel { grid-template-columns: 1fr; }
       .itinerary-list { max-height: none; }
       .stats-bar { grid-template-columns: repeat(2, 1fr); }
@@ -211,8 +239,7 @@
       .map-toolbar { align-items: flex-start; flex-direction: column; }
       .city-pills { justify-content: flex-start; }
     }
-    @media (max-width: 520px) {
-      .topbar { flex-direction: column; }
+    @media (max-width: 560px) {
       .toolbar { width: 100%; }
       .text-button { flex: 1; }
       .stats-bar { grid-template-columns: 1fr; }
@@ -226,8 +253,9 @@
   <div class="app-shell">
     <header class="topbar">
       <div>
-        <p class="eyebrow">PixelTravelMap MVP</p>
+        <p class="eyebrow">PixelTravelMap Atlas</p>
         <h1>意法瑞 8 日轻松自驾</h1>
+        <p class="atlas-note">方位和距离基于 POI 经纬度计算，路线距离为直线近似值，不等同于实际驾车或步行距离。</p>
       </div>
       <div class="toolbar">
         <button class="icon-button" id="overview-button" type="button" title="返回总览" aria-label="返回总览">↩</button>
@@ -236,99 +264,461 @@
     </header>
 
     <main class="workspace">
-      <section class="map-stage" aria-label="像素旅行地图">
+      <section class="map-stage" aria-label="经纬度旅行地图">
         <div class="map-toolbar">
           <span id="view-label">总览地图</span>
-          <div class="city-pills" aria-label="城市筛选">
-            <button class="city-pill active" type="button" data-city="">总览</button>
-<button class="city-pill" type="button" data-city="Annecy">Annecy</button>
-<button class="city-pill" type="button" data-city="Como">Como</button>
-<button class="city-pill" type="button" data-city="Geneva">Geneva</button>
-<button class="city-pill" type="button" data-city="Interlaken">Interlaken</button>
-<button class="city-pill" type="button" data-city="Lucerne">Lucerne</button>
-<button class="city-pill" type="button" data-city="Lyon">Lyon</button>
-<button class="city-pill" type="button" data-city="Milan">Milan</button>
+          <div class="city-pills" aria-label="城市 detail view">
+            <button class="city-pill active" type="button" data-view="overview">总览</button>
+<button class="city-pill" type="button" data-view="Annecy">Annecy</button>
+<button class="city-pill" type="button" data-view="Como">Como</button>
+<button class="city-pill" type="button" data-view="Geneva">Geneva</button>
+<button class="city-pill" type="button" data-view="Interlaken">Interlaken</button>
+<button class="city-pill" type="button" data-view="Lucerne">Lucerne</button>
+<button class="city-pill" type="button" data-view="Lyon">Lyon</button>
+<button class="city-pill" type="button" data-view="Milan">Milan</button>
           </div>
         </div>
         
-        <svg id="pixel-map" class="pixel-map" viewBox="0 0 920 540" role="img" aria-label="Pixel route map">
+        <svg id="pixel-map" class="pixel-map" viewBox="0 0 1040 620" role="img" aria-label="Latitude longitude travel atlas">
           <defs>
-            <pattern id="pixel-grid" width="16" height="16" patternUnits="userSpaceOnUse">
-              <path d="M 16 0 L 0 0 0 16" fill="none" stroke="rgba(58,58,58,0.08)" stroke-width="1"/>
+            <pattern id="atlas-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(49,61,76,0.12)" stroke-width="1"/>
             </pattern>
+            <marker id="route-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" class="arrow-head"/>
+            </marker>
           </defs>
-          <rect width="920" height="540" class="water" />
-          <rect width="920" height="540" fill="url(#pixel-grid)" />
-          <path class="land land-a" d="M72 362 L160 288 L264 310 L344 218 L520 238 L616 176 L802 214 L850 334 L736 438 L536 426 L418 474 L260 424 Z" />
-          <path class="land land-b" d="M106 134 L236 82 L384 118 L466 84 L616 112 L752 78 L854 150 L792 236 L628 218 L520 266 L384 218 L210 232 Z" />
-          <path class="mountains" d="M188 318 L226 270 L264 318 M526 250 L562 202 L604 250 M688 224 L726 174 L764 224" />
-          <polyline id="route-overview" class="route" points="840,464 848,336 680,72 600,160 304,280 304,360 72,392 832,464" />
-          <polyline class="route city-route" data-city="Milan" points="840,464 832,464" />
-          <g id="marker-layer">
-            
-            <g class="marker marker-landmark" data-stop-index="0" data-city="Milan" tabindex="0" role="button" aria-label="米兰大教堂">
-              <rect class="marker-shadow" x="828" y="458" width="30" height="30" />
-              <rect class="marker-box" x="826" y="446" width="28" height="28" />
-              <text x="840" y="466" text-anchor="middle">1</text>
+          
+  <g transform="translate(0,0)">
+    <g class="map-view" data-view="overview">
+      <rect width="1040" height="620" class="atlas-water"/>
+      <rect width="1040" height="620" fill="url(#atlas-grid)"/>
+      <rect x="28" y="28" width="984" height="564" class="atlas-frame-inner"/>
+      <text x="48" y="56" class="map-title">总览地图</text>
+      <text x="992" y="56" class="north" text-anchor="end">N ↑</text>
+      <polyline class="route" points="952,544 968,392 776,80 680,184 344,328 336,416 72,456 952,536" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      <text class="distance-label" x="960" y="458" text-anchor="middle">58 km</text><text class="distance-label" x="872" y="226" text-anchor="middle">139 km</text><text class="distance-label" x="728" y="122" text-anchor="middle">52 km</text><text class="distance-label" x="512" y="246" text-anchor="middle">141 km</text><text class="distance-label" x="340" y="362" text-anchor="middle">34 km</text><text class="distance-label" x="204" y="426" text-anchor="middle">102 km</text><text class="distance-label" x="512" y="486" text-anchor="middle">340 km</text>
+      <text class="city-label" x="952" y="504" text-anchor="middle">Milan · IT</text><text class="city-label" x="968" y="360" text-anchor="middle">Como · IT</text><text class="city-label" x="776" y="48" text-anchor="middle">Lucerne · CH</text><text class="city-label" x="680" y="152" text-anchor="middle">Interlaken · CH</text><text class="city-label" x="344" y="296" text-anchor="middle">Geneva · CH</text><text class="city-label" x="336" y="384" text-anchor="middle">Annecy · FR</text><text class="city-label" x="72" y="424" text-anchor="middle">Lyon · FR</text>
+      <g class="marker-layer" data-view="overview">
+        
+            <g class="marker marker-landmark" data-stop-index="0" tabindex="0" role="button" aria-label="米兰大教堂">
+              <circle class="marker-halo" cx="952" cy="544" r="18"/>
+              <rect class="marker-box" x="937" y="529" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="952" y="549" text-anchor="middle">1</text>
+              <text class="poi-label" x="976" y="536">米兰大教堂</text>
+              <text class="poi-day" x="976" y="554">Day 1 · Milan</text>
             </g>
             
-            <g class="marker marker-nature" data-stop-index="1" data-city="Como" tabindex="0" role="button" aria-label="科莫湖">
-              <rect class="marker-shadow" x="836" y="330" width="30" height="30" />
-              <rect class="marker-box" x="834" y="318" width="28" height="28" />
-              <text x="848" y="338" text-anchor="middle">2</text>
+            <g class="marker marker-nature" data-stop-index="1" tabindex="0" role="button" aria-label="科莫湖">
+              <circle class="marker-halo" cx="968" cy="392" r="18"/>
+              <rect class="marker-box" x="953" y="377" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="968" y="397" text-anchor="middle">2</text>
+              <text class="poi-label" x="992" y="384">科莫湖</text>
+              <text class="poi-day" x="992" y="402">Day 2 · Como</text>
             </g>
             
-            <g class="marker marker-landmark" data-stop-index="2" data-city="Lucerne" tabindex="0" role="button" aria-label="卡佩尔廊桥">
-              <rect class="marker-shadow" x="668" y="66" width="30" height="30" />
-              <rect class="marker-box" x="666" y="54" width="28" height="28" />
-              <text x="680" y="74" text-anchor="middle">3</text>
+            <g class="marker marker-landmark" data-stop-index="2" tabindex="0" role="button" aria-label="卡佩尔廊桥">
+              <circle class="marker-halo" cx="776" cy="80" r="18"/>
+              <rect class="marker-box" x="761" y="65" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="776" y="85" text-anchor="middle">3</text>
+              <text class="poi-label" x="800" y="72">卡佩尔廊桥</text>
+              <text class="poi-day" x="800" y="90">Day 3 · Lucerne</text>
             </g>
             
-            <g class="marker marker-viewpoint" data-stop-index="3" data-city="Interlaken" tabindex="0" role="button" aria-label="哈德昆观景台">
-              <rect class="marker-shadow" x="588" y="154" width="30" height="30" />
-              <rect class="marker-box" x="586" y="142" width="28" height="28" />
-              <text x="600" y="162" text-anchor="middle">4</text>
+            <g class="marker marker-viewpoint" data-stop-index="3" tabindex="0" role="button" aria-label="哈德昆观景台">
+              <circle class="marker-halo" cx="680" cy="184" r="18"/>
+              <rect class="marker-box" x="665" y="169" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="680" y="189" text-anchor="middle">4</text>
+              <text class="poi-label" x="704" y="176">哈德昆观景台</text>
+              <text class="poi-day" x="704" y="194">Day 4 · Interlaken</text>
             </g>
             
-            <g class="marker marker-landmark" data-stop-index="4" data-city="Geneva" tabindex="0" role="button" aria-label="日内瓦大喷泉">
-              <rect class="marker-shadow" x="292" y="274" width="30" height="30" />
-              <rect class="marker-box" x="290" y="262" width="28" height="28" />
-              <text x="304" y="282" text-anchor="middle">5</text>
+            <g class="marker marker-landmark" data-stop-index="4" tabindex="0" role="button" aria-label="日内瓦大喷泉">
+              <circle class="marker-halo" cx="344" cy="328" r="18"/>
+              <rect class="marker-box" x="329" y="313" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="344" y="333" text-anchor="middle">5</text>
+              <text class="poi-label" x="368" y="320">日内瓦大喷泉</text>
+              <text class="poi-day" x="368" y="338">Day 5 · Geneva</text>
             </g>
             
-            <g class="marker marker-experience" data-stop-index="5" data-city="Annecy" tabindex="0" role="button" aria-label="安纳西老城">
-              <rect class="marker-shadow" x="292" y="354" width="30" height="30" />
-              <rect class="marker-box" x="290" y="342" width="28" height="28" />
-              <text x="304" y="362" text-anchor="middle">6</text>
+            <g class="marker marker-experience" data-stop-index="5" tabindex="0" role="button" aria-label="安纳西老城">
+              <circle class="marker-halo" cx="336" cy="416" r="18"/>
+              <rect class="marker-box" x="321" y="401" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="336" y="421" text-anchor="middle">6</text>
+              <text class="poi-label" x="360" y="408">安纳西老城</text>
+              <text class="poi-day" x="360" y="426">Day 6 · Annecy</text>
             </g>
             
-            <g class="marker marker-landmark" data-stop-index="6" data-city="Lyon" tabindex="0" role="button" aria-label="里昂老城">
-              <rect class="marker-shadow" x="60" y="386" width="30" height="30" />
-              <rect class="marker-box" x="58" y="374" width="28" height="28" />
-              <text x="72" y="394" text-anchor="middle">7</text>
+            <g class="marker marker-landmark" data-stop-index="6" tabindex="0" role="button" aria-label="里昂老城">
+              <circle class="marker-halo" cx="72" cy="456" r="18"/>
+              <rect class="marker-box" x="57" y="441" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="72" y="461" text-anchor="middle">7</text>
+              <text class="poi-label" x="96" y="448">里昂老城</text>
+              <text class="poi-day" x="96" y="466">Day 7 · Lyon</text>
             </g>
             
-            <g class="marker marker-museum" data-stop-index="7" data-city="Milan" tabindex="0" role="button" aria-label="斯福尔扎城堡">
-              <rect class="marker-shadow" x="820" y="458" width="30" height="30" />
-              <rect class="marker-box" x="818" y="446" width="28" height="28" />
-              <text x="832" y="466" text-anchor="middle">8</text>
+            <g class="marker marker-museum" data-stop-index="7" tabindex="0" role="button" aria-label="斯福尔扎城堡">
+              <circle class="marker-halo" cx="952" cy="536" r="18"/>
+              <rect class="marker-box" x="937" y="521" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="952" y="541" text-anchor="middle">8</text>
+              <text class="poi-label" x="976" y="528">斯福尔扎城堡</text>
+              <text class="poi-day" x="976" y="546">Day 8 · Milan</text>
             </g>
             
-          </g>
+      </g>
+      
+      <g class="scale-bar">
+        <line x1="48" y1="572" x2="124" y2="572" />
+        <line x1="48" y1="564" x2="48" y2="580" />
+        <line x1="124" y1="564" x2="124" y2="580" />
+        <text x="86" y="558" text-anchor="middle">≈ 20 km</text>
+      </g>
+
+    </g>
+  </g>
+
+  <g transform="translate(0,0)">
+    <g class="map-view" data-view="Annecy" style="display:none">
+      <rect width="1040" height="620" class="atlas-water"/>
+      <rect width="1040" height="620" fill="url(#atlas-grid)"/>
+      <rect x="28" y="28" width="984" height="564" class="atlas-frame-inner"/>
+      <text x="48" y="56" class="map-title">Annecy detail view</text>
+      <text x="992" y="56" class="north" text-anchor="end">N ↑</text>
+      <polyline class="route" points="968,96 952,392 72,528" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      <text class="distance-label" x="960" y="234" text-anchor="middle">34 km</text><text class="distance-label" x="512" y="450" text-anchor="middle">102 km</text>
+      <text class="city-label" x="968" y="64" text-anchor="middle">Geneva · CH</text><text class="city-label" x="952" y="360" text-anchor="middle">Annecy · FR</text><text class="city-label" x="72" y="496" text-anchor="middle">Lyon · FR</text>
+      <g class="marker-layer" data-view="Annecy">
+        
+            <g class="marker marker-landmark context" aria-label="日内瓦大喷泉">
+              <circle class="marker-halo" cx="968" cy="96" r="18"/>
+              <rect class="marker-box" x="953" y="81" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="968" y="101" text-anchor="middle">5</text>
+              <text class="poi-label" x="992" y="88">日内瓦大喷泉</text>
+              <text class="poi-day" x="992" y="106">Day 5 · Geneva</text>
+            </g>
+            
+            <g class="marker marker-experience" data-stop-index="5" tabindex="0" role="button" aria-label="安纳西老城">
+              <circle class="marker-halo" cx="952" cy="392" r="18"/>
+              <rect class="marker-box" x="937" y="377" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="952" y="397" text-anchor="middle">6</text>
+              <text class="poi-label" x="976" y="384">安纳西老城</text>
+              <text class="poi-day" x="976" y="402">Day 6 · Annecy</text>
+            </g>
+            
+            <g class="marker marker-landmark context" aria-label="里昂老城">
+              <circle class="marker-halo" cx="72" cy="528" r="18"/>
+              <rect class="marker-box" x="57" y="513" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="72" y="533" text-anchor="middle">7</text>
+              <text class="poi-label" x="96" y="520">里昂老城</text>
+              <text class="poi-day" x="96" y="538">Day 7 · Lyon</text>
+            </g>
+            
+      </g>
+      
+      <g class="scale-bar">
+        <line x1="48" y1="572" x2="173" y2="572" />
+        <line x1="48" y1="564" x2="48" y2="580" />
+        <line x1="173" y1="564" x2="173" y2="580" />
+        <text x="110" y="558" text-anchor="middle">≈ 10 km</text>
+      </g>
+
+    </g>
+  </g>
+
+  <g transform="translate(0,0)">
+    <g class="map-view" data-view="Como" style="display:none">
+      <rect width="1040" height="620" class="atlas-water"/>
+      <rect width="1040" height="620" fill="url(#atlas-grid)"/>
+      <rect x="28" y="28" width="984" height="564" class="atlas-frame-inner"/>
+      <text x="48" y="56" class="map-title">Como detail view</text>
+      <text x="992" y="56" class="north" text-anchor="end">N ↑</text>
+      <polyline class="route" points="608,544 616,392 424,72" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      <text class="distance-label" x="612" y="458" text-anchor="middle">58 km</text><text class="distance-label" x="520" y="222" text-anchor="middle">139 km</text>
+      <text class="city-label" x="608" y="512" text-anchor="middle">Milan · IT</text><text class="city-label" x="616" y="360" text-anchor="middle">Como · IT</text><text class="city-label" x="424" y="40" text-anchor="middle">Lucerne · CH</text>
+      <g class="marker-layer" data-view="Como">
+        
+            <g class="marker marker-landmark context" aria-label="米兰大教堂">
+              <circle class="marker-halo" cx="608" cy="544" r="18"/>
+              <rect class="marker-box" x="593" y="529" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="608" y="549" text-anchor="middle">1</text>
+              <text class="poi-label" x="632" y="536">米兰大教堂</text>
+              <text class="poi-day" x="632" y="554">Day 1 · Milan</text>
+            </g>
+            
+            <g class="marker marker-nature" data-stop-index="1" tabindex="0" role="button" aria-label="科莫湖">
+              <circle class="marker-halo" cx="616" cy="392" r="18"/>
+              <rect class="marker-box" x="601" y="377" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="616" y="397" text-anchor="middle">2</text>
+              <text class="poi-label" x="640" y="384">科莫湖</text>
+              <text class="poi-day" x="640" y="402">Day 2 · Como</text>
+            </g>
+            
+            <g class="marker marker-landmark context" aria-label="卡佩尔廊桥">
+              <circle class="marker-halo" cx="424" cy="72" r="18"/>
+              <rect class="marker-box" x="409" y="57" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="424" y="77" text-anchor="middle">3</text>
+              <text class="poi-label" x="448" y="64">卡佩尔廊桥</text>
+              <text class="poi-day" x="448" y="82">Day 3 · Lucerne</text>
+            </g>
+            
+      </g>
+      
+      <g class="scale-bar">
+        <line x1="48" y1="572" x2="126" y2="572" />
+        <line x1="48" y1="564" x2="48" y2="580" />
+        <line x1="126" y1="564" x2="126" y2="580" />
+        <text x="87" y="558" text-anchor="middle">≈ 20 km</text>
+      </g>
+
+    </g>
+  </g>
+
+  <g transform="translate(0,0)">
+    <g class="map-view" data-view="Geneva" style="display:none">
+      <rect width="1040" height="620" class="atlas-water"/>
+      <rect width="1040" height="620" fill="url(#atlas-grid)"/>
+      <rect x="28" y="28" width="984" height="564" class="atlas-frame-inner"/>
+      <text x="48" y="56" class="map-title">Geneva detail view</text>
+      <text x="992" y="56" class="north" text-anchor="end">N ↑</text>
+      <polyline class="route" points="872,72 176,368 168,544" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      <text class="distance-label" x="524" y="210" text-anchor="middle">141 km</text><text class="distance-label" x="172" y="446" text-anchor="middle">34 km</text>
+      <text class="city-label" x="872" y="40" text-anchor="middle">Interlaken · CH</text><text class="city-label" x="176" y="336" text-anchor="middle">Geneva · CH</text><text class="city-label" x="168" y="512" text-anchor="middle">Annecy · FR</text>
+      <g class="marker-layer" data-view="Geneva">
+        
+            <g class="marker marker-viewpoint context" aria-label="哈德昆观景台">
+              <circle class="marker-halo" cx="872" cy="72" r="18"/>
+              <rect class="marker-box" x="857" y="57" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="872" y="77" text-anchor="middle">4</text>
+              <text class="poi-label" x="896" y="64">哈德昆观景台</text>
+              <text class="poi-day" x="896" y="82">Day 4 · Interlaken</text>
+            </g>
+            
+            <g class="marker marker-landmark" data-stop-index="4" tabindex="0" role="button" aria-label="日内瓦大喷泉">
+              <circle class="marker-halo" cx="176" cy="368" r="18"/>
+              <rect class="marker-box" x="161" y="353" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="176" y="373" text-anchor="middle">5</text>
+              <text class="poi-label" x="200" y="360">日内瓦大喷泉</text>
+              <text class="poi-day" x="200" y="378">Day 5 · Geneva</text>
+            </g>
+            
+            <g class="marker marker-experience context" aria-label="安纳西老城">
+              <circle class="marker-halo" cx="168" cy="544" r="18"/>
+              <rect class="marker-box" x="153" y="529" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="168" y="549" text-anchor="middle">6</text>
+              <text class="poi-label" x="192" y="536">安纳西老城</text>
+              <text class="poi-day" x="192" y="554">Day 6 · Annecy</text>
+            </g>
+            
+      </g>
+      
+      <g class="scale-bar">
+        <line x1="48" y1="572" x2="203" y2="572" />
+        <line x1="48" y1="564" x2="48" y2="580" />
+        <line x1="203" y1="564" x2="203" y2="580" />
+        <text x="126" y="558" text-anchor="middle">≈ 20 km</text>
+      </g>
+
+    </g>
+  </g>
+
+  <g transform="translate(0,0)">
+    <g class="map-view" data-view="Interlaken" style="display:none">
+      <rect width="1040" height="620" class="atlas-water"/>
+      <rect width="1040" height="620" fill="url(#atlas-grid)"/>
+      <rect x="28" y="28" width="984" height="564" class="atlas-frame-inner"/>
+      <text x="48" y="56" class="map-title">Interlaken detail view</text>
+      <text x="992" y="56" class="north" text-anchor="end">N ↑</text>
+      <polyline class="route" points="936,72 760,272 104,544" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      <text class="distance-label" x="848" y="162" text-anchor="middle">52 km</text><text class="distance-label" x="432" y="398" text-anchor="middle">141 km</text>
+      <text class="city-label" x="936" y="40" text-anchor="middle">Lucerne · CH</text><text class="city-label" x="760" y="240" text-anchor="middle">Interlaken · CH</text><text class="city-label" x="104" y="512" text-anchor="middle">Geneva · CH</text>
+      <g class="marker-layer" data-view="Interlaken">
+        
+            <g class="marker marker-landmark context" aria-label="卡佩尔廊桥">
+              <circle class="marker-halo" cx="936" cy="72" r="18"/>
+              <rect class="marker-box" x="921" y="57" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="936" y="77" text-anchor="middle">3</text>
+              <text class="poi-label" x="960" y="64">卡佩尔廊桥</text>
+              <text class="poi-day" x="960" y="82">Day 3 · Lucerne</text>
+            </g>
+            
+            <g class="marker marker-viewpoint" data-stop-index="3" tabindex="0" role="button" aria-label="哈德昆观景台">
+              <circle class="marker-halo" cx="760" cy="272" r="18"/>
+              <rect class="marker-box" x="745" y="257" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="760" y="277" text-anchor="middle">4</text>
+              <text class="poi-label" x="784" y="264">哈德昆观景台</text>
+              <text class="poi-day" x="784" y="282">Day 4 · Interlaken</text>
+            </g>
+            
+            <g class="marker marker-landmark context" aria-label="日内瓦大喷泉">
+              <circle class="marker-halo" cx="104" cy="544" r="18"/>
+              <rect class="marker-box" x="89" y="529" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="104" y="549" text-anchor="middle">5</text>
+              <text class="poi-label" x="128" y="536">日内瓦大喷泉</text>
+              <text class="poi-day" x="128" y="554">Day 5 · Geneva</text>
+            </g>
+            
+      </g>
+      
+      <g class="scale-bar">
+        <line x1="48" y1="572" x2="196" y2="572" />
+        <line x1="48" y1="564" x2="48" y2="580" />
+        <line x1="196" y1="564" x2="196" y2="580" />
+        <text x="122" y="558" text-anchor="middle">≈ 20 km</text>
+      </g>
+
+    </g>
+  </g>
+
+  <g transform="translate(0,0)">
+    <g class="map-view" data-view="Lucerne" style="display:none">
+      <rect width="1040" height="620" class="atlas-water"/>
+      <rect width="1040" height="620" fill="url(#atlas-grid)"/>
+      <rect x="28" y="28" width="984" height="564" class="atlas-frame-inner"/>
+      <text x="48" y="56" class="map-title">Lucerne detail view</text>
+      <text x="992" y="56" class="north" text-anchor="end">N ↑</text>
+      <polyline class="route" points="736,544 448,72 304,232" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      <text class="distance-label" x="592" y="298" text-anchor="middle">139 km</text><text class="distance-label" x="376" y="142" text-anchor="middle">52 km</text>
+      <text class="city-label" x="736" y="512" text-anchor="middle">Como · IT</text><text class="city-label" x="448" y="40" text-anchor="middle">Lucerne · CH</text><text class="city-label" x="304" y="200" text-anchor="middle">Interlaken · CH</text>
+      <g class="marker-layer" data-view="Lucerne">
+        
+            <g class="marker marker-nature context" aria-label="科莫湖">
+              <circle class="marker-halo" cx="736" cy="544" r="18"/>
+              <rect class="marker-box" x="721" y="529" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="736" y="549" text-anchor="middle">2</text>
+              <text class="poi-label" x="760" y="536">科莫湖</text>
+              <text class="poi-day" x="760" y="554">Day 2 · Como</text>
+            </g>
+            
+            <g class="marker marker-landmark" data-stop-index="2" tabindex="0" role="button" aria-label="卡佩尔廊桥">
+              <circle class="marker-halo" cx="448" cy="72" r="18"/>
+              <rect class="marker-box" x="433" y="57" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="448" y="77" text-anchor="middle">3</text>
+              <text class="poi-label" x="472" y="64">卡佩尔廊桥</text>
+              <text class="poi-day" x="472" y="82">Day 3 · Lucerne</text>
+            </g>
+            
+            <g class="marker marker-viewpoint context" aria-label="哈德昆观景台">
+              <circle class="marker-halo" cx="304" cy="232" r="18"/>
+              <rect class="marker-box" x="289" y="217" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="304" y="237" text-anchor="middle">4</text>
+              <text class="poi-label" x="328" y="224">哈德昆观景台</text>
+              <text class="poi-day" x="328" y="242">Day 4 · Interlaken</text>
+            </g>
+            
+      </g>
+      
+      <g class="scale-bar">
+        <line x1="48" y1="572" x2="165" y2="572" />
+        <line x1="48" y1="564" x2="48" y2="580" />
+        <line x1="165" y1="564" x2="165" y2="580" />
+        <text x="106" y="558" text-anchor="middle">≈ 20 km</text>
+      </g>
+
+    </g>
+  </g>
+
+  <g transform="translate(0,0)">
+    <g class="map-view" data-view="Lyon" style="display:none">
+      <rect width="1040" height="620" class="atlas-water"/>
+      <rect width="1040" height="620" fill="url(#atlas-grid)"/>
+      <rect x="28" y="28" width="984" height="564" class="atlas-frame-inner"/>
+      <text x="48" y="56" class="map-title">Lyon detail view</text>
+      <text x="992" y="56" class="north" text-anchor="end">N ↑</text>
+      <polyline class="route" points="344,248 72,288 968,376" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      <text class="distance-label" x="208" y="258" text-anchor="middle">102 km</text><text class="distance-label" x="520" y="322" text-anchor="middle">340 km</text>
+      <text class="city-label" x="344" y="216" text-anchor="middle">Annecy · FR</text><text class="city-label" x="72" y="256" text-anchor="middle">Lyon · FR</text><text class="city-label" x="968" y="344" text-anchor="middle">Milan · IT</text>
+      <g class="marker-layer" data-view="Lyon">
+        
+            <g class="marker marker-experience context" aria-label="安纳西老城">
+              <circle class="marker-halo" cx="344" cy="248" r="18"/>
+              <rect class="marker-box" x="329" y="233" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="344" y="253" text-anchor="middle">6</text>
+              <text class="poi-label" x="368" y="240">安纳西老城</text>
+              <text class="poi-day" x="368" y="258">Day 6 · Annecy</text>
+            </g>
+            
+            <g class="marker marker-landmark" data-stop-index="6" tabindex="0" role="button" aria-label="里昂老城">
+              <circle class="marker-halo" cx="72" cy="288" r="18"/>
+              <rect class="marker-box" x="57" y="273" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="72" y="293" text-anchor="middle">7</text>
+              <text class="poi-label" x="96" y="280">里昂老城</text>
+              <text class="poi-day" x="96" y="298">Day 7 · Lyon</text>
+            </g>
+            
+            <g class="marker marker-museum context" aria-label="斯福尔扎城堡">
+              <circle class="marker-halo" cx="968" cy="376" r="18"/>
+              <rect class="marker-box" x="953" y="361" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="968" y="381" text-anchor="middle">8</text>
+              <text class="poi-label" x="992" y="368">斯福尔扎城堡</text>
+              <text class="poi-day" x="992" y="386">Day 8 · Milan</text>
+            </g>
+            
+      </g>
+      
+      <g class="scale-bar">
+        <line x1="48" y1="572" x2="124" y2="572" />
+        <line x1="48" y1="564" x2="48" y2="580" />
+        <line x1="124" y1="564" x2="124" y2="580" />
+        <text x="86" y="558" text-anchor="middle">≈ 20 km</text>
+      </g>
+
+    </g>
+  </g>
+
+  <g transform="translate(0,0)">
+    <g class="map-view" data-view="Milan" style="display:none">
+      <rect width="1040" height="620" class="atlas-water"/>
+      <rect width="1040" height="620" fill="url(#atlas-grid)"/>
+      <rect x="28" y="28" width="984" height="564" class="atlas-frame-inner"/>
+      <text x="48" y="56" class="map-title">Milan detail view</text>
+      <text x="992" y="56" class="north" text-anchor="end">N ↑</text>
+      <polyline class="route" points="336,112 280,72" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      <text class="distance-label" x="308" y="82" text-anchor="middle">1 km</text>
+      <text class="city-label" x="308" y="40" text-anchor="middle">Milan · IT</text>
+      <g class="marker-layer" data-view="Milan">
+        
+            <g class="marker marker-landmark" data-stop-index="0" tabindex="0" role="button" aria-label="米兰大教堂">
+              <circle class="marker-halo" cx="336" cy="112" r="18"/>
+              <rect class="marker-box" x="321" y="97" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="336" y="117" text-anchor="middle">1</text>
+              <text class="poi-label" x="360" y="104">米兰大教堂</text>
+              <text class="poi-day" x="360" y="122">Day 1 · Milan</text>
+            </g>
+            
+            <g class="marker marker-museum" data-stop-index="7" tabindex="0" role="button" aria-label="斯福尔扎城堡">
+              <circle class="marker-halo" cx="280" cy="72" r="18"/>
+              <rect class="marker-box" x="265" y="57" width="30" height="30" rx="2"/>
+              <text class="marker-num" x="280" y="77" text-anchor="middle">8</text>
+              <text class="poi-label" x="304" y="64">斯福尔扎城堡</text>
+              <text class="poi-day" x="304" y="82">Day 8 · Milan</text>
+            </g>
+            
+      </g>
+      
+      <g class="scale-bar">
+        <line x1="48" y1="572" x2="124" y2="572" />
+        <line x1="48" y1="564" x2="48" y2="580" />
+        <line x1="124" y1="564" x2="124" y2="580" />
+        <text x="86" y="558" text-anchor="middle">≈ 1 km</text>
+      </g>
+
+    </g>
+  </g>
+
         </svg>
 
         <div class="stats-bar">
           <div class="stat-item"><span>天数</span><strong>8</strong></div>
 <div class="stat-item"><span>城市</span><strong>7</strong></div>
 <div class="stat-item"><span>地点</span><strong>8</strong></div>
-<div class="stat-item"><span>路线</span><strong>867 km</strong></div>
+<div class="stat-item"><span>直线路线</span><strong>867 km</strong></div>
 <div class="stat-item"><span>预算</span><strong>¥30,000</strong></div>
         </div>
       </section>
 
       <aside class="side-panel">
         <section class="panel-section">
-          <h2>日程</h2>
+          <h2>完整行程</h2>
           <div id="itinerary-list" class="itinerary-list">
             <div class="day-block"><h3>Day 1 <span>2024-07-01</span></h3>
 <p class="day-summary">米兰抵达与城市地标</p>
@@ -337,7 +727,7 @@
                   <span class="schedule-index">1</span>
                   <span>
                     <strong>米兰大教堂</strong>
-                    <small>Milan · 120 min</small>
+                    <small>Milan · Day 1 · 120 min</small>
                   </span>
                 </button>
                 
@@ -349,7 +739,7 @@
                   <span class="schedule-index">2</span>
                   <span>
                     <strong>科莫湖</strong>
-                    <small>Como · 180 min</small>
+                    <small>Como · Day 2 · 180 min</small>
                   </span>
                 </button>
                 
@@ -361,7 +751,7 @@
                   <span class="schedule-index">3</span>
                   <span>
                     <strong>卡佩尔廊桥</strong>
-                    <small>Lucerne · 90 min</small>
+                    <small>Lucerne · Day 3 · 90 min</small>
                   </span>
                 </button>
                 
@@ -373,7 +763,7 @@
                   <span class="schedule-index">4</span>
                   <span>
                     <strong>哈德昆观景台</strong>
-                    <small>Interlaken · 150 min</small>
+                    <small>Interlaken · Day 4 · 150 min</small>
                   </span>
                 </button>
                 
@@ -385,7 +775,7 @@
                   <span class="schedule-index">5</span>
                   <span>
                     <strong>日内瓦大喷泉</strong>
-                    <small>Geneva · 80 min</small>
+                    <small>Geneva · Day 5 · 80 min</small>
                   </span>
                 </button>
                 
@@ -397,7 +787,7 @@
                   <span class="schedule-index">6</span>
                   <span>
                     <strong>安纳西老城</strong>
-                    <small>Annecy · 180 min</small>
+                    <small>Annecy · Day 6 · 180 min</small>
                   </span>
                 </button>
                 
@@ -409,7 +799,7 @@
                   <span class="schedule-index">7</span>
                   <span>
                     <strong>里昂老城</strong>
-                    <small>Lyon · 150 min</small>
+                    <small>Lyon · Day 7 · 150 min</small>
                   </span>
                 </button>
                 
@@ -421,7 +811,7 @@
                   <span class="schedule-index">8</span>
                   <span>
                     <strong>斯福尔扎城堡</strong>
-                    <small>Milan · 120 min</small>
+                    <small>Milan · Day 8 · 120 min</small>
                   </span>
                 </button>
                 
@@ -448,11 +838,9 @@
     })));
     const card = document.getElementById("poi-card");
     const viewLabel = document.getElementById("view-label");
-    const markers = Array.from(document.querySelectorAll(".marker"));
+    const mapViews = Array.from(document.querySelectorAll(".map-view"));
     const scheduleItems = Array.from(document.querySelectorAll(".schedule-item"));
     const cityButtons = Array.from(document.querySelectorAll(".city-pill"));
-    const overviewRoute = document.getElementById("route-overview");
-    const cityRoutes = Array.from(document.querySelectorAll(".city-route"));
 
     function esc(value) {
       return String(value ?? "").replace(/[&<>"']/g, ch => ({
@@ -462,6 +850,10 @@
         '"': "&quot;",
         "'": "&#39;"
       }[ch]));
+    }
+
+    function markers() {
+      return Array.from(document.querySelectorAll(".marker[data-stop-index]"));
     }
 
     function mapsUrl(stop) {
@@ -476,12 +868,12 @@
 
     function showCard(index) {
       const stop = stops[index];
-      markers.forEach(marker => marker.classList.toggle("active", Number(marker.dataset.stopIndex) === index));
+      markers().forEach(marker => marker.classList.toggle("active", Number(marker.dataset.stopIndex) === index));
       scheduleItems.forEach(item => item.classList.toggle("active", Number(item.dataset.stopIndex) === index));
       const missing = stop.info_missing ? "信息暂缺，建议实地查证。" : esc(stop.description || "暂无补充描述。");
       const source = stop.info_missing ? "信息暂缺" : esc(stop.source);
       card.innerHTML = `
-        <p class="poi-meta">Day ${esc(stop.day)} · ${esc(stop.city)} · ${esc(stop.category)} · ${esc(stop.duration_min)} min</p>
+        <p class="poi-meta">Day ${esc(stop.day)} · ${esc(stop.city)} · ${esc(stop.category)} · ${esc(stop.duration_min)} min · ${esc(stop.lat)}, ${esc(stop.lon)}</p>
         <h3>${esc(stop.name)}</h3>
         <p>${missing}</p>
         <p><strong>备注：</strong>${esc(stop.notes)}</p>
@@ -490,45 +882,52 @@
           ${linkHtml(stop.official_url, "官网")}
           ${linkHtml(mapsUrl(stop), "导航")}
         </div>
-        <div class="source-note">来源：${source}。营业时间、票价和预约信息请以官网为准；本地图用于旅行展示，不作为精准导航。</div>
+        <div class="source-note">来源：${source}。地图方位与距离由 POI 经纬度计算；营业时间、票价和预约信息请以官网为准。</div>
       `;
     }
 
-    function showCity(city) {
-      const isOverview = !city;
-      viewLabel.textContent = isOverview ? "总览地图" : `${city} 子地图`;
-      cityButtons.forEach(button => button.classList.toggle("active", button.dataset.city === city));
-      markers.forEach(marker => marker.classList.toggle("hidden", !isOverview && marker.dataset.city !== city));
-      scheduleItems.forEach(item => item.classList.toggle("hidden", !isOverview && item.dataset.city !== city));
-      overviewRoute.style.display = isOverview ? "block" : "none";
-      cityRoutes.forEach(route => {
-        route.style.display = !isOverview && route.dataset.city === city ? "block" : "none";
+    function bindMarkers() {
+      markers().forEach(marker => {
+        if (marker.dataset.bound === "true") return;
+        marker.dataset.bound = "true";
+        marker.addEventListener("click", () => showCard(Number(marker.dataset.stopIndex)));
+        marker.addEventListener("keydown", event => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            showCard(Number(marker.dataset.stopIndex));
+          }
+        });
       });
-      if (!isOverview) {
-        const first = scheduleItems.find(item => item.dataset.city === city);
-        if (first) showCard(Number(first.dataset.stopIndex));
-      }
     }
 
-    markers.forEach(marker => {
-      marker.addEventListener("click", () => showCard(Number(marker.dataset.stopIndex)));
-      marker.addEventListener("keydown", event => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          showCard(Number(marker.dataset.stopIndex));
-        }
+    function showView(view) {
+      const isOverview = view === "overview";
+      mapViews.forEach(group => {
+        group.style.display = group.dataset.view === view ? "block" : "none";
       });
-    });
+      viewLabel.textContent = isOverview ? "总览地图" : `${view} detail view`;
+      cityButtons.forEach(button => button.classList.toggle("active", button.dataset.view === view));
+      scheduleItems.forEach(item => {
+        item.classList.toggle("focus-city", !isOverview);
+        item.classList.toggle("in-city", !isOverview && item.dataset.city === view);
+      });
+      if (!isOverview) {
+        const first = scheduleItems.find(item => item.dataset.city === view);
+        if (first) showCard(Number(first.dataset.stopIndex));
+      }
+      bindMarkers();
+    }
+
     scheduleItems.forEach(item => {
       item.addEventListener("click", () => {
-        showCity(item.dataset.city);
+        showView(item.dataset.city);
         showCard(Number(item.dataset.stopIndex));
       });
     });
     cityButtons.forEach(button => {
-      button.addEventListener("click", () => showCity(button.dataset.city));
+      button.addEventListener("click", () => showView(button.dataset.view));
     });
-    document.getElementById("overview-button").addEventListener("click", () => showCity(""));
+    document.getElementById("overview-button").addEventListener("click", () => showView("overview"));
     document.getElementById("download-html").addEventListener("click", () => {
       const html = "<!doctype html>\n" + document.documentElement.outerHTML;
       const blob = new Blob([html], { type: "text/html;charset=utf-8" });
@@ -540,6 +939,7 @@
       URL.revokeObjectURL(a.href);
       a.remove();
     });
+    bindMarkers();
     if (stops.length) showCard(0);
 
   </script>

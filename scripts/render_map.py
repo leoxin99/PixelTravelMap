@@ -9,13 +9,14 @@ sys.path.insert(0, str(ROOT))
 
 from pixel_travel_map.parser import load_trip_from_json
 from pixel_travel_map.quality import validate_trip
-from pixel_travel_map.renderer import write_trip_html
+from pixel_travel_map.renderer import write_trip_html, write_trip_poster_svg
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Render itinerary JSON to self-contained HTML.")
     parser.add_argument("--input", type=Path, required=True, help="Itinerary JSON path.")
     parser.add_argument("--output", type=Path, required=True, help="Output HTML path.")
+    parser.add_argument("--poster-svg", type=Path, help="Optional path to save one-page SVG poster.")
     args = parser.parse_args()
 
     trip = load_trip_from_json(args.input)
@@ -28,6 +29,9 @@ def main() -> int:
 
     write_trip_html(trip, args.output)
     print(f"Wrote {args.output}")
+    if args.poster_svg:
+        write_trip_poster_svg(trip, args.poster_svg)
+        print(f"Wrote {args.poster_svg}")
     return 0
 
 

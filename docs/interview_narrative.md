@@ -4,15 +4,16 @@
 
 PixelTravelMap is a portfolio MVP for an AI travel artifact generator. The user
 describes a trip in natural language, the system turns it into structured
-itinerary JSON, validates the schema, and renders a self-contained offline HTML
-pixel map with clickable POIs, itinerary panels, source notes, and artifact
+itinerary JSON, validates the schema, and renders offline artifacts: an
+interactive HTML atlas plus a one-page SVG poster with coordinate-projected
+POIs, route distance labels, itinerary panels, source notes, and artifact
 quality checks.
 
 ## Why Start With an HTML Artifact
 
 I intentionally did not start with a full SaaS. The risky assumption is whether
 the output itself is valuable: can a user get a beautiful, shareable, offline
-travel artifact from one description? A single HTML file validates that core
+travel artifact from one description? HTML and SVG files validate that core
 loop quickly without accounts, databases, deployment, billing, or map-provider
 licensing.
 
@@ -45,9 +46,10 @@ The MVP can be evaluated without subjective vibes:
 - JSON validity rate.
 - Required-field completion rate.
 - POI source coverage.
-- Artifact open rate.
+- Artifact open rate for HTML and SVG.
 - Offline compliance: no external scripts/styles/fetch.
-- Interaction success: marker click, itinerary click, city filter, download.
+- Interaction success: marker click, itinerary click, city detail view, download.
+- Map readability: POI labels, relative direction, scale bar, and segment distance labels are legible.
 - Human review: does the itinerary map communicate the trip clearly?
 
 ## Product Tradeoffs
@@ -56,7 +58,7 @@ Chose:
 
 - local CLI before web app;
 - static/demo POI before live APIs;
-- offline SVG artifact before precise navigation;
+- offline coordinate-projected SVG/HTML artifacts before precise navigation;
 - validation and quality checks before extra themes.
 
 Deferred:
@@ -72,9 +74,9 @@ Deferred:
 English:
 
 Built a local PixelTravelMap MVP that converts natural-language trip plans into
-validated itinerary JSON and renders a self-contained interactive pixel-map HTML
-artifact with clickable POIs, citations, itinerary panels, and artifact quality checks.
+validated itinerary JSON and renders offline HTML atlas and SVG poster artifacts
+with coordinate-projected POIs, route distances, citations, itinerary panels, and artifact quality checks.
 
 Chinese:
 
-完成 PixelTravelMap 本地 MVP，将自然语言旅行描述转化为可校验 itinerary JSON，并生成离线可用的自包含像素风交互地图 HTML，支持可点击 POI、来源标注、日程面板和 artifact 质量检查。
+完成 PixelTravelMap 本地 MVP，将自然语言旅行描述转化为可校验 itinerary JSON，并生成离线可用的 HTML atlas 和一页式 SVG 海报，支持坐标投影 POI、路线距离、来源标注、日程面板和 artifact 质量检查。

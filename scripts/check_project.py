@@ -8,7 +8,8 @@ sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from pixel_travel_map.quality import check_artifact, load_json, validate_trip
+from pixel_travel_map.parser import ParseNeedInput, parse_travel_text
+from pixel_travel_map.quality import check_artifact, check_svg_artifact, load_json, validate_trip
 
 
 PYTHON_FILES = [
@@ -29,10 +30,20 @@ FIXTURES = [
     ROOT / "examples" / "expected" / "beijing_family_trip.json",
 ]
 
+COORDINATE_INPUTS = [
+    ROOT / "examples" / "inputs" / "tokyo_coordinate_trip.txt",
+]
+
 ARTIFACTS = [
     ROOT / "dist" / "italy_france_switzerland_demo.html",
     ROOT / "dist" / "japan_kansai_demo.html",
     ROOT / "dist" / "beijing_family_demo.html",
+]
+
+POSTERS = [
+    ROOT / "dist" / "italy_france_switzerland_demo_poster.svg",
+    ROOT / "dist" / "japan_kansai_demo_poster.svg",
+    ROOT / "dist" / "beijing_family_demo_poster.svg",
 ]
 
 
@@ -51,8 +62,23 @@ def main() -> int:
         for error in validate_trip(load_json(path)):
             failures.append(f"{path.relative_to(ROOT)}: {error}")
 
+    for path in COORDINATE_INPUTS:
+        try:
+            trip = parse_travel_text(path.read_text(encoding="utf-8"))
+        except ParseNeedInput as exc:
+            failures.append(f"{path.relative_to(ROOT)}: {exc.message}")
+            for question in exc.questions:
+                failures.append(f"{path.relative_to(ROOT)}: {question}")
+            continue
+        for error in validate_trip(trip):
+            failures.append(f"{path.relative_to(ROOT)}: {error}")
+
     for path in ARTIFACTS:
         for error in check_artifact(path):
+            failures.append(f"{path.relative_to(ROOT)}: {error}")
+
+    for path in POSTERS:
+        for error in check_svg_artifact(path):
             failures.append(f"{path.relative_to(ROOT)}: {error}")
 
     if failures:

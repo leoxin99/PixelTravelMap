@@ -1,0 +1,14 @@
+标题：日本东京 3 日亲子游
+日期：2026-07-01 到 2026-07-03
+交通：public-transit
+
+Day 1：东京塔和城市观景
+- 东京塔 (lat:35.6586, lon:139.7454, city:Tokyo, country:JP, category:landmark, duration:90)
+- 六本木之丘 (lat:35.6605, lon:139.7292, city:Tokyo, country:JP, category:viewpoint, duration:120)
+
+Day 2：浅草与上野
+- 浅草寺 (lat:35.7148, lon:139.7967, city:Tokyo, country:JP, category:landmark, duration:120)
+- 上野公园 (lat:35.7156, lon:139.7745, city:Tokyo, country:JP, category:nature, duration:150)
+
+Day 3：台场收尾
+- 台场海滨公园 (lat:35.6290, lon:139.7765, city:Tokyo, country:JP, category:experience, duration:150)
