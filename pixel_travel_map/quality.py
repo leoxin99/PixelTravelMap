@@ -202,6 +202,12 @@ def check_artifact(html_path: Path, max_bytes: int = 2_000_000) -> list[str]:
         'id="itinerary-list"',
         'id="poi-card"',
         'id="download-html"',
+        'id="download-overview-poster"',
+        'id="download-day-poster"',
+        'id="download-record-poster"',
+        'id="trip-note"',
+        'id="day-note"',
+        'id="stop-note"',
         'name="viewport"',
         "data-stop-index",
     ]

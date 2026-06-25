@@ -47,6 +47,15 @@ The generated HTML includes inline CSS, inline JavaScript, inline SVG, and the
 trip JSON payload. The poster SVG is a single image file. Both are designed to
 open directly from disk and work without network access.
 
+The HTML demo also includes an in-browser Poster tool. It can download:
+
+- overall trip poster for pre-trip orientation;
+- daily briefing poster for sharing the next day's plan;
+- travel record poster that uses notes written during the trip.
+
+Notes are saved only in the current browser with `localStorage`; they do not
+change the itinerary JSON and do not leave the device.
+
 ## Quickstart
 
 Requirements:
@@ -178,7 +187,8 @@ Built in phase 1:
 - Heuristic parser for three curated demo prompts
 - Stable itinerary JSON schema and dependency-free validator
 - Offline HTML atlas with coordinate-projected route, POI labels, city detail
-  views, scale bar, segment distances, itinerary panel, citations, and download button
+  views, scale bar, segment distances, itinerary panel, citations, browser-side
+  poster downloads, and local trip notes
 - One-page SVG poster containing the map and full itinerary
 - Artifact quality checks for offline HTML and SVG constraints
 

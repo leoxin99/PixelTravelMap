@@ -67,6 +67,8 @@
     }
     .icon-button { width: 42px; height: 38px; font-size: 20px; }
     .text-button { min-height: 38px; padding: 0 14px; font-weight: 700; }
+    .text-button.compact { width: 100%; min-height: 34px; padding: 0 10px; font-size: 12px; }
+    .text-button.danger { background: #fff0f0; }
     .workspace {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 380px;
@@ -227,6 +229,36 @@
       font-size: 12px;
     }
     .empty-state { color: var(--muted); }
+    .poster-tools { display: grid; gap: 14px; }
+    .poster-controls,
+    .notes-editor { display: grid; gap: 8px; }
+    .inline-controls {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 150px;
+      gap: 8px;
+      align-items: center;
+    }
+    .field-label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    select,
+    textarea {
+      width: 100%;
+      border: 2px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+    }
+    select { min-height: 34px; padding: 0 8px; }
+    textarea {
+      min-height: 72px;
+      padding: 8px;
+      resize: vertical;
+      line-height: 1.4;
+    }
     @media (max-width: 980px) {
       .app-shell { padding: 12px; }
       .topbar { align-items: flex-start; flex-direction: column; }
@@ -238,6 +270,7 @@
       .stat-item { border-bottom: 2px solid var(--line); }
       .map-toolbar { align-items: flex-start; flex-direction: column; }
       .city-pills { justify-content: flex-start; }
+      .inline-controls { grid-template-columns: 1fr; }
     }
     @media (max-width: 560px) {
       .toolbar { width: 100%; }
@@ -513,6 +546,31 @@
             <p class="empty-state">点击地图编号或日程项查看详情。</p>
           </article>
         </section>
+        <section class="panel-section poster-tools">
+          <h2>Poster 工具</h2>
+          <div class="poster-controls">
+            <button class="text-button compact" id="download-overview-poster" type="button">下载总行程 poster</button>
+            <label class="field-label" for="poster-day-select">每日简报</label>
+            <div class="inline-controls">
+              <select id="poster-day-select">
+                <option value="1">Day 1 · 2024-10-01</option>
+<option value="2">Day 2 · 2024-10-02</option>
+<option value="3">Day 3 · 2024-10-03</option>
+              </select>
+              <button class="text-button compact" id="download-day-poster" type="button">下载每日 poster</button>
+            </div>
+            <button class="text-button compact" id="download-record-poster" type="button">下载旅行记录 poster</button>
+          </div>
+          <div class="notes-editor">
+            <label class="field-label" for="trip-note">全程备注 / 结束总结</label>
+            <textarea id="trip-note" rows="3" placeholder="旅行前可写整体提醒；旅行后可写总结。"></textarea>
+            <label class="field-label" for="day-note">当前 Day 备注</label>
+            <textarea id="day-note" rows="3" placeholder="写给同行朋友的明日注意事项，或当天记录。"></textarea>
+            <label class="field-label" for="stop-note">当前地点备注</label>
+            <textarea id="stop-note" rows="3" placeholder="记录某个地点的临时变化、体验或提醒。"></textarea>
+            <button class="text-button compact danger" id="clear-notes" type="button">清空备注</button>
+          </div>
+        </section>
       </aside>
     </main>
   </div>
@@ -530,6 +588,13 @@
     const mapViews = Array.from(document.querySelectorAll(".map-view"));
     const scheduleItems = Array.from(document.querySelectorAll(".schedule-item"));
     const cityButtons = Array.from(document.querySelectorAll(".city-pill"));
+    const daySelect = document.getElementById("poster-day-select");
+    const tripNote = document.getElementById("trip-note");
+    const dayNote = document.getElementById("day-note");
+    const stopNote = document.getElementById("stop-note");
+    const storageKey = `PixelTravelMap:${trip.trip_title}:${trip.start_date}:${trip.end_date}`;
+    let currentStopIndex = 0;
+    let tripNotes = loadTripNotes();
 
     function esc(value) {
       return String(value ?? "").replace(/[&<>"']/g, ch => ({
@@ -541,8 +606,57 @@
       }[ch]));
     }
 
+    function text(value, fallback = "") {
+      return String(value ?? fallback).trim();
+    }
+
+    function trimText(value, limit) {
+      const raw = text(value);
+      return raw.length <= limit ? raw : `${raw.slice(0, limit - 1)}…`;
+    }
+
+    function fileSafe(value) {
+      return text(value, "pixel-travel-map").replace(/[\\/:*?"<>|]+/g, "-").replace(/\s+/g, "-");
+    }
+
     function markers() {
       return Array.from(document.querySelectorAll(".marker[data-stop-index]"));
+    }
+
+    function stopKey(stop) {
+      return stop.id || `${stop.day}-${stop.name}-${stop.city}`;
+    }
+
+    function loadTripNotes() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(storageKey) || "{}");
+        return {
+          trip: parsed.trip || "",
+          days: parsed.days || {},
+          stops: parsed.stops || {}
+        };
+      } catch {
+        return { trip: "", days: {}, stops: {} };
+      }
+    }
+
+    function saveTripNotes() {
+      localStorage.setItem(storageKey, JSON.stringify(tripNotes));
+    }
+
+    function selectedDayNumber() {
+      return Number(daySelect.value || trip.days[0].day);
+    }
+
+    function selectedDay() {
+      return trip.days.find(day => day.day === selectedDayNumber()) || trip.days[0];
+    }
+
+    function syncNoteFields() {
+      tripNote.value = tripNotes.trip || "";
+      dayNote.value = tripNotes.days[selectedDayNumber()] || "";
+      const stop = stops[currentStopIndex];
+      stopNote.value = stop ? (tripNotes.stops[stopKey(stop)] || "") : "";
     }
 
     function mapsUrl(stop) {
@@ -557,6 +671,8 @@
 
     function showCard(index) {
       const stop = stops[index];
+      currentStopIndex = index;
+      if (daySelect) daySelect.value = String(stop.day);
       markers().forEach(marker => marker.classList.toggle("active", Number(marker.dataset.stopIndex) === index));
       scheduleItems.forEach(item => item.classList.toggle("active", Number(item.dataset.stopIndex) === index));
       const missing = stop.info_missing ? "信息暂缺，建议实地查证。" : esc(stop.description || "暂无补充描述。");
@@ -573,6 +689,7 @@
         </div>
         <div class="source-note">来源：${source}。地图方位与距离由 POI 经纬度计算；营业时间、票价和预约信息请以官网为准。</div>
       `;
+      syncNoteFields();
     }
 
     function bindMarkers() {
@@ -628,8 +745,275 @@
       URL.revokeObjectURL(a.href);
       a.remove();
     });
+
+    tripNote.addEventListener("input", () => {
+      tripNotes.trip = tripNote.value;
+      saveTripNotes();
+    });
+    dayNote.addEventListener("input", () => {
+      tripNotes.days[selectedDayNumber()] = dayNote.value;
+      saveTripNotes();
+    });
+    stopNote.addEventListener("input", () => {
+      const stop = stops[currentStopIndex];
+      if (stop) {
+        tripNotes.stops[stopKey(stop)] = stopNote.value;
+        saveTripNotes();
+      }
+    });
+    daySelect.addEventListener("change", syncNoteFields);
+    document.getElementById("clear-notes").addEventListener("click", () => {
+      if (!confirm("清空当前浏览器保存的旅行备注？")) return;
+      tripNotes = { trip: "", days: {}, stops: {} };
+      localStorage.removeItem(storageKey);
+      syncNoteFields();
+    });
+    document.getElementById("download-overview-poster").addEventListener("click", () => {
+      downloadSvg(`${fileSafe(trip.trip_title)}-overview-poster.svg`, renderOverviewPosterSvg());
+    });
+    document.getElementById("download-day-poster").addEventListener("click", () => {
+      const day = selectedDay();
+      downloadSvg(`${fileSafe(trip.trip_title)}-day-${day.day}-briefing.svg`, renderDayPosterSvg(day.day));
+    });
+    document.getElementById("download-record-poster").addEventListener("click", () => {
+      downloadSvg(`${fileSafe(trip.trip_title)}-travel-record-poster.svg`, renderRecordPosterSvg());
+    });
+
+    function downloadSvg(filename, svgText) {
+      const blob = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(a.href);
+      a.remove();
+    }
+
+    function haversineKm(a, b) {
+      const radius = 6371;
+      const toRad = value => value * Math.PI / 180;
+      const lat1 = toRad(a.lat);
+      const lat2 = toRad(b.lat);
+      const dlat = lat2 - lat1;
+      const dlon = toRad(b.lon - a.lon);
+      const h = Math.sin(dlat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon / 2) ** 2;
+      return 2 * radius * Math.asin(Math.sqrt(h));
+    }
+
+    function totalKm(items) {
+      return Math.round(items.slice(1).reduce((sum, stop, index) => sum + haversineKm(items[index], stop), 0));
+    }
+
+    function niceScale(maxKm) {
+      if (maxKm <= 5) return 1;
+      let scale = 1;
+      [2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000].forEach(candidate => {
+        if (candidate <= maxKm) scale = candidate;
+      });
+      return scale;
+    }
+
+    function projectStops(items, width, height, padding = 70) {
+      const meanLat = items.reduce((sum, stop) => sum + stop.lat, 0) / Math.max(items.length, 1);
+      const cosLat = Math.max(Math.cos(meanLat * Math.PI / 180), 0.18);
+      const values = items.map(stop => ({ stop, x: stop.lon * cosLat, y: stop.lat }));
+      const xs = values.map(item => item.x);
+      const ys = values.map(item => item.y);
+      const minX = Math.min(...xs);
+      const maxX = Math.max(...xs);
+      const minY = Math.min(...ys);
+      const maxY = Math.max(...ys);
+      const xSpan = Math.max(maxX - minX, 0.08);
+      const ySpan = Math.max(maxY - minY, 0.08);
+      const drawW = width - padding * 2;
+      const drawH = height - padding * 2;
+      const fit = Math.min(drawW / xSpan, drawH / ySpan);
+      const usedW = xSpan * fit;
+      const usedH = ySpan * fit;
+      const left = (width - usedW) / 2;
+      const top = (height - usedH) / 2;
+      const points = {};
+      values.forEach(({ stop, x, y }, index) => {
+        let px = Math.round((left + (x - minX) * fit) / 8) * 8;
+        let py = Math.round((top + (maxY - y) * fit) / 8) * 8;
+        px = Math.min(Math.max(px, 44), width - 44);
+        py = Math.min(Math.max(py, 44), height - 44);
+        if (points[stopKey(stop)]) {
+          px += (index % 3 - 1) * 24;
+          py += 22;
+        }
+        points[stopKey(stop)] = [px, py];
+      });
+      const kmPerPx = xSpan * 111.32 * cosLat / Math.max(usedW, 1);
+      const scaleKm = niceScale(kmPerPx * Math.min(180, Math.max(90, drawW * 0.18)));
+      const scalePx = Math.max(56, Math.round(scaleKm / Math.max(kmPerPx, 0.001)));
+      return { points, scaleKm, scalePx: Math.min(scalePx, width - 160) };
+    }
+
+    function posterCss() {
+      return `
+        .bg{fill:#f6ecd9}.frame{fill:#fffaf0;stroke:#313d4c;stroke-width:4}
+        .kicker{fill:#7a3e9d;font:700 22px Courier New,monospace}.title{fill:#26313d;font:700 42px Courier New,monospace}
+        .meta,.small{fill:#697386;font:700 18px Courier New,monospace}.section{fill:#26313d;font:700 28px Courier New,monospace}
+        .map-bg{fill:#d9edf0}.map-frame{fill:rgba(255,255,255,.25);stroke:#313d4c;stroke-width:2}
+        .route{fill:none;stroke:#d64f3f;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:12 7}.arrow{fill:#d64f3f}
+        .label{paint-order:stroke;stroke:#fffaf0;stroke-width:5;fill:#26313d;font:700 15px Courier New,monospace}
+        .muted-label{paint-order:stroke;stroke:#fffaf0;stroke-width:4;fill:#697386;font:700 12px Courier New,monospace}
+        .city{paint-order:stroke;stroke:#fffaf0;stroke-width:6;fill:#7a3e9d;font:700 17px Courier New,monospace}
+        .distance{paint-order:stroke;stroke:#fffaf0;stroke-width:5;fill:#313d4c;font:700 13px Courier New,monospace}
+        .marker-box{fill:#1f7a8c;stroke:#313d4c;stroke-width:2}.marker-num{fill:#fffaf0;font:700 16px Courier New,monospace}
+        .row{fill:#fff;stroke:#313d4c;stroke-width:2}.row-title{fill:#26313d;font:700 18px Courier New,monospace}
+        .row-text{fill:#697386;font:700 15px Courier New,monospace}.note{fill:#fff7d6;stroke:#313d4c;stroke-width:2;stroke-dasharray:8 6}
+        .note-text{fill:#26313d;font:700 16px Courier New,monospace}.scale line{stroke:#313d4c;stroke-width:3}.scale text{fill:#313d4c;font:700 13px Courier New,monospace}
+      `;
+    }
+
+    function posterDefs() {
+      return `
+        <defs>
+          <pattern id="poster-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(49,61,76,0.12)" stroke-width="1"/>
+          </pattern>
+          <marker id="poster-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10z" class="arrow"/>
+          </marker>
+        </defs>
+      `;
+    }
+
+    function routeMapSvg(items, x, y, width, height, title) {
+      const mapStops = items.length ? items : stops.slice(0, 1);
+      const projection = projectStops(mapStops, width, height);
+      const routePoints = mapStops.map(stop => projection.points[stopKey(stop)].join(",")).join(" ");
+      const segments = mapStops.slice(1).map((stop, index) => {
+        const a = mapStops[index];
+        const p1 = projection.points[stopKey(a)];
+        const p2 = projection.points[stopKey(stop)];
+        const km = Math.max(1, Math.round(haversineKm(a, stop)));
+        return `<text class="distance" x="${(p1[0] + p2[0]) / 2}" y="${(p1[1] + p2[1]) / 2 - 10}" text-anchor="middle">${km} km</text>`;
+      }).join("");
+      const cities = [...new Set(mapStops.map(stop => `${stop.city} · ${stop.country}`))].map(cityLabel => {
+        const cityStops = mapStops.filter(stop => `${stop.city} · ${stop.country}` === cityLabel);
+        const pts = cityStops.map(stop => projection.points[stopKey(stop)]);
+        const cx = pts.reduce((sum, point) => sum + point[0], 0) / pts.length;
+        const cy = Math.max(Math.min(...pts.map(point => point[1])) - 30, 28);
+        return `<text class="city" x="${cx}" y="${cy}" text-anchor="middle">${esc(cityLabel)}</text>`;
+      }).join("");
+      const markersSvg = mapStops.map(stop => {
+        const point = projection.points[stopKey(stop)];
+        return `
+          <g>
+            <rect class="marker-box" x="${point[0] - 15}" y="${point[1] - 15}" width="30" height="30" rx="2"/>
+            <text class="marker-num" x="${point[0]}" y="${point[1] + 5}" text-anchor="middle">${stop.ordinal}</text>
+            <text class="label" x="${point[0] + 24}" y="${point[1] - 8}">${esc(trimText(stop.name, 14))}</text>
+            <text class="muted-label" x="${point[0] + 24}" y="${point[1] + 10}">Day ${stop.day} · ${esc(stop.city)}</text>
+          </g>`;
+      }).join("");
+      return `
+        <g transform="translate(${x},${y})">
+          <rect width="${width}" height="${height}" class="map-bg"/>
+          <rect width="${width}" height="${height}" fill="url(#poster-grid)"/>
+          <rect x="28" y="28" width="${width - 56}" height="${height - 56}" class="map-frame"/>
+          <text x="48" y="56" class="row-title">${esc(title)}</text>
+          <text x="${width - 48}" y="56" class="row-title" text-anchor="end">N ↑</text>
+          <polyline class="route" points="${routePoints}" marker-mid="url(#poster-arrow)" marker-end="url(#poster-arrow)"/>
+          ${segments}${cities}${markersSvg}
+          <g class="scale">
+            <line x1="48" y1="${height - 48}" x2="${48 + projection.scalePx}" y2="${height - 48}"/>
+            <line x1="48" y1="${height - 56}" x2="48" y2="${height - 40}"/>
+            <line x1="${48 + projection.scalePx}" y1="${height - 56}" x2="${48 + projection.scalePx}" y2="${height - 40}"/>
+            <text x="${48 + projection.scalePx / 2}" y="${height - 62}" text-anchor="middle">≈ ${projection.scaleKm} km</text>
+          </g>
+        </g>`;
+    }
+
+    function posterShell(title, subtitle, body) {
+      return `<svg id="pixel-travel-dynamic-poster" xmlns="http://www.w3.org/2000/svg" width="1600" height="1130" viewBox="0 0 1600 1130" role="img" aria-label="${esc(title)}">
+        ${posterDefs()}
+        <style>${posterCss()}</style>
+        <rect width="1600" height="1130" class="bg"/>
+        <rect x="64" y="56" width="1472" height="1018" class="frame"/>
+        <text x="120" y="112" class="kicker">PixelTravelMap · offline share poster</text>
+        <text x="120" y="154" class="title">${esc(trimText(title, 34))}</text>
+        <text x="120" y="194" class="meta">${esc(subtitle)}</text>
+        ${body}
+      </svg>`;
+    }
+
+    function itineraryRows(items, x, y, width, rowHeight, limit) {
+      return items.slice(0, limit).map((item, index) => {
+        const rowY = y + index * rowHeight;
+        return `<g transform="translate(${x},${rowY})">
+          <rect width="${width}" height="${rowHeight - 8}" rx="4" class="row"/>
+          <text x="20" y="25" class="row-title">${esc(item.title)}</text>
+          <text x="20" y="${rowHeight - 18}" class="row-text">${esc(trimText(item.body, 105))}</text>
+        </g>`;
+      }).join("");
+    }
+
+    function noteBox(label, note, x, y, width, height) {
+      const content = text(note) || "暂无补充备注。";
+      return `<g transform="translate(${x},${y})">
+        <rect width="${width}" height="${height}" rx="4" class="note"/>
+        <text x="20" y="28" class="row-title">${esc(label)}</text>
+        <text x="20" y="58" class="note-text">${esc(trimText(content, 96))}</text>
+      </g>`;
+    }
+
+    function renderOverviewPosterSvg() {
+      const rows = trip.days.map(day => ({
+        title: `Day ${day.day} · ${day.date}`,
+        body: `${day.summary || "行程"}：${day.stops.map(stop => `${stop.name}(${stop.city}, ${stop.duration_min}m)`).join(" · ")}`
+      }));
+      const subtitle = `${trip.start_date} - ${trip.end_date} · ${trip.days.length} days · ${new Set(stops.map(stop => stop.city)).size} cities · ${stops.length} stops · ${totalKm(stops)} km straight-line route`;
+      const body = `
+        ${routeMapSvg(stops, 120, 220, 1360, 500, "总行程路线")}
+        <text x="120" y="760" class="section">完整行程</text>
+        ${itineraryRows(rows, 120, 790, 1360, Math.min(58, Math.max(42, Math.floor(300 / trip.days.length))), trip.days.length)}
+      `;
+      return posterShell(`${trip.trip_title} · 总行程介绍`, subtitle, body);
+    }
+
+    function renderDayPosterSvg(dayNumber) {
+      const day = trip.days.find(item => item.day === Number(dayNumber)) || trip.days[0];
+      const dayStops = stops.filter(stop => stop.day === day.day);
+      const rows = dayStops.map(stop => ({
+        title: `${stop.ordinal}. ${stop.name} · ${stop.city}`,
+        body: `${stop.category} · 预计停留 ${stop.duration_min} min · ${stop.notes || "按现场情况调整"}`
+      }));
+      const note = tripNotes.days[day.day] || day.summary || "";
+      const body = `
+        ${routeMapSvg(dayStops, 120, 220, 1360, 420, `Day ${day.day} 明日路线`)}
+        <text x="120" y="690" class="section">明日具体行程</text>
+        ${itineraryRows(rows, 120, 720, 1360, 58, 6)}
+        ${noteBox("同行提醒 / 注意事项", note, 120, 1010, 1360, 70)}
+      `;
+      return posterShell(`${trip.trip_title} · Day ${day.day} 简报`, `${day.date} · ${day.summary || "每日行程"} · ${dayStops.length} stops · ${totalKm(dayStops)} km straight-line route`, body);
+    }
+
+    function renderRecordPosterSvg() {
+      const rows = trip.days.map(day => {
+        const dayStops = stops.filter(stop => stop.day === day.day);
+        const dayRemark = text(tripNotes.days[day.day]) || day.summary || "暂无当天记录";
+        const stopRemark = dayStops.map(stop => text(tripNotes.stops[stopKey(stop)])).filter(Boolean).join("；");
+        return {
+          title: `Day ${day.day} · ${day.date}`,
+          body: stopRemark ? `${dayRemark}｜${stopRemark}` : dayRemark
+        };
+      });
+      const body = `
+        ${routeMapSvg(stops, 120, 220, 1360, 450, "旅行记录路线")}
+        ${noteBox("全程总结", tripNotes.trip, 120, 700, 1360, 86)}
+        <text x="120" y="830" class="section">每日记录</text>
+        ${itineraryRows(rows, 120, 860, 1360, Math.min(54, Math.max(40, Math.floor(205 / trip.days.length))), trip.days.length)}
+      `;
+      return posterShell(`${trip.trip_title} · 旅行记录`, `${trip.start_date} - ${trip.end_date} · 记录来自当前浏览器备注`, body);
+    }
+
     bindMarkers();
     if (stops.length) showCard(0);
+    syncNoteFields();
 
   </script>
 </body>

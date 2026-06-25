@@ -9,6 +9,11 @@ interactive HTML atlas plus a one-page SVG poster with coordinate-projected
 POIs, route distance labels, itinerary panels, source notes, and artifact
 quality checks.
 
+The HTML artifact also works as a lightweight trip companion: before the trip,
+it can generate an overall poster and per-day briefing posters for companions;
+during the trip, notes are saved locally in the browser; after the trip, those
+notes can be turned into a travel record poster.
+
 ## Why Start With an HTML Artifact
 
 I intentionally did not start with a full SaaS. The risky assumption is whether
@@ -49,6 +54,8 @@ The MVP can be evaluated without subjective vibes:
 - Artifact open rate for HTML and SVG.
 - Offline compliance: no external scripts/styles/fetch.
 - Interaction success: marker click, itinerary click, city detail view, download.
+- Poster success: overall trip, daily briefing, and travel record posters download from the HTML artifact.
+- Note persistence: browser-local trip/day/POI notes survive refresh and appear in the record poster.
 - Map readability: POI labels, relative direction, scale bar, and segment distance labels are legible.
 - Human review: does the itinerary map communicate the trip clearly?
 
