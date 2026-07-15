@@ -9,14 +9,22 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from pixel_travel_map.parser import ParseNeedInput, parse_travel_text
-from pixel_travel_map.quality import check_artifact, check_svg_artifact, load_json, validate_trip
+from pixel_travel_map.quality import (
+    check_artifact,
+    check_builder_artifact,
+    check_svg_artifact,
+    load_json,
+    validate_trip,
+)
 
 
 PYTHON_FILES = [
     ROOT / "pixel_travel_map" / "__init__.py",
+    ROOT / "pixel_travel_map" / "builder.py",
     ROOT / "pixel_travel_map" / "parser.py",
     ROOT / "pixel_travel_map" / "quality.py",
     ROOT / "pixel_travel_map" / "renderer.py",
+    ROOT / "scripts" / "build_builder.py",
     ROOT / "scripts" / "check_artifact.py",
     ROOT / "scripts" / "check_project.py",
     ROOT / "scripts" / "generate_map.py",
@@ -45,6 +53,8 @@ POSTERS = [
     ROOT / "dist" / "japan_kansai_demo_poster.svg",
     ROOT / "dist" / "beijing_family_demo_poster.svg",
 ]
+
+BUILDER_ARTIFACT = ROOT / "dist" / "builder.html"
 
 
 def main() -> int:
@@ -80,6 +90,9 @@ def main() -> int:
     for path in POSTERS:
         for error in check_svg_artifact(path):
             failures.append(f"{path.relative_to(ROOT)}: {error}")
+
+    for error in check_builder_artifact(BUILDER_ARTIFACT):
+        failures.append(f"{BUILDER_ARTIFACT.relative_to(ROOT)}: {error}")
 
     if failures:
         print("FAILED")

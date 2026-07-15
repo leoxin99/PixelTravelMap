@@ -218,6 +218,55 @@ def check_artifact(html_path: Path, max_bytes: int = 2_000_000) -> list[str]:
     return errors
 
 
+def check_builder_artifact(html_path: Path, max_bytes: int = 2_500_000) -> list[str]:
+    """Check that the browser builder is static and has the expected controls."""
+
+    errors: list[str] = []
+    if not html_path.exists():
+        return [f"missing artifact: {html_path}"]
+
+    size = html_path.stat().st_size
+    if size > max_bytes:
+        errors.append(f"artifact is {size} bytes, expected <= {max_bytes}")
+
+    html = html_path.read_text(encoding="utf-8")
+    forbidden_patterns = {
+        r"<script[^>]+src=": "external script tag",
+        r"<link[^>]+rel=[\"']?stylesheet": "external stylesheet link",
+        r"\bfetch\s*\(": "fetch call",
+        r"\bXMLHttpRequest\b": "XMLHttpRequest usage",
+        r"\bimport\s*\(": "dynamic import",
+        r"@import": "CSS import",
+        r"\burl\([\"']?https?://": "remote CSS url",
+    }
+    for pattern, label in forbidden_patterns.items():
+        if re.search(pattern, html, flags=re.IGNORECASE):
+            errors.append(f"builder contains forbidden {label}")
+
+    required_snippets = [
+        'id="docx-input"',
+        'id="builder-data-input"',
+        'id="parse-input"',
+        'id="draft-table"',
+        'id="build-preview"',
+        'id="map-preview"',
+        'id="download-json"',
+        'id="download-map-html"',
+        'id="download-overview-poster"',
+        'id="download-day-poster"',
+        'id="download-record-poster"',
+        "DecompressionStream",
+        "word/document.xml",
+        "lat",
+        "lon",
+    ]
+    for snippet in required_snippets:
+        if snippet not in html:
+            errors.append(f"builder missing required snippet: {snippet}")
+
+    return errors
+
+
 def check_svg_artifact(svg_path: Path, max_bytes: int = 2_000_000) -> list[str]:
     """Check that a poster SVG is offline and contains the expected sections."""
 

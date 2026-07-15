@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from pixel_travel_map.quality import check_artifact, check_svg_artifact
+from pixel_travel_map.quality import check_artifact, check_builder_artifact, check_svg_artifact
 
 
 def main() -> int:
@@ -17,6 +17,8 @@ def main() -> int:
 
     if args.artifact.suffix.lower() == ".svg":
         errors = check_svg_artifact(args.artifact)
+    elif args.artifact.name == "builder.html":
+        errors = check_builder_artifact(args.artifact)
     else:
         errors = check_artifact(args.artifact)
     if errors:
