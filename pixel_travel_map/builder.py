@@ -273,6 +273,21 @@ def render_builder_html() -> str:
       align-items: end;
       margin-bottom: 10px;
     }
+    .day-brief-grid {
+      display: grid;
+      grid-template-columns: 130px minmax(180px, 0.8fr) minmax(220px, 1.2fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .check-field {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 32px;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .check-field input { width: auto; margin: 0; }
     .table-wrap { width: 100%; min-width: 0; max-width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
     table { width: 100%; border-collapse: collapse; min-width: 1080px; }
     th, td { border-bottom: 1px solid var(--line); padding: 7px; vertical-align: top; }
@@ -415,7 +430,7 @@ def render_builder_html() -> str:
       .topbar { align-items: flex-start; }
       .status-chip { display: none; }
       .field-grid, .summary-grid { grid-template-columns: 1fr; }
-      .day-head { grid-template-columns: 1fr; }
+      .day-head, .day-brief-grid { grid-template-columns: 1fr; }
       .geocoder-controls { grid-template-columns: 1fr; }
       .button-row .text-button { flex: 1 1 150px; }
       .preview-map, .preview-map .empty { min-height: 300px; }
@@ -599,6 +614,7 @@ Day 2：浅草和上野
   <script>
     const MAP_W = 1040;
     const MAP_H = 620;
+    const SHARE_VIEWER_URL = "https://leoxin99.github.io/PixelTravelMap/dist/viewer.html";
     const GEOCODER_ENDPOINT = "https://nominatim.openstreetmap.org/search";
     const GEOCODER_CACHE_KEY = "PixelTravelMap:geocode-cache:v1";
     const CATEGORY_VALUES = ["landmark", "museum", "food", "hotel", "nature", "transit", "shopping", "experience", "viewpoint"];
@@ -645,7 +661,15 @@ Day 2：浅草和上野
         start_date: today,
         end_date: today,
         transport: "mixed",
-        days: [{ day: 1, date: today, summary: "待补全行程", stops: [] }],
+        days: [{
+          day: 1,
+          date: today,
+          summary: "待补全行程",
+          meeting_time: "",
+          meeting_point: "",
+          cautions: "",
+          stops: []
+        }],
         _missing: { title: true, dates: true }
       };
     }
@@ -672,6 +696,129 @@ Day 2：浅草和上野
 
     function fileSafe(value) {
       return text(value, "pixel-travel-map").replace(/[\\/:*?"<>|]+/g, "-").replace(/\s+/g, "-");
+    }
+
+    function encodeBase64Url(value) {
+      const bytes = new TextEncoder().encode(value);
+      let binary = "";
+      bytes.forEach(byte => { binary += String.fromCharCode(byte); });
+      return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+    }
+
+    function decodeBase64Url(value) {
+      const padded = value.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((value.length + 3) % 4);
+      const binary = atob(padded);
+      return new TextDecoder().decode(Uint8Array.from(binary, char => char.charCodeAt(0)));
+    }
+
+    function readSharePayload() {
+      try {
+        const params = new URLSearchParams(location.hash.replace(/^#/, ""));
+        const value = params.get("ptm");
+        return value ? JSON.parse(decodeBase64Url(value)) : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function compactTripForShare(source) {
+      return {
+        v: source.schema_version, t: source.trip_title, s: source.start_date, e: source.end_date,
+        r: source.travelers, b: source.budget_cny, x: source.transport, y: source.style_theme, l: source.lang,
+        d: source.days.map(day => [
+          day.day, day.date, day.summary || "", day.meeting_time || null,
+          day.meeting_point || "", day.cautions || "",
+          day.stops.map(stop => [
+            stop.id, stop.name, stop.name_en || null, stop.city, stop.country,
+            stop.lat, stop.lon, stop.crs, stop.category, stop.duration_min,
+            stop.arrival_time || null, Boolean(stop.reservation_required),
+            stop.reservation_time || null, stop.reservation_reference || "",
+            stop.transit_buffer_min ?? 20, stop.cautions || "",
+            stop.description || null, stop.notes || "", stop.source || "shared_link",
+            stop.source_url || null, stop.official_url || null,
+            stop.navigation_url || null, Boolean(stop.info_missing)
+          ])
+        ])
+      };
+    }
+
+    function expandSharedTrip(value) {
+      if (value && value.schema_version && value.days) return value;
+      return {
+        schema_version: value.v || "1.0", trip_title: value.t, start_date: value.s, end_date: value.e,
+        travelers: value.r || ["traveler"], budget_cny: value.b ?? null, transport: value.x || "mixed",
+        style_theme: value.y || "pastel-pixel", lang: value.l || "zh-CN",
+        days: (value.d || []).map(day => ({
+          day: day[0], date: day[1], summary: day[2] || "", meeting_time: day[3] || null,
+          meeting_point: day[4] || "", cautions: day[5] || "",
+          stops: (day[6] || []).map(stop => ({
+            id: stop[0], name: stop[1], name_en: stop[2], city: stop[3], country: stop[4],
+            lat: stop[5], lon: stop[6], crs: stop[7], category: stop[8], duration_min: stop[9],
+            arrival_time: stop[10] || null, reservation_required: Boolean(stop[11]),
+            reservation_time: stop[12] || null, reservation_reference: stop[13] || "",
+            transit_buffer_min: stop[14] ?? 20, cautions: stop[15] || "",
+            description: stop[16] || null, notes: stop[17] || "", source: stop[18] || "shared_link",
+            source_url: stop[19] || null, official_url: stop[20] || null,
+            navigation_url: stop[21] || null, info_missing: Boolean(stop[22])
+          }))
+        }))
+      };
+    }
+
+    function emptyTripNotes(actor = "") {
+      return { version: 2, actor, trip: null, days: {}, stops: {}, updatedAt: new Date(0).toISOString() };
+    }
+
+    function noteRecord(value, actor, updatedAt = new Date().toISOString()) {
+      return { value: String(value || ""), actor: String(actor || "同行者"), updatedAt };
+    }
+
+    function noteValue(value) {
+      if (typeof value === "string") return value;
+      return value && typeof value.value === "string" ? value.value : "";
+    }
+
+    function normalizeTripNotes(raw) {
+      if (!raw || typeof raw !== "object") return emptyTripNotes();
+      if (raw.version === 2) {
+        return {
+          version: 2, actor: raw.actor || "", trip: raw.trip || null,
+          days: raw.days || {}, stops: raw.stops || {},
+          updatedAt: raw.updatedAt || new Date(0).toISOString()
+        };
+      }
+      const migrated = emptyTripNotes(raw.actor || "");
+      if (raw.trip) migrated.trip = noteRecord(raw.trip, "旧版备注", raw.updatedAt || new Date(0).toISOString());
+      Object.entries(raw.days || {}).forEach(([key, value]) => {
+        migrated.days[key] = noteRecord(value, "旧版备注", raw.updatedAt || new Date(0).toISOString());
+      });
+      Object.entries(raw.stops || {}).forEach(([key, value]) => {
+        migrated.stops[key] = noteRecord(value, "旧版备注", raw.updatedAt || new Date(0).toISOString());
+      });
+      return migrated;
+    }
+
+    function newerRecord(localValue, incomingValue) {
+      if (!incomingValue) return localValue || null;
+      if (!localValue) return incomingValue;
+      const localTime = Date.parse(localValue.updatedAt || 0) || 0;
+      const incomingTime = Date.parse(incomingValue.updatedAt || 0) || 0;
+      return incomingTime > localTime ? incomingValue : localValue;
+    }
+
+    function mergeTripNotes(localRaw, incomingRaw) {
+      const local = normalizeTripNotes(localRaw);
+      const incoming = normalizeTripNotes(incomingRaw);
+      const merged = emptyTripNotes(local.actor || incoming.actor || "");
+      merged.trip = newerRecord(local.trip, incoming.trip);
+      for (const key of new Set([...Object.keys(local.days), ...Object.keys(incoming.days)])) {
+        merged.days[key] = newerRecord(local.days[key], incoming.days[key]);
+      }
+      for (const key of new Set([...Object.keys(local.stops), ...Object.keys(incoming.stops)])) {
+        merged.stops[key] = newerRecord(local.stops[key], incoming.stops[key]);
+      }
+      merged.updatedAt = [local.updatedAt, incoming.updatedAt].sort().at(-1);
+      return merged;
     }
 
     function addDays(dateText, offset) {
@@ -733,6 +880,9 @@ Day 2：浅草和上野
             day: heading.day,
             date: addDays(startDate, heading.day - 1),
             summary: heading.summary || "待补全行程",
+            meeting_time: "",
+            meeting_point: "",
+            cautions: "",
             stops: []
           };
           parsed.days.push(currentDay);
@@ -745,6 +895,9 @@ Day 2：浅草和上野
             day: 1,
             date: startDate,
             summary: "待补全行程",
+            meeting_time: "",
+            meeting_point: "",
+            cautions: "",
             stops: []
           };
           parsed.days.push(currentDay);
@@ -752,7 +905,15 @@ Day 2：浅草和上野
         currentDay.stops.push(stop);
       }
       if (!parsed.days.length) {
-        parsed.days.push({ day: 1, date: startDate, summary: "待补全行程", stops: [] });
+        parsed.days.push({
+          day: 1,
+          date: startDate,
+          summary: "待补全行程",
+          meeting_time: "",
+          meeting_point: "",
+          cautions: "",
+          stops: []
+        });
       }
       const maxDay = Math.max(...parsed.days.map(day => day.day));
       parsed.end_date = parsed.end_date < addDays(startDate, maxDay - 1) ? addDays(startDate, maxDay - 1) : parsed.end_date;
@@ -811,7 +972,7 @@ Day 2：浅草和上野
       value = value.replace(/^\d{1,2}[:：]\d{2}(?:\s*[-–—到至]\s*\d{1,2}[:：]\d{2})?\s*/, "").trim();
       const fields = parseInlineFields(value);
       if (fields.duration) duration = Number(fields.duration) || duration;
-      const fieldBlockPattern = /[（(][^()（）]*(?:lat|lon|city|country|category|duration|notes|source)[^()（）]*[）)]/ig;
+      const fieldBlockPattern = /[（(][^()（）]*(?:lat|lon|city|country|category|duration|arrival|reservation|buffer|caution|notes|source)[^()（）]*[）)]/ig;
       let name = value.replace(fieldBlockPattern, "").trim();
       name = name.replace(/^[:：,\-—、\s]+/, "").replace(/\s+/g, " ");
       if (!name && !isStopLike(original)) return null;
@@ -824,6 +985,12 @@ Day 2：浅草和上野
         lon: fields.lon || "",
         category: CATEGORY_VALUES.includes(fields.category) ? fields.category : "landmark",
         duration_min: String(Math.max(0, Math.round(duration))),
+        arrival_time: fields.arrival || fields.arrival_time || "",
+        reservation_required: ["true", "yes", "required", "1", "需要", "是"].includes(String(fields.reservation || "").toLowerCase()),
+        reservation_time: fields.reservation_time || "",
+        reservation_reference: fields.reservation_reference || "",
+        transit_buffer_min: String(Math.max(0, Number(fields.buffer || fields.transit_buffer || 20) || 20)),
+        cautions: fields.cautions || fields.caution || "",
         notes: fields.notes || "由创建器导入，建议补充实际注意事项。",
         source: "user_builder_input",
         source_url: ""
@@ -854,15 +1021,26 @@ Day 2：浅草和上野
             </label>
             <button class="text-button" type="button" data-action="add-stop" data-day-index="${dayIndex}">增加地点</button>
           </div>
+          <div class="day-brief-grid">
+            <label>集合时间
+              <input type="time" value="${esc(day.meeting_time || "")}" data-kind="day" data-field="meeting_time">
+            </label>
+            <label>集合地点
+              <input type="text" value="${esc(day.meeting_point || "")}" data-kind="day" data-field="meeting_point" placeholder="酒店大堂、车站出口等">
+            </label>
+            <label>当日注意事项
+              <input type="text" value="${esc(day.cautions || "")}" data-kind="day" data-field="cautions" placeholder="证件、天气、着装、迟到处理等">
+            </label>
+          </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>地点</th><th>城市</th><th>国家</th><th>lat</th><th>lon</th><th>类型</th><th>停留</th><th>备注</th><th class="row-actions">操作</th>
+                  <th>地点</th><th>城市</th><th>国家</th><th>lat</th><th>lon</th><th>到达</th><th>类型</th><th>停留</th><th>交通缓冲</th><th>预约</th><th>预约时间</th><th>预约凭证</th><th>注意事项</th><th>备注</th><th class="row-actions">操作</th>
                 </tr>
               </thead>
               <tbody>
-                ${day.stops.map((stop, stopIndex) => renderStopRow(stop, dayIndex, stopIndex)).join("") || `<tr><td colspan="9" class="help-text">此 Day 还没有地点。</td></tr>`}
+                ${day.stops.map((stop, stopIndex) => renderStopRow(stop, dayIndex, stopIndex)).join("") || `<tr><td colspan="15" class="help-text">此 Day 还没有地点。</td></tr>`}
               </tbody>
             </table>
           </div>
@@ -880,12 +1058,18 @@ Day 2：浅草和上野
           <td><input type="text" value="${esc(stop.country)}" data-kind="stop" data-field="country"></td>
           <td><input type="number" step="0.0001" value="${esc(stop.lat)}" data-kind="stop" data-field="lat"></td>
           <td><input type="number" step="0.0001" value="${esc(stop.lon)}" data-kind="stop" data-field="lon"></td>
+          <td><input type="time" value="${esc(stop.arrival_time || "")}" data-kind="stop" data-field="arrival_time"></td>
           <td>
             <select data-kind="stop" data-field="category">
               ${CATEGORY_VALUES.map(category => `<option value="${category}" ${stop.category === category ? "selected" : ""}>${category}</option>`).join("")}
             </select>
           </td>
           <td><input type="number" min="0" step="5" value="${esc(stop.duration_min)}" data-kind="stop" data-field="duration_min"></td>
+          <td><input type="number" min="0" max="360" step="5" value="${esc(stop.transit_buffer_min ?? 20)}" data-kind="stop" data-field="transit_buffer_min"></td>
+          <td><label class="check-field"><input type="checkbox" ${stop.reservation_required ? "checked" : ""} data-kind="stop" data-field="reservation_required">需要</label></td>
+          <td><input type="time" value="${esc(stop.reservation_time || "")}" data-kind="stop" data-field="reservation_time"></td>
+          <td><input type="text" value="${esc(stop.reservation_reference || "")}" data-kind="stop" data-field="reservation_reference" placeholder="订单号/取票说明"></td>
+          <td><input type="text" value="${esc(stop.cautions || "")}" data-kind="stop" data-field="cautions" placeholder="闭馆、着装、安检等"></td>
           <td><input type="text" value="${esc(stop.notes)}" data-kind="stop" data-field="notes"></td>
           <td>
             <div class="row-action-stack">
@@ -906,6 +1090,12 @@ Day 2：浅草和上野
         lon: "",
         category: "landmark",
         duration_min: "90",
+        arrival_time: "",
+        reservation_required: false,
+        reservation_time: "",
+        reservation_reference: "",
+        transit_buffer_min: "20",
+        cautions: "",
         notes: "由创建器导入，建议补充实际注意事项。",
         source: "user_builder_input",
         source_url: ""
@@ -1282,6 +1472,9 @@ Day 2：浅草和上野
           day: Number(day.day) || dayIndex + 1,
           date: day.date || addDays(draft.start_date, dayIndex),
           summary: day.summary || "每日行程",
+          meeting_time: text(day.meeting_time) || null,
+          meeting_point: text(day.meeting_point),
+          cautions: text(day.cautions),
           stops: day.stops.map((stop, stopIndex) => normalizeStop(stop, day, dayIndex, stopIndex, errors))
         }))
         .filter(day => day.stops.length);
@@ -1311,6 +1504,7 @@ Day 2：浅草和上野
       const lat = Number(latRaw);
       const lon = Number(lonRaw);
       const duration = Number(stop.duration_min);
+      const transitBuffer = Number(stop.transit_buffer_min);
       if (!text(stop.name)) errors.push(`${prefix} 缺少地点名。`);
       if (!text(stop.city)) errors.push(`${prefix} 缺少 city。`);
       if (!text(stop.country)) errors.push(`${prefix} 缺少 country。`);
@@ -1327,6 +1521,12 @@ Day 2：浅草和上野
         crs: "wgs84",
         category: CATEGORY_VALUES.includes(stop.category) ? stop.category : "landmark",
         duration_min: Number.isFinite(duration) ? Math.max(0, Math.round(duration)) : 90,
+        arrival_time: text(stop.arrival_time) || null,
+        reservation_required: Boolean(stop.reservation_required),
+        reservation_time: text(stop.reservation_time) || null,
+        reservation_reference: text(stop.reservation_reference),
+        transit_buffer_min: Number.isFinite(transitBuffer) ? Math.max(0, Math.min(360, Math.round(transitBuffer))) : 20,
+        cautions: text(stop.cautions),
         description: null,
         notes: text(stop.notes, "由创建器导入，建议补充实际注意事项。"),
         source: text(stop.source, "user_builder_input"),
@@ -1508,6 +1708,9 @@ Day 2：浅草和上野
       const markers = viewStops.map(stop => {
         const point = view.points[stopKey(stop)];
         const isActive = activeIds.has(stop.id);
+        const labelOnLeft = point[0] > MAP_W - 220;
+        const labelX = labelOnLeft ? point[0] - 24 : point[0] + 24;
+        const labelAnchor = labelOnLeft ? "end" : "start";
         const data = interactive && isActive ? ` data-stop-index="${stop.ordinal - 1}" tabindex="0" role="button"` : "";
         const dim = isActive ? "" : " context";
         return `
@@ -1515,8 +1718,8 @@ Day 2：浅草和上野
             <circle class="marker-halo" cx="${point[0]}" cy="${point[1]}" r="22"/>
             <circle class="marker-box" cx="${point[0]}" cy="${point[1]}" r="15"/>
             <text class="marker-num" x="${point[0]}" y="${point[1] + 5}" text-anchor="middle">${stop.ordinal}</text>
-            <text class="poi-label" x="${point[0] + 24}" y="${point[1] - 8}">${esc(trimText(stop.name, 14))}</text>
-            <text class="poi-day" x="${point[0] + 24}" y="${point[1] + 10}">Day ${stop.day} · ${esc(stop.city)}</text>
+            <text class="poi-label" x="${labelX}" y="${point[1] - 8}" text-anchor="${labelAnchor}">${esc(trimText(stop.name, 14))}</text>
+            <text class="poi-day" x="${labelX}" y="${point[1] + 10}" text-anchor="${labelAnchor}">Day ${stop.day} · ${esc(stop.city)}</text>
           </g>
         `;
       }).join("");
@@ -1575,15 +1778,26 @@ Day 2：浅草和上野
     function renderItineraryHtml(trip) {
       let index = 0;
       return trip.days.map(day => {
+        const briefingMeta = [
+          day.meeting_time ? `集合 ${day.meeting_time}` : "",
+          day.meeting_point || "",
+          day.cautions || ""
+        ].filter(Boolean).join(" · ");
         const stopsHtml = day.stops.map(stop => {
           const currentIndex = index;
           index += 1;
+          const stopMeta = [
+            stop.arrival_time || "",
+            `${stop.duration_min} min`,
+            stop.reservation_required ? `预约 ${stop.reservation_time || "已确认"}` : "",
+            stop.transit_buffer_min ? `缓冲 ${stop.transit_buffer_min} min` : ""
+          ].filter(Boolean).join(" · ");
           return `
             <button class="schedule-item" type="button" data-stop-index="${currentIndex}" data-city="${esc(stop.city)}">
               <span class="schedule-index">${currentIndex + 1}</span>
               <span>
                 <strong>${esc(stop.name)}</strong>
-                <small>${esc(stop.city)} · Day ${day.day} · ${stop.duration_min} min</small>
+                <small>${esc(stop.city)} · ${esc(stopMeta)}</small>
               </span>
             </button>
           `;
@@ -1592,6 +1806,7 @@ Day 2：浅草和上野
           <div class="day-block">
             <h3>Day ${day.day} <span>${esc(day.date)}</span></h3>
             <p class="day-summary">${esc(day.summary || "每日行程")}</p>
+            ${briefingMeta ? `<p class="day-brief-meta">${esc(briefingMeta)}</p>` : ""}
             ${stopsHtml}
           </div>
         `;
@@ -1601,10 +1816,16 @@ Day 2：浅草和上野
     function renderPoiCardHtml(stop) {
       const mapUrl = stop.navigation_url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(stop.lat + "," + stop.lon)}`;
       const link = (url, label) => url ? `<a href="${esc(url)}" target="_blank" rel="noreferrer">${esc(label)}</a>` : "";
+      const reservation = stop.reservation_required
+        ? `需要预约${stop.reservation_time ? ` · ${esc(stop.reservation_time)}` : ""}${stop.reservation_reference ? ` · ${esc(stop.reservation_reference)}` : ""}`
+        : "无需预约";
       return `
-        <p class="poi-meta">Day ${esc(stop.day)} · ${esc(stop.city)} · ${esc(stop.category)} · ${esc(stop.duration_min)} min · ${esc(stop.lat)}, ${esc(stop.lon)}</p>
+        <p class="poi-meta">Day ${esc(stop.day)} · ${esc(stop.city)} · ${esc(stop.category)} · ${esc(stop.arrival_time || "时间待定")} · ${esc(stop.duration_min)} min</p>
         <h3>${esc(stop.name)}</h3>
         <p>${esc(stop.description || "暂无补充描述。")}</p>
+        <p><strong>预约：</strong>${reservation}</p>
+        <p><strong>交通缓冲：</strong>${esc(stop.transit_buffer_min ?? 20)} min</p>
+        ${stop.cautions ? `<p><strong>注意：</strong>${esc(stop.cautions)}</p>` : ""}
         <p><strong>备注：</strong>${esc(stop.notes)}</p>
         <div class="poi-actions">
           ${link(stop.source_url, "来源")}
@@ -1666,12 +1887,15 @@ Day 2：浅草和上野
       }).join("");
       const markersSvg = mapStops.map(stop => {
         const point = projection.points[stopKey(stop)];
+        const labelOnLeft = point[0] > width - 220;
+        const labelX = labelOnLeft ? point[0] - 24 : point[0] + 24;
+        const labelAnchor = labelOnLeft ? "end" : "start";
         return `
           <g>
             <rect class="marker-box" x="${point[0] - 15}" y="${point[1] - 15}" width="30" height="30" rx="2"/>
             <text class="marker-num" x="${point[0]}" y="${point[1] + 5}" text-anchor="middle">${stop.ordinal}</text>
-            <text class="label" x="${point[0] + 24}" y="${point[1] - 8}">${esc(trimText(stop.name, 14))}</text>
-            <text class="muted-label" x="${point[0] + 24}" y="${point[1] + 10}">Day ${stop.day} · ${esc(stop.city)}</text>
+            <text class="label" x="${labelX}" y="${point[1] - 8}" text-anchor="${labelAnchor}">${esc(trimText(stop.name, 14))}</text>
+            <text class="muted-label" x="${labelX}" y="${point[1] + 10}" text-anchor="${labelAnchor}">Day ${stop.day} · ${esc(stop.city)}</text>
           </g>`;
       }).join("");
       return `
@@ -1745,15 +1969,15 @@ Day 2：浅草和上野
       const day = trip.days.find(item => item.day === Number(dayNumber)) || trip.days[0];
       const dayStops = stops.filter(stop => stop.day === day.day);
       const rows = dayStops.map(stop => ({
-        title: `${stop.ordinal}. ${stop.name} · ${stop.city}`,
-        body: `${stop.category} · 预计停留 ${stop.duration_min} min · ${stop.notes || "按现场情况调整"}`
+        title: `${stop.arrival_time || stop.ordinal + "."} ${stop.name} · ${stop.city}`,
+        body: `${stop.reservation_required ? `预约 ${stop.reservation_time || "已确认"} · ` : ""}停留 ${stop.duration_min} min · 缓冲 ${stop.transit_buffer_min ?? 20} min · ${stop.cautions || stop.notes || "按现场情况调整"}`
       }));
-      const note = (notes.days && notes.days[day.day]) || day.summary || "";
+      const note = noteValue(notes.days && notes.days[day.day]) || day.cautions || day.summary || "";
       const body = `
         ${routeMapSvg(dayStops, 120, 220, 1360, 420, `Day ${day.day} 明日路线`)}
         <text x="120" y="690" class="section">明日具体行程</text>
         ${itineraryRows(rows, 120, 720, 1360, 58, 6)}
-        ${noteBox("同行提醒 / 注意事项", note, 120, 1010, 1360, 70)}
+        ${noteBox(`集合 ${day.meeting_time || "待确认"} · ${day.meeting_point || "集合地点待确认"}`, note, 120, 1010, 1360, 70)}
       `;
       return posterShell(`${trip.trip_title} · Day ${day.day} 简报`, `${day.date} · ${day.summary || "每日行程"} · ${dayStops.length} stops · ${totalKm(dayStops)} km straight-line route`, body);
     }
@@ -1762,8 +1986,8 @@ Day 2：浅草和上野
       const stops = flattenStops(trip);
       const rows = trip.days.map(day => {
         const dayStops = stops.filter(stop => stop.day === day.day);
-        const dayRemark = text(notes.days && notes.days[day.day]) || day.summary || "暂无当天记录";
-        const stopRemark = dayStops.map(stop => text(notes.stops && notes.stops[stopKey(stop)])).filter(Boolean).join("；");
+        const dayRemark = noteValue(notes.days && notes.days[day.day]) || day.summary || "暂无当天记录";
+        const stopRemark = dayStops.map(stop => noteValue(notes.stops && notes.stops[stopKey(stop)])).filter(Boolean).join("；");
         return {
           title: `Day ${day.day} · ${day.date}`,
           body: stopRemark ? `${dayRemark}｜${stopRemark}` : dayRemark
@@ -1771,7 +1995,7 @@ Day 2：浅草和上野
       });
       const body = `
         ${routeMapSvg(stops, 120, 220, 1360, 450, "旅行记录路线")}
-        ${noteBox("全程总结", notes.trip || "", 120, 700, 1360, 86)}
+        ${noteBox("全程总结", noteValue(notes.trip), 120, 700, 1360, 86)}
         <text x="120" y="830" class="section">每日记录</text>
         ${itineraryRows(rows, 120, 860, 1360, Math.min(54, Math.max(40, Math.floor(205 / trip.days.length))), trip.days.length)}
       `;
@@ -1815,11 +2039,13 @@ Day 2：浅草和上野
         <p class="atlas-note">方位和距离基于 POI 经纬度计算，路线距离为直线近似值，不等同于实际驾车或步行距离。</p>
       </div>
       <div class="toolbar">
+        <button class="text-button view-button active" id="map-view-button" type="button">地图</button>
+        <button class="text-button view-button" id="briefing-view-button" type="button">明日简报</button>
         <button class="icon-button" id="overview-button" type="button" title="返回总览" aria-label="返回总览">↩</button>
         <button class="text-button" id="download-html" type="button">保存 HTML</button>
       </div>
     </header>
-    <main class="workspace">
+    <main class="workspace" id="map-workspace">
       <section class="map-stage" aria-label="经纬度旅行地图">
         <div class="map-toolbar">
           <span id="view-label">总览地图</span>
@@ -1838,6 +2064,18 @@ Day 2：浅草和上野
           <article id="poi-card" class="poi-card" aria-live="polite">
             <p class="empty-state">点击地图编号或日程项查看详情。</p>
           </article>
+        </section>
+        <section class="panel-section collaboration-tools">
+          <h2>分享与同行协作</h2>
+          <label class="field-label" for="collaborator-name">你的名字</label>
+          <input id="collaborator-name" type="text" placeholder="用于标记备注更新来源">
+          <div class="collaboration-actions">
+            <button class="text-button compact" id="copy-trip-link" type="button">复制行程分享链接</button>
+            <button class="text-button compact" id="export-notes" type="button">导出协作更新包</button>
+            <label class="text-button compact file-button" for="import-notes">导入更新包</label>
+            <input id="import-notes" class="sr-only" type="file" accept=".json,application/json">
+          </div>
+          <p id="collaboration-status" class="collaboration-status" aria-live="polite">链接中的行程和备注位于 URL fragment，不会随页面请求发送给服务器。</p>
         </section>
         <section class="panel-section poster-tools">
           <h2>Poster 工具</h2>
@@ -1862,6 +2100,20 @@ Day 2：浅草和上野
         </section>
       </aside>
     </main>
+    <section class="briefing-view" id="briefing-view" hidden>
+      <div class="briefing-toolbar">
+        <div>
+          <p class="eyebrow">Tomorrow briefing</p>
+          <h2>同行明日简报</h2>
+        </div>
+        <div class="briefing-actions">
+          <select id="briefing-day-select" aria-label="选择简报日期"></select>
+          <button class="text-button" id="copy-briefing-link" type="button">复制简报链接</button>
+          <button class="text-button" id="briefing-back" type="button">返回地图</button>
+        </div>
+      </div>
+      <div id="briefing-content"></div>
+    </section>
   </div>
   <script>${runtime}
 initViewer();${closeScript}
@@ -1875,6 +2127,17 @@ initViewer();${closeScript}
         text,
         trimText,
         fileSafe,
+        encodeBase64Url,
+        decodeBase64Url,
+        readSharePayload,
+        compactTripForShare,
+        expandSharedTrip,
+        emptyTripNotes,
+        noteRecord,
+        noteValue,
+        normalizeTripNotes,
+        newerRecord,
+        mergeTripNotes,
         flattenStops,
         stopKey,
         haversineKm,
@@ -1903,67 +2166,105 @@ initViewer();${closeScript}
         viewerCss,
         initViewer
       ];
-      return `const MAP_W = ${MAP_W};\nconst MAP_H = ${MAP_H};\n` + functions.map(fn => fn.toString()).join("\n\n");
+      return `const MAP_W = ${MAP_W};\nconst MAP_H = ${MAP_H};\nconst SHARE_VIEWER_URL = ${JSON.stringify(SHARE_VIEWER_URL)};\n` + functions.map(fn => fn.toString()).join("\n\n");
     }
 
     function viewerCss() {
       return `
         :root{--paper:#edf3f1;--paper-2:#fff;--ink:#172522;--muted:#64736f;--water:#dceff1;--route:#e65c4f;--marker:#147d75;--panel:#fff;--line:#c9d5d1;--line-strong:#8fa39d;--focus:#0f766e;--shadow:rgba(23,37,34,.08)}
         *{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--ink);background:var(--paper);font-family:Inter,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;letter-spacing:0}
-        button,a,select,textarea{font:inherit}.app-shell{width:min(1480px,100%);margin:0 auto;padding:18px}.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:10px 0 18px}.eyebrow{margin:0 0 4px;color:var(--focus);font-size:12px;font-weight:750;text-transform:uppercase}h1,h2,h3,p{margin-top:0}h1{margin-bottom:6px;font-size:clamp(24px,4vw,38px);line-height:1.15}h2{margin-bottom:12px;font-size:18px}h3{margin-bottom:6px;font-size:15px}.atlas-note{max-width:760px;margin-bottom:0;color:var(--muted);font-size:13px;line-height:1.5}.toolbar{display:flex;gap:8px;align-items:center}
-        .icon-button,.text-button,.city-pill{border:1px solid var(--line-strong);border-radius:6px;background:var(--panel);color:var(--ink);cursor:pointer;font-weight:700}.icon-button{width:40px;height:38px}.text-button,.city-pill{padding:9px 12px}.compact{padding:8px 10px;font-size:12px}.danger{color:#b42318}.icon-button:hover,.text-button:hover,.city-pill:hover{border-color:var(--focus);color:var(--focus);background:#d9efeb}
+        button,a,input,select,textarea{font:inherit}[hidden]{display:none!important}.app-shell{width:min(1480px,100%);margin:0 auto;padding:18px}.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:10px 0 18px}.eyebrow{margin:0 0 4px;color:var(--focus);font-size:12px;font-weight:750;text-transform:uppercase}h1,h2,h3,p{margin-top:0}h1{margin-bottom:6px;font-size:clamp(24px,4vw,38px);line-height:1.15}h2{margin-bottom:12px;font-size:18px}h3{margin-bottom:6px;font-size:15px}.atlas-note{max-width:760px;margin-bottom:0;color:var(--muted);font-size:13px;line-height:1.5}.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+        .icon-button,.text-button,.city-pill{border:1px solid var(--line-strong);border-radius:6px;background:var(--panel);color:var(--ink);cursor:pointer;font-weight:700}.icon-button{width:40px;height:38px}.text-button,.city-pill{padding:9px 12px}.compact{padding:8px 10px;font-size:12px}.danger{color:#b42318}.icon-button:hover,.text-button:hover,.city-pill:hover{border-color:var(--focus);color:var(--focus);background:#d9efeb}.view-button.active{border-color:var(--focus);background:var(--focus);color:#fff}
         .workspace{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;align-items:start}.map-stage,.side-panel{border:1px solid var(--line);border-radius:8px;background:var(--panel);box-shadow:0 16px 40px var(--shadow)}.map-stage{overflow:hidden}.map-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);background:#f5f8f7;font-weight:700}.city-pills{display:flex;flex-wrap:wrap;gap:8px}.city-pill.active{border-color:var(--focus);background:var(--focus);color:#fff}.pixel-map{display:block;width:100%;height:auto;background:var(--water)}.atlas-water{fill:var(--water)}.atlas-frame-inner{fill:rgba(255,255,255,.42);stroke:rgba(23,37,34,.12);stroke-width:1}.map-title,.north{fill:var(--ink);font:700 17px Inter,"Segoe UI",sans-serif}.route-shadow{fill:none;stroke:rgba(255,255,255,.9);stroke-width:9;stroke-linecap:round;stroke-linejoin:round}.route{fill:none;stroke:var(--route);stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round}.arrow-head{fill:var(--route)}.distance-label{pointer-events:none;paint-order:stroke;stroke:rgba(255,255,255,.96);stroke-width:5;fill:#41514d;font:650 12px Inter,"Segoe UI",sans-serif}.city-label{pointer-events:none;paint-order:stroke;stroke:rgba(255,255,255,.96);stroke-width:6;fill:var(--focus);font:750 15px Inter,"Segoe UI",sans-serif}.marker{cursor:pointer}.marker.context{opacity:.45}.marker.active .marker-box{fill:#f1b82d}.marker-halo{fill:rgba(20,125,117,.12);stroke:rgba(20,125,117,.2);stroke-width:1}.marker-box{fill:var(--marker);stroke:#fff;stroke-width:3}.marker-num{fill:#fff;font:750 14px Inter,"Segoe UI",sans-serif}.poi-label{pointer-events:none;paint-order:stroke;stroke:rgba(255,255,255,.98);stroke-width:5;fill:var(--ink);font:700 13px Inter,"Segoe UI",sans-serif}.poi-day{pointer-events:none;paint-order:stroke;stroke:rgba(255,255,255,.98);stroke-width:4;fill:var(--muted);font:600 11px Inter,"Segoe UI",sans-serif}.scale-bar line{stroke:#41514d;stroke-width:2}.scale-bar text{fill:#41514d;font:650 12px Inter,"Segoe UI",sans-serif}
-        .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}.stat-item{padding:12px;border-right:1px solid var(--line);background:var(--paper-2)}.stat-item:last-child{border-right:0}.stat-item span{display:block;color:var(--muted);font-size:11px}.stat-item strong{display:block;margin-top:5px;font-size:18px}.side-panel{display:grid;gap:0;overflow:hidden}.panel-section{padding:14px;border-bottom:1px solid var(--line)}.panel-section:last-child{border-bottom:0}.itinerary-list{display:grid;gap:12px}.day-block{display:grid;gap:6px;border-left:3px solid var(--focus);padding-left:10px}.day-summary{color:var(--muted);font-size:12px;line-height:1.4}.schedule-item{width:100%;display:grid;grid-template-columns:28px 1fr;gap:10px;text-align:left;border:1px solid var(--line);border-radius:6px;background:var(--paper-2);padding:8px;cursor:pointer}.schedule-item.active{border-color:var(--focus);background:#d9efeb}.schedule-item.focus-city{opacity:.45}.schedule-item.in-city{opacity:1}.schedule-index{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--marker);color:#fff;font-weight:700}.schedule-item strong{display:block;font-size:13px}.schedule-item small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.poi-card{display:grid;gap:8px}.empty-state{color:var(--muted);font-size:13px}.poi-meta{margin:0;color:var(--muted);font-size:12px}.poi-actions{display:flex;gap:8px;flex-wrap:wrap}.poi-actions a{border:1px solid var(--line-strong);border-radius:5px;background:#fff;color:var(--ink);padding:6px 8px;text-decoration:none;font-weight:700}.source-note{padding:8px 10px;border-left:3px solid var(--focus);background:#f5f8f7;color:var(--muted);font-size:11px;line-height:1.45}.poster-tools{display:grid;gap:14px}.poster-controls,.notes-editor{display:grid;gap:10px}.inline-controls{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:8px}.field-label{display:grid;gap:6px;color:var(--muted);font-size:12px;font-weight:700}select,textarea{width:100%;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);padding:8px}textarea{min-height:72px;resize:vertical}.poster-bg{fill:#edf3f1}.poster-frame{fill:#fff;stroke:#8fa39d;stroke-width:2}.poster-kicker{fill:#0f766e;font:700 22px Inter,"Segoe UI",sans-serif}.poster-title{fill:#172522;font:700 42px Inter,"Segoe UI",sans-serif}.poster-meta{fill:#64736f;font:600 20px Inter,"Segoe UI",sans-serif}
-        @media(max-width:1000px){.workspace{grid-template-columns:1fr}.side-panel{grid-template-columns:1fr}.stats-bar{grid-template-columns:repeat(2,1fr)}}@media(max-width:620px){.app-shell{padding:12px}.topbar{display:block}.map-toolbar{display:block}.city-pills{margin-top:10px}.stats-bar{grid-template-columns:1fr}.inline-controls{grid-template-columns:1fr}}
+        .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}.stat-item{padding:12px;border-right:1px solid var(--line);background:var(--paper-2)}.stat-item:last-child{border-right:0}.stat-item span{display:block;color:var(--muted);font-size:11px}.stat-item strong{display:block;margin-top:5px;font-size:18px}.side-panel{display:grid;gap:0;overflow:hidden}.panel-section{padding:14px;border-bottom:1px solid var(--line)}.panel-section:last-child{border-bottom:0}.itinerary-list{display:grid;gap:12px}.day-block{display:grid;gap:6px;border-left:3px solid var(--focus);padding-left:10px}.day-summary{color:var(--muted);font-size:12px;line-height:1.4}.day-brief-meta{margin:-2px 0 8px;padding:7px 9px;border-left:3px solid #d89b17;background:#fff8dc;color:var(--ink);font-size:11px;line-height:1.45}.schedule-item{width:100%;display:grid;grid-template-columns:28px 1fr;gap:10px;text-align:left;border:1px solid var(--line);border-radius:6px;background:var(--paper-2);padding:8px;cursor:pointer}.schedule-item.active{border-color:var(--focus);background:#d9efeb}.schedule-item.focus-city{opacity:.45}.schedule-item.in-city{opacity:1}.schedule-index{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--marker);color:#fff;font-weight:700}.schedule-item strong{display:block;font-size:13px}.schedule-item small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.poi-card{display:grid;gap:8px}.empty-state{color:var(--muted);font-size:13px}.poi-meta{margin:0;color:var(--muted);font-size:12px}.poi-actions{display:flex;gap:8px;flex-wrap:wrap}.poi-actions a{border:1px solid var(--line-strong);border-radius:5px;background:#fff;color:var(--ink);padding:6px 8px;text-decoration:none;font-weight:700}.source-note{padding:8px 10px;border-left:3px solid var(--focus);background:#f5f8f7;color:var(--muted);font-size:11px;line-height:1.45}.poster-tools{display:grid;gap:14px}.collaboration-tools{display:grid;gap:9px}.collaboration-actions{display:grid;gap:8px}.collaboration-status{margin:0;color:var(--muted);font-size:11px;line-height:1.45}.collaboration-status.ok{color:#16724b}.collaboration-status.error{color:#b42318}.file-button{display:grid;place-items:center;cursor:pointer}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.poster-controls,.notes-editor{display:grid;gap:10px}.inline-controls{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:8px}.field-label{display:grid;gap:6px;color:var(--muted);font-size:12px;font-weight:700}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);padding:8px}textarea{min-height:72px;resize:vertical}.briefing-view{display:grid;gap:14px;max-width:880px;margin:0 auto;border:1px solid var(--line);border-radius:8px;background:var(--panel);box-shadow:0 16px 40px var(--shadow);overflow:hidden}.briefing-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;border-bottom:1px solid var(--line);background:#f5f8f7}.briefing-toolbar h2{margin:0}.briefing-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}#briefing-content{padding:0 18px 20px}.briefing-hero{display:grid;gap:6px;padding:18px 0;border-bottom:1px solid var(--line)}.briefing-date{color:var(--focus);font-size:12px;font-weight:750;text-transform:uppercase}.briefing-hero h3{margin:0;font-size:26px}.briefing-summary{margin:0;color:var(--muted);line-height:1.55}.briefing-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0}.briefing-fact{padding:11px;border-left:3px solid var(--focus);background:#f5f8f7}.briefing-fact span{display:block;color:var(--muted);font-size:11px}.briefing-fact strong{display:block;margin-top:4px;font-size:14px}.briefing-caution{margin:0 0 14px;padding:11px 12px;border-left:3px solid #d89b17;background:#fff8dc;line-height:1.5}.briefing-timeline{display:grid;gap:0}.briefing-stop{display:grid;grid-template-columns:74px 18px minmax(0,1fr);gap:10px;position:relative;padding:0 0 18px}.briefing-time{padding-top:2px;color:var(--ink);font-weight:750}.briefing-rail{position:relative}.briefing-rail:before{content:"";position:absolute;top:8px;bottom:-20px;left:8px;width:2px;background:var(--line)}.briefing-stop:last-child .briefing-rail:before{display:none}.briefing-dot{position:relative;z-index:1;display:block;width:18px;height:18px;border:4px solid #fff;border-radius:50%;background:var(--marker);box-shadow:0 0 0 1px var(--marker)}.briefing-stop-card{padding:12px;border:1px solid var(--line);border-radius:7px;background:#fff}.briefing-stop-head{display:flex;justify-content:space-between;gap:10px;align-items:start}.briefing-stop-head h4{margin:0;font-size:15px}.briefing-badges{display:flex;flex-wrap:wrap;gap:6px;margin:7px 0}.briefing-badge{display:inline-flex;padding:3px 7px;border-radius:999px;color:var(--muted);background:#edf3f1;font-size:11px;font-weight:650}.briefing-badge.reservation{color:#845d00;background:#fff1bf}.briefing-stop-card p{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.5}.poster-bg{fill:#edf3f1}.poster-frame{fill:#fff;stroke:#8fa39d;stroke-width:2}.poster-kicker{fill:#0f766e;font:700 22px Inter,"Segoe UI",sans-serif}.poster-title{fill:#172522;font:700 42px Inter,"Segoe UI",sans-serif}.poster-meta{fill:#64736f;font:600 20px Inter,"Segoe UI",sans-serif}
+        @media(max-width:1000px){.workspace{grid-template-columns:1fr}.side-panel{grid-template-columns:1fr}.stats-bar{grid-template-columns:repeat(2,1fr)}.briefing-toolbar{align-items:flex-start;flex-direction:column}.briefing-actions{width:100%}.briefing-actions select,.briefing-actions .text-button{flex:1 1 150px}}@media(max-width:620px){.app-shell{padding:12px}.topbar{display:block}.toolbar{width:100%;margin-top:12px}.map-toolbar{display:block}.city-pills{margin-top:10px}.stats-bar{grid-template-columns:1fr}.inline-controls{grid-template-columns:1fr}.briefing-view{margin:0}.briefing-facts{grid-template-columns:1fr}.briefing-stop{grid-template-columns:58px 18px minmax(0,1fr);gap:8px}#briefing-content{padding:0 12px 16px}}
       `;
     }
 
     function initViewer() {
-      const trip = JSON.parse(document.getElementById("trip-data").textContent);
+      const embeddedTrip = JSON.parse(document.getElementById("trip-data").textContent);
+      const sharedPayload = readSharePayload();
+      const trip = sharedPayload && sharedPayload.trip ? expandSharedTrip(sharedPayload.trip) : embeddedTrip;
+      document.getElementById("trip-data").textContent = JSON.stringify(trip);
+      document.title = `${trip.trip_title} | PixelTravelMap`;
+      document.querySelector("h1").textContent = trip.trip_title;
+
       const stops = flattenStops(trip);
       const storageKey = `PixelTravelMap:${trip.trip_title}:${trip.start_date}:${trip.end_date}`;
-      let currentStopIndex = 0;
-      let tripNotes = loadTripNotes();
       const cityPills = document.getElementById("city-pills");
-      cityPills.innerHTML = `<button class="city-pill active" type="button" data-view="overview">总览</button>` + [...new Set(stops.map(stop => stop.city))].sort().map(city => `<button class="city-pill" type="button" data-view="${esc(city)}">${esc(city)}</button>`).join("");
-      document.getElementById("map-container").innerHTML = renderMapSvg(trip, true);
-      document.getElementById("stats-bar").innerHTML = renderStatsHtml(trip);
-      document.getElementById("itinerary-list").innerHTML = renderItineraryHtml(trip);
       const daySelect = document.getElementById("poster-day-select");
-      daySelect.innerHTML = trip.days.map(day => `<option value="${day.day}">Day ${day.day} · ${esc(day.date)}</option>`).join("");
+      const briefingDaySelect = document.getElementById("briefing-day-select");
       const tripNote = document.getElementById("trip-note");
       const dayNote = document.getElementById("day-note");
       const stopNote = document.getElementById("stop-note");
+      const collaboratorName = document.getElementById("collaborator-name");
+      const collaborationStatus = document.getElementById("collaboration-status");
       const card = document.getElementById("poi-card");
       const viewLabel = document.getElementById("view-label");
-      function markers() { return Array.from(document.querySelectorAll(".marker[data-stop-index]")); }
-      function scheduleItems() { return Array.from(document.querySelectorAll(".schedule-item")); }
-      function cityButtons() { return Array.from(document.querySelectorAll(".city-pill")); }
+      let currentStopIndex = 0;
+      let tripNotes = mergeTripNotes(loadTripNotes(), sharedPayload && sharedPayload.notes);
+
+      cityPills.innerHTML = `<button class="city-pill active" type="button" data-view="overview">总览</button>` +
+        [...new Set(stops.map(stop => stop.city))].sort()
+          .map(city => `<button class="city-pill" type="button" data-view="${esc(city)}">${esc(city)}</button>`)
+          .join("");
+      document.getElementById("map-container").innerHTML = renderMapSvg(trip, true);
+      document.getElementById("stats-bar").innerHTML = renderStatsHtml(trip);
+      document.getElementById("itinerary-list").innerHTML = renderItineraryHtml(trip);
+      const dayOptions = trip.days.map(day => `<option value="${day.day}">Day ${day.day} · ${esc(day.date)}</option>`).join("");
+      daySelect.innerHTML = dayOptions;
+      briefingDaySelect.innerHTML = dayOptions;
+
+      function markers() {
+        return Array.from(document.querySelectorAll(".marker[data-stop-index]"));
+      }
+
+      function scheduleItems() {
+        return Array.from(document.querySelectorAll(".schedule-item"));
+      }
+
+      function cityButtons() {
+        return Array.from(document.querySelectorAll(".city-pill"));
+      }
+
       function loadTripNotes() {
         try {
-          const parsed = JSON.parse(localStorage.getItem(storageKey) || "{}");
-          return { trip: parsed.trip || "", days: parsed.days || {}, stops: parsed.stops || {} };
+          return normalizeTripNotes(JSON.parse(localStorage.getItem(storageKey) || "{}"));
         } catch {
-          return { trip: "", days: {}, stops: {} };
+          return emptyTripNotes();
         }
       }
-      function saveTripNotes() { localStorage.setItem(storageKey, JSON.stringify(tripNotes)); }
-      function selectedDayNumber() { return Number(daySelect.value || trip.days[0].day); }
-      function syncNoteFields() {
-        tripNote.value = tripNotes.trip || "";
-        dayNote.value = tripNotes.days[selectedDayNumber()] || "";
-        const stop = stops[currentStopIndex];
-        stopNote.value = stop ? (tripNotes.stops[stopKey(stop)] || "") : "";
+
+      function saveTripNotes() {
+        tripNotes.actor = collaboratorName.value.trim();
+        tripNotes.updatedAt = new Date().toISOString();
+        localStorage.setItem(storageKey, JSON.stringify(tripNotes));
       }
+
+      function selectedDayNumber() {
+        return Number(daySelect.value || trip.days[0].day);
+      }
+
+      function syncNoteFields() {
+        collaboratorName.value = tripNotes.actor || "";
+        tripNote.value = noteValue(tripNotes.trip);
+        dayNote.value = noteValue(tripNotes.days[selectedDayNumber()]);
+        const stop = stops[currentStopIndex];
+        stopNote.value = stop ? noteValue(tripNotes.stops[stopKey(stop)]) : "";
+      }
+
       function showCard(index) {
         const stop = stops[index];
+        if (!stop) return;
         currentStopIndex = index;
-        if (daySelect) daySelect.value = String(stop.day);
+        daySelect.value = String(stop.day);
+        briefingDaySelect.value = String(stop.day);
         markers().forEach(marker => marker.classList.toggle("active", Number(marker.dataset.stopIndex) === index));
         scheduleItems().forEach(item => item.classList.toggle("active", Number(item.dataset.stopIndex) === index));
         card.innerHTML = renderPoiCardHtml(stop);
         syncNoteFields();
       }
+
       function bindMarkers() {
         markers().forEach(marker => {
           if (marker.dataset.bound === "true") return;
@@ -1977,6 +2278,7 @@ initViewer();${closeScript}
           });
         });
       }
+
       function showView(view) {
         const isOverview = view === "overview";
         document.querySelectorAll(".map-view").forEach(group => {
@@ -1994,6 +2296,140 @@ initViewer();${closeScript}
         }
         bindMarkers();
       }
+
+      function tripIdentity() {
+        return `${trip.trip_title}|${trip.start_date}|${trip.end_date}`;
+      }
+
+      function setCollaborationStatus(message, kind = "") {
+        collaborationStatus.textContent = message;
+        collaborationStatus.className = "collaboration-status" + (kind ? ` ${kind}` : "");
+      }
+
+      async function copyText(value) {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(value);
+          return;
+        }
+        const textarea = document.createElement("textarea");
+        textarea.value = value;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        const copied = document.execCommand("copy");
+        textarea.remove();
+        if (!copied) throw new Error("当前浏览器无法自动复制，请手动复制地址栏链接。");
+      }
+
+      function buildShareLink(view = "map", dayNumber = selectedDayNumber()) {
+        const payload = {
+          v: 2,
+          trip: compactTripForShare(trip),
+          notes: tripNotes,
+          view,
+          day: Number(dayNumber),
+          sharedAt: new Date().toISOString()
+        };
+        const url = new URL(SHARE_VIEWER_URL);
+        url.hash = `ptm=${encodeBase64Url(JSON.stringify(payload))}`;
+        return url.toString();
+      }
+
+      function downloadJson(filename, value) {
+        downloadText(filename, JSON.stringify(value, null, 2), "application/json;charset=utf-8");
+      }
+
+      function exportCollaborationPackage() {
+        saveTripNotes();
+        downloadJson(`${fileSafe(trip.trip_title)}-collaboration-update.json`, {
+          format: "PixelTravelMapCollaboration",
+          version: 1,
+          tripIdentity: tripIdentity(),
+          actor: tripNotes.actor || "同行者",
+          exportedAt: new Date().toISOString(),
+          notes: tripNotes
+        });
+        setCollaborationStatus("协作更新包已导出，可发送给行程组织者合并。", "ok");
+      }
+
+      async function importCollaborationPackage(file) {
+        const payload = JSON.parse(await file.text());
+        if (payload.format !== "PixelTravelMapCollaboration" || !payload.notes) {
+          throw new Error("这不是 PixelTravelMap 协作更新包。");
+        }
+        if (payload.tripIdentity !== tripIdentity()) {
+          throw new Error("更新包属于另一份行程，已停止导入。");
+        }
+        const before = JSON.stringify(tripNotes);
+        tripNotes = mergeTripNotes(tripNotes, payload.notes);
+        saveTripNotes();
+        syncNoteFields();
+        renderBriefing(selectedDayNumber());
+        setCollaborationStatus(
+          before !== JSON.stringify(tripNotes)
+            ? `已合并 ${payload.actor || "同行者"} 的更新。`
+            : "没有比本地更新的备注需要合并。",
+          "ok"
+        );
+      }
+
+      function stopBriefingNote(stop) {
+        return noteValue(tripNotes.stops[stopKey(stop)]) || stop.cautions || stop.notes || "";
+      }
+
+      function renderBriefing(dayNumber) {
+        const day = trip.days.find(item => item.day === Number(dayNumber)) || trip.days[0];
+        const dayStops = stops.filter(stop => stop.day === day.day);
+        briefingDaySelect.value = String(day.day);
+        const timeline = dayStops.map((stop, index) => {
+          const reservation = stop.reservation_required
+            ? `预约${stop.reservation_time ? ` ${esc(stop.reservation_time)}` : ""}`
+            : "";
+          return `
+            <article class="briefing-stop">
+              <div class="briefing-time">${esc(stop.arrival_time || `第 ${index + 1} 站`)}</div>
+              <div class="briefing-rail"><span class="briefing-dot"></span></div>
+              <div class="briefing-stop-card">
+                <div class="briefing-stop-head">
+                  <h4>${esc(stop.name)}</h4>
+                  <span class="briefing-badge">${esc(stop.duration_min)} min</span>
+                </div>
+                <div class="briefing-badges">
+                  <span class="briefing-badge">${esc(stop.city)}</span>
+                  ${reservation ? `<span class="briefing-badge reservation">${reservation}</span>` : ""}
+                  ${stop.transit_buffer_min ? `<span class="briefing-badge">交通缓冲 ${esc(stop.transit_buffer_min)} min</span>` : ""}
+                </div>
+                ${stop.reservation_reference ? `<p><strong>凭证：</strong>${esc(stop.reservation_reference)}</p>` : ""}
+                ${stopBriefingNote(stop) ? `<p>${esc(stopBriefingNote(stop))}</p>` : ""}
+              </div>
+            </article>`;
+        }).join("");
+        document.getElementById("briefing-content").innerHTML = `
+          <div class="briefing-hero">
+            <span class="briefing-date">Day ${day.day} · ${esc(day.date)}</span>
+            <h3>${esc(day.summary || "明日行程")}</h3>
+            <p class="briefing-summary">${esc(noteValue(tripNotes.days[day.day]) || "请按集合时间到达，行程可根据现场情况调整。")}</p>
+          </div>
+          <div class="briefing-facts">
+            <div class="briefing-fact"><span>集合时间</span><strong>${esc(day.meeting_time || "待确认")}</strong></div>
+            <div class="briefing-fact"><span>集合地点</span><strong>${esc(day.meeting_point || "待确认")}</strong></div>
+            <div class="briefing-fact"><span>地点数量</span><strong>${dayStops.length} 个</strong></div>
+          </div>
+          ${day.cautions ? `<p class="briefing-caution"><strong>注意事项：</strong>${esc(day.cautions)}</p>` : ""}
+          <div class="briefing-timeline">${timeline}</div>
+        `;
+      }
+
+      function showAppView(view, dayNumber = selectedDayNumber()) {
+        const briefing = view === "briefing";
+        document.getElementById("map-workspace").hidden = briefing;
+        document.getElementById("briefing-view").hidden = !briefing;
+        document.getElementById("map-view-button").classList.toggle("active", !briefing);
+        document.getElementById("briefing-view-button").classList.toggle("active", briefing);
+        if (briefing) renderBriefing(dayNumber);
+      }
+
       scheduleItems().forEach(item => {
         item.addEventListener("click", () => {
           showView(item.dataset.city);
@@ -2002,24 +2438,71 @@ initViewer();${closeScript}
       });
       cityButtons().forEach(button => button.addEventListener("click", () => showView(button.dataset.view)));
       document.getElementById("overview-button").addEventListener("click", () => showView("overview"));
+      document.getElementById("map-view-button").addEventListener("click", () => showAppView("map"));
+      document.getElementById("briefing-view-button").addEventListener("click", () => showAppView("briefing"));
+      document.getElementById("briefing-back").addEventListener("click", () => showAppView("map"));
+      briefingDaySelect.addEventListener("change", () => renderBriefing(Number(briefingDaySelect.value)));
+      document.getElementById("copy-trip-link").addEventListener("click", async () => {
+        try {
+          saveTripNotes();
+          const link = buildShareLink("map");
+          await copyText(link);
+          setCollaborationStatus(`行程链接已复制${link.length > 12000 ? "，链接较长，部分聊天工具可能截断；可改发协作更新包。" : "。"}`, "ok");
+        } catch (error) {
+          setCollaborationStatus(error.message, "error");
+        }
+      });
+      document.getElementById("copy-briefing-link").addEventListener("click", async () => {
+        try {
+          saveTripNotes();
+          await copyText(buildShareLink("briefing", Number(briefingDaySelect.value)));
+          setCollaborationStatus("明日简报链接已复制，可直接发给同行者。", "ok");
+        } catch (error) {
+          setCollaborationStatus(error.message, "error");
+        }
+      });
+      document.getElementById("export-notes").addEventListener("click", exportCollaborationPackage);
+      document.getElementById("import-notes").addEventListener("change", async event => {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        try {
+          await importCollaborationPackage(file);
+        } catch (error) {
+          setCollaborationStatus(error.message, "error");
+        } finally {
+          event.target.value = "";
+        }
+      });
+      collaboratorName.addEventListener("change", saveTripNotes);
       document.getElementById("download-html").addEventListener("click", () => {
         downloadText(`${fileSafe(trip.trip_title)}.html`, "<!doctype html>\n" + document.documentElement.outerHTML, "text/html;charset=utf-8");
       });
-      tripNote.addEventListener("input", () => { tripNotes.trip = tripNote.value; saveTripNotes(); });
-      dayNote.addEventListener("input", () => { tripNotes.days[selectedDayNumber()] = dayNote.value; saveTripNotes(); });
+      tripNote.addEventListener("input", () => {
+        tripNotes.trip = noteRecord(tripNote.value, collaboratorName.value.trim());
+        saveTripNotes();
+      });
+      dayNote.addEventListener("input", () => {
+        tripNotes.days[selectedDayNumber()] = noteRecord(dayNote.value, collaboratorName.value.trim());
+        saveTripNotes();
+        renderBriefing(selectedDayNumber());
+      });
       stopNote.addEventListener("input", () => {
         const stop = stops[currentStopIndex];
-        if (stop) {
-          tripNotes.stops[stopKey(stop)] = stopNote.value;
-          saveTripNotes();
-        }
+        if (!stop) return;
+        tripNotes.stops[stopKey(stop)] = noteRecord(stopNote.value, collaboratorName.value.trim());
+        saveTripNotes();
+        renderBriefing(stop.day);
       });
-      daySelect.addEventListener("change", syncNoteFields);
+      daySelect.addEventListener("change", () => {
+        briefingDaySelect.value = daySelect.value;
+        syncNoteFields();
+      });
       document.getElementById("clear-notes").addEventListener("click", () => {
         if (!confirm("清空当前浏览器保存的旅行备注？")) return;
-        tripNotes = { trip: "", days: {}, stops: {} };
+        tripNotes = emptyTripNotes(collaboratorName.value.trim());
         localStorage.removeItem(storageKey);
         syncNoteFields();
+        renderBriefing(selectedDayNumber());
       });
       document.getElementById("download-overview-poster").addEventListener("click", () => {
         downloadSvg(`${fileSafe(trip.trip_title)}-overview-poster.svg`, renderOverviewPosterSvgForTrip(trip));
@@ -2030,9 +2513,13 @@ initViewer();${closeScript}
       document.getElementById("download-record-poster").addEventListener("click", () => {
         downloadSvg(`${fileSafe(trip.trip_title)}-travel-record-poster.svg`, renderRecordPosterSvgForTrip(trip, tripNotes));
       });
+
+      localStorage.setItem(storageKey, JSON.stringify(tripNotes));
       bindMarkers();
       if (stops.length) showCard(0);
       syncNoteFields();
+      renderBriefing(Number(sharedPayload && sharedPayload.day || trip.days[0].day));
+      showAppView(sharedPayload && sharedPayload.view === "briefing" ? "briefing" : "map", sharedPayload && sharedPayload.day);
     }
 
     function updateDownloads(enabled) {
@@ -2177,7 +2664,8 @@ initViewer();${closeScript}
       } else {
         const row = target.closest("[data-stop-index]");
         const stopIndex = Number(row.dataset.stopIndex);
-        draft.days[dayIndex].stops[stopIndex][target.dataset.field] = target.value;
+        draft.days[dayIndex].stops[stopIndex][target.dataset.field] =
+          target.type === "checkbox" ? target.checked : target.value;
       }
       activeTrip = null;
       updateDownloads(false);
@@ -2272,6 +2760,9 @@ initViewer();${closeScript}
         day: nextDay,
         date: addDays(draft.start_date, nextDay - 1),
         summary: "待补全行程",
+        meeting_time: "",
+        meeting_point: "",
+        cautions: "",
         stops: []
       });
       renderDraft();

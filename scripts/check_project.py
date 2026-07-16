@@ -25,6 +25,7 @@ PYTHON_FILES = [
     ROOT / "pixel_travel_map" / "quality.py",
     ROOT / "pixel_travel_map" / "renderer.py",
     ROOT / "scripts" / "build_builder.py",
+    ROOT / "scripts" / "build_viewer.py",
     ROOT / "scripts" / "check_artifact.py",
     ROOT / "scripts" / "check_project.py",
     ROOT / "scripts" / "generate_map.py",
@@ -55,6 +56,7 @@ POSTERS = [
 ]
 
 BUILDER_ARTIFACT = ROOT / "dist" / "builder.html"
+VIEWER_ARTIFACT = ROOT / "dist" / "viewer.html"
 
 
 def main() -> int:
@@ -93,6 +95,9 @@ def main() -> int:
 
     for error in check_builder_artifact(BUILDER_ARTIFACT):
         failures.append(f"{BUILDER_ARTIFACT.relative_to(ROOT)}: {error}")
+
+    for error in check_artifact(VIEWER_ARTIFACT):
+        failures.append(f"{VIEWER_ARTIFACT.relative_to(ROOT)}: {error}")
 
     if failures:
         print("FAILED")

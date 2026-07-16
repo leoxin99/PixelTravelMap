@@ -57,72 +57,72 @@
               <circle class="marker-halo" cx="536" cy="528" r="22"/>
               <circle class="marker-box" cx="536" cy="528" r="15"/>
               <text class="marker-num" x="536" y="533" text-anchor="middle">1</text>
-              <text class="poi-label" x="560" y="520">大阪城</text>
-              <text class="poi-day" x="560" y="538">Day 1 · Osaka</text>
+              <text class="poi-label" x="560" y="520" text-anchor="start">大阪城</text>
+              <text class="poi-day" x="560" y="538" text-anchor="start">Day 1 · Osaka</text>
             </g>
             
             <g class="marker marker-food" aria-label="道顿堀">
               <circle class="marker-halo" cx="480" cy="544" r="22"/>
               <circle class="marker-box" cx="480" cy="544" r="15"/>
               <text class="marker-num" x="480" y="549" text-anchor="middle">2</text>
-              <text class="poi-label" x="504" y="536">道顿堀</text>
-              <text class="poi-day" x="504" y="554">Day 1 · Osaka</text>
+              <text class="poi-label" x="504" y="536" text-anchor="start">道顿堀</text>
+              <text class="poi-day" x="504" y="554" text-anchor="start">Day 1 · Osaka</text>
             </g>
             
             <g class="marker marker-landmark" aria-label="清水寺">
               <circle class="marker-halo" cx="808" cy="128" r="22"/>
               <circle class="marker-box" cx="808" cy="128" r="15"/>
               <text class="marker-num" x="808" y="133" text-anchor="middle">3</text>
-              <text class="poi-label" x="832" y="120">清水寺</text>
-              <text class="poi-day" x="832" y="138">Day 2 · Kyoto</text>
+              <text class="poi-label" x="832" y="120" text-anchor="start">清水寺</text>
+              <text class="poi-day" x="832" y="138" text-anchor="start">Day 2 · Kyoto</text>
             </g>
             
             <g class="marker marker-experience" aria-label="二年坂">
               <circle class="marker-halo" cx="768" cy="128" r="22"/>
               <circle class="marker-box" cx="768" cy="128" r="15"/>
               <text class="marker-num" x="768" y="133" text-anchor="middle">4</text>
-              <text class="poi-label" x="792" y="120">二年坂</text>
-              <text class="poi-day" x="792" y="138">Day 2 · Kyoto</text>
+              <text class="poi-label" x="792" y="120" text-anchor="start">二年坂</text>
+              <text class="poi-day" x="792" y="138" text-anchor="start">Day 2 · Kyoto</text>
             </g>
             
             <g class="marker marker-landmark" aria-label="伏见稻荷大社">
               <circle class="marker-halo" cx="792" cy="168" r="22"/>
               <circle class="marker-box" cx="792" cy="168" r="15"/>
               <text class="marker-num" x="792" y="173" text-anchor="middle">5</text>
-              <text class="poi-label" x="816" y="160">伏见稻荷大社</text>
-              <text class="poi-day" x="816" y="178">Day 3 · Kyoto</text>
+              <text class="poi-label" x="816" y="160" text-anchor="start">伏见稻荷大社</text>
+              <text class="poi-day" x="816" y="178" text-anchor="start">Day 3 · Kyoto</text>
             </g>
             
             <g class="marker marker-nature" aria-label="奈良公园">
               <circle class="marker-halo" cx="872" cy="528" r="22"/>
               <circle class="marker-box" cx="872" cy="528" r="15"/>
               <text class="marker-num" x="872" y="533" text-anchor="middle">6</text>
-              <text class="poi-label" x="896" y="520">奈良公园</text>
-              <text class="poi-day" x="896" y="538">Day 3 · Nara</text>
+              <text class="poi-label" x="896" y="520" text-anchor="start">奈良公园</text>
+              <text class="poi-day" x="896" y="538" text-anchor="start">Day 3 · Nara</text>
             </g>
             
             <g class="marker marker-nature" aria-label="岚山竹林">
               <circle class="marker-halo" cx="688" cy="104" r="22"/>
               <circle class="marker-box" cx="688" cy="104" r="15"/>
               <text class="marker-num" x="688" y="109" text-anchor="middle">7</text>
-              <text class="poi-label" x="712" y="96">岚山竹林</text>
-              <text class="poi-day" x="712" y="114">Day 4 · Kyoto</text>
+              <text class="poi-label" x="712" y="96" text-anchor="start">岚山竹林</text>
+              <text class="poi-day" x="712" y="114" text-anchor="start">Day 4 · Kyoto</text>
             </g>
             
             <g class="marker marker-landmark" aria-label="金阁寺">
               <circle class="marker-halo" cx="752" cy="72" r="22"/>
               <circle class="marker-box" cx="752" cy="72" r="15"/>
               <text class="marker-num" x="752" y="77" text-anchor="middle">8</text>
-              <text class="poi-label" x="776" y="64">金阁寺</text>
-              <text class="poi-day" x="776" y="82">Day 4 · Kyoto</text>
+              <text class="poi-label" x="776" y="64" text-anchor="start">金阁寺</text>
+              <text class="poi-day" x="776" y="82" text-anchor="start">Day 4 · Kyoto</text>
             </g>
             
             <g class="marker marker-experience" aria-label="神户临海乐园">
               <circle class="marker-halo" cx="168" cy="536" r="22"/>
               <circle class="marker-box" cx="168" cy="536" r="15"/>
               <text class="marker-num" x="168" y="541" text-anchor="middle">9</text>
-              <text class="poi-label" x="192" y="528">神户临海乐园</text>
-              <text class="poi-day" x="192" y="546">Day 5 · Kobe</text>
+              <text class="poi-label" x="192" y="528" text-anchor="start">神户临海乐园</text>
+              <text class="poi-day" x="192" y="546" text-anchor="start">Day 5 · Kobe</text>
             </g>
             
       </g>

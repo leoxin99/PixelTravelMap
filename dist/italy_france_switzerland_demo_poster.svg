@@ -57,64 +57,64 @@
               <circle class="marker-halo" cx="952" cy="544" r="22"/>
               <circle class="marker-box" cx="952" cy="544" r="15"/>
               <text class="marker-num" x="952" y="549" text-anchor="middle">1</text>
-              <text class="poi-label" x="976" y="536">米兰大教堂</text>
-              <text class="poi-day" x="976" y="554">Day 1 · Milan</text>
+              <text class="poi-label" x="976" y="536" text-anchor="start">米兰大教堂</text>
+              <text class="poi-day" x="976" y="554" text-anchor="start">Day 1 · Milan</text>
             </g>
             
             <g class="marker marker-nature" aria-label="科莫湖">
               <circle class="marker-halo" cx="968" cy="392" r="22"/>
               <circle class="marker-box" cx="968" cy="392" r="15"/>
               <text class="marker-num" x="968" y="397" text-anchor="middle">2</text>
-              <text class="poi-label" x="992" y="384">科莫湖</text>
-              <text class="poi-day" x="992" y="402">Day 2 · Como</text>
+              <text class="poi-label" x="992" y="384" text-anchor="start">科莫湖</text>
+              <text class="poi-day" x="992" y="402" text-anchor="start">Day 2 · Como</text>
             </g>
             
             <g class="marker marker-landmark" aria-label="卡佩尔廊桥">
               <circle class="marker-halo" cx="776" cy="80" r="22"/>
               <circle class="marker-box" cx="776" cy="80" r="15"/>
               <text class="marker-num" x="776" y="85" text-anchor="middle">3</text>
-              <text class="poi-label" x="800" y="72">卡佩尔廊桥</text>
-              <text class="poi-day" x="800" y="90">Day 3 · Lucerne</text>
+              <text class="poi-label" x="800" y="72" text-anchor="start">卡佩尔廊桥</text>
+              <text class="poi-day" x="800" y="90" text-anchor="start">Day 3 · Lucerne</text>
             </g>
             
             <g class="marker marker-viewpoint" aria-label="哈德昆观景台">
               <circle class="marker-halo" cx="680" cy="184" r="22"/>
               <circle class="marker-box" cx="680" cy="184" r="15"/>
               <text class="marker-num" x="680" y="189" text-anchor="middle">4</text>
-              <text class="poi-label" x="704" y="176">哈德昆观景台</text>
-              <text class="poi-day" x="704" y="194">Day 4 · Interlaken</text>
+              <text class="poi-label" x="704" y="176" text-anchor="start">哈德昆观景台</text>
+              <text class="poi-day" x="704" y="194" text-anchor="start">Day 4 · Interlaken</text>
             </g>
             
             <g class="marker marker-landmark" aria-label="日内瓦大喷泉">
               <circle class="marker-halo" cx="344" cy="328" r="22"/>
               <circle class="marker-box" cx="344" cy="328" r="15"/>
               <text class="marker-num" x="344" y="333" text-anchor="middle">5</text>
-              <text class="poi-label" x="368" y="320">日内瓦大喷泉</text>
-              <text class="poi-day" x="368" y="338">Day 5 · Geneva</text>
+              <text class="poi-label" x="368" y="320" text-anchor="start">日内瓦大喷泉</text>
+              <text class="poi-day" x="368" y="338" text-anchor="start">Day 5 · Geneva</text>
             </g>
             
             <g class="marker marker-experience" aria-label="安纳西老城">
               <circle class="marker-halo" cx="336" cy="416" r="22"/>
               <circle class="marker-box" cx="336" cy="416" r="15"/>
               <text class="marker-num" x="336" y="421" text-anchor="middle">6</text>
-              <text class="poi-label" x="360" y="408">安纳西老城</text>
-              <text class="poi-day" x="360" y="426">Day 6 · Annecy</text>
+              <text class="poi-label" x="360" y="408" text-anchor="start">安纳西老城</text>
+              <text class="poi-day" x="360" y="426" text-anchor="start">Day 6 · Annecy</text>
             </g>
             
             <g class="marker marker-landmark" aria-label="里昂老城">
               <circle class="marker-halo" cx="72" cy="456" r="22"/>
               <circle class="marker-box" cx="72" cy="456" r="15"/>
               <text class="marker-num" x="72" y="461" text-anchor="middle">7</text>
-              <text class="poi-label" x="96" y="448">里昂老城</text>
-              <text class="poi-day" x="96" y="466">Day 7 · Lyon</text>
+              <text class="poi-label" x="96" y="448" text-anchor="start">里昂老城</text>
+              <text class="poi-day" x="96" y="466" text-anchor="start">Day 7 · Lyon</text>
             </g>
             
             <g class="marker marker-museum" aria-label="斯福尔扎城堡">
               <circle class="marker-halo" cx="952" cy="504" r="22"/>
               <circle class="marker-box" cx="952" cy="504" r="15"/>
               <text class="marker-num" x="952" y="509" text-anchor="middle">8</text>
-              <text class="poi-label" x="976" y="496">斯福尔扎城堡</text>
-              <text class="poi-day" x="976" y="514">Day 8 · Milan</text>
+              <text class="poi-label" x="976" y="496" text-anchor="start">斯福尔扎城堡</text>
+              <text class="poi-day" x="976" y="514" text-anchor="start">Day 8 · Milan</text>
             </g>
             
       </g>

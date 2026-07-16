@@ -161,6 +161,9 @@ def parse_coordinate_trip_text(text: str) -> dict[str, Any]:
                 "day": day_num,
                 "date": day_date.isoformat(),
                 "summary": day_match.group(2).strip(),
+                "meeting_time": None,
+                "meeting_point": "",
+                "cautions": "",
                 "stops": [],
             }
             days.append(current_day)
@@ -263,6 +266,19 @@ def _parse_coordinate_stop(line: str, day_num: int) -> dict[str, Any]:
 
     info_missing = fields.get("info_missing", "false").lower() == "true"
     source = "info_missing" if info_missing else fields.get("source", "user_coordinate_input")
+    reservation_required = fields.get("reservation", "false").lower() in {
+        "true",
+        "yes",
+        "required",
+        "1",
+        "需要",
+        "是",
+    }
+    buffer_value = fields.get("buffer", fields.get("transit_buffer", "20"))
+    try:
+        transit_buffer_min = max(0, min(360, int(float(buffer_value))))
+    except ValueError:
+        transit_buffer_min = 20
 
     return {
         "id": _slugify(f"day-{day_num}-{name}"),
@@ -275,6 +291,12 @@ def _parse_coordinate_stop(line: str, day_num: int) -> dict[str, Any]:
         "crs": fields.get("crs", "wgs84"),
         "category": category,
         "duration_min": duration,
+        "arrival_time": fields.get("arrival") or fields.get("arrival_time"),
+        "reservation_required": reservation_required,
+        "reservation_time": fields.get("reservation_time"),
+        "reservation_reference": fields.get("reservation_reference", ""),
+        "transit_buffer_min": transit_buffer_min,
+        "cautions": fields.get("cautions", fields.get("caution", "")),
         "description": fields.get("description"),
         "notes": fields.get("notes", "用户输入坐标地点。"),
         "source": source,

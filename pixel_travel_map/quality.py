@@ -74,6 +74,12 @@ def _is_date(value: Any) -> bool:
     return True
 
 
+def _is_time_or_none(value: Any) -> bool:
+    return value is None or (
+        isinstance(value, str) and bool(re.fullmatch(r"([01]\d|2[0-3]):[0-5]\d", value))
+    )
+
+
 def validate_trip(trip: dict[str, Any]) -> list[str]:
     """Return validation errors for the MVP schema contract.
 
@@ -122,6 +128,11 @@ def validate_trip(trip: dict[str, Any]) -> list[str]:
             errors.append(f"{prefix}.day must be a positive integer")
         if not _is_date(day.get("date")):
             errors.append(f"{prefix}.date must be YYYY-MM-DD")
+        if "meeting_time" in day and not _is_time_or_none(day.get("meeting_time")):
+            errors.append(f"{prefix}.meeting_time must be HH:MM or null")
+        for field in ["meeting_point", "cautions"]:
+            if field in day and not isinstance(day.get(field), str):
+                errors.append(f"{prefix}.{field} must be a string")
         if not isinstance(day.get("stops"), list) or not day.get("stops"):
             errors.append(f"{prefix}.stops must be a non-empty array")
             continue
@@ -165,6 +176,21 @@ def _validate_stop_values(stop: dict[str, Any], prefix: str, errors: list[str]) 
         errors.append(f"{prefix}.category must be one of {sorted(CATEGORY_VALUES)}")
     if not isinstance(stop.get("duration_min"), int) or stop["duration_min"] < 0:
         errors.append(f"{prefix}.duration_min must be a non-negative integer")
+    for field in ["arrival_time", "reservation_time"]:
+        if field in stop and not _is_time_or_none(stop.get(field)):
+            errors.append(f"{prefix}.{field} must be HH:MM or null")
+    if "reservation_required" in stop and not isinstance(
+        stop.get("reservation_required"), bool
+    ):
+        errors.append(f"{prefix}.reservation_required must be boolean")
+    if "transit_buffer_min" in stop and (
+        not isinstance(stop.get("transit_buffer_min"), int)
+        or not 0 <= stop["transit_buffer_min"] <= 360
+    ):
+        errors.append(f"{prefix}.transit_buffer_min must be an integer in [0, 360]")
+    for field in ["reservation_reference", "cautions"]:
+        if field in stop and not isinstance(stop.get(field), str):
+            errors.append(f"{prefix}.{field} must be a string")
     if not isinstance(stop.get("info_missing"), bool):
         errors.append(f"{prefix}.info_missing must be boolean")
     if stop.get("info_missing") and stop.get("source") != "info_missing":
@@ -208,6 +234,13 @@ def check_artifact(html_path: Path, max_bytes: int = 2_000_000) -> list[str]:
         'id="trip-note"',
         'id="day-note"',
         'id="stop-note"',
+        'id="copy-trip-link"',
+        'id="export-notes"',
+        'id="import-notes"',
+        'id="collaborator-name"',
+        'id="briefing-view"',
+        'id="briefing-day-select"',
+        "PixelTravelMapCollaboration",
         'name="viewport"',
         "data-stop-index",
     ]
@@ -265,6 +298,12 @@ def check_builder_artifact(html_path: Path, max_bytes: int = 2_500_000) -> list[
         'id="geocoder-provider"',
         'id="geocode-candidates"',
         'id="confirm-geocode"',
+        'id="copy-trip-link"',
+        'id="export-notes"',
+        'id="import-notes"',
+        'id="briefing-view"',
+        "PixelTravelMapCollaboration",
+        "SHARE_VIEWER_URL",
         "GEOCODER_CACHE_KEY",
         "waitForGeocoderSlot",
         "OpenStreetMap contributors",

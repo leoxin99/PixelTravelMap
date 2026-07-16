@@ -1,36 +1,48 @@
 # PixelTravelMap
 
-PixelTravelMap 是一个离线优先的旅行地图生成工具。它可以把旅行计划转换成结构化行程数据，并生成可直接打开的交互式 HTML 地图和 SVG 行程海报。
+PixelTravelMap 是一个离线优先的旅行行程工具：把 Word 或自然语言行程整理成可交互地图、同行明日简报和一页式 SVG 海报。
 
-项目不依赖后端服务，也不需要 API key。生成的 HTML 和 SVG 文件可以直接在浏览器中打开，适合用于旅行前查看路线、给同行朋友分享每日行程，或在旅行结束后整理记录。
+项目无需后端和 API key。生成的 HTML、JSON 与 SVG 可独立保存和打开，适合旅行前规划、途中协作和旅行后记录。
 
-## 在线 Demo
+## 在线体验
 
-- [在线创建器：上传 Word / 粘贴行程生成地图](https://leoxin99.github.io/PixelTravelMap/dist/builder.html)
-- [意法瑞 8 日自驾 HTML 地图](https://leoxin99.github.io/PixelTravelMap/dist/italy_france_switzerland_demo.html)
-- [意法瑞 8 日自驾 SVG 海报](https://leoxin99.github.io/PixelTravelMap/dist/italy_france_switzerland_demo_poster.svg)
-- [日本关西城市旅行 HTML 地图](https://leoxin99.github.io/PixelTravelMap/dist/japan_kansai_demo.html)
-- [北京亲子游 HTML 地图](https://leoxin99.github.io/PixelTravelMap/dist/beijing_family_demo.html)
+- [创建自己的地图](https://leoxin99.github.io/PixelTravelMap/dist/builder.html)
+- [意法瑞 8 日自驾 Demo](https://leoxin99.github.io/PixelTravelMap/dist/italy_france_switzerland_demo.html)
+- [日本关西城市旅行 Demo](https://leoxin99.github.io/PixelTravelMap/dist/japan_kansai_demo.html)
+- [北京亲子游 Demo](https://leoxin99.github.io/PixelTravelMap/dist/beijing_family_demo.html)
 
-## 功能
+## 成果展示
 
-- 根据行程数据生成交互式 HTML 地图
-- 使用经纬度展示 POI、路线、城市 detail view、比例尺和段间距离
-- 查看完整日程、地点详情、来源信息和导航链接
-- 在 HTML 页面内下载三类 SVG poster：
-  - 总行程 poster
-  - 每日行程 poster
-  - 旅行记录 poster
-- 在浏览器中记录全程备注、每日备注和地点备注
-- 支持在创建器中上传 `.docx` 行程或粘贴自然语言行程
-- 通过引导式对话补全标题、日期、地点和缺失信息
-- 可选使用 OpenStreetMap 推荐地点坐标，并由用户确认后写入草稿
-- 支持从自然语言 + 坐标的文本输入生成新地图
-- 提供本地校验脚本，检查 JSON、HTML 和 SVG artifact
+| 桌面端行程地图 | 手机端明日简报 |
+| --- | --- |
+| ![桌面端行程地图](docs/assets/pixeltravelmap-map-desktop.png) | ![手机端明日简报](docs/assets/pixeltravelmap-briefing-mobile.png) |
 
-## 快速开始
+## 主要功能
 
-需要 Python 3.10 或以上版本，无需安装第三方依赖。
+- 上传 `.docx` 或粘贴自然语言行程，生成可编辑草稿
+- 可选使用 OpenStreetMap 推荐坐标，并由用户确认
+- 基于经纬度显示路线、方位、比例尺和近似距离
+- 记录集合时间、到达时间、预约信息、交通缓冲和注意事项
+- 生成总行程、每日简报和旅行记录 SVG poster
+- 通过链接分享完整行程或指定日期的手机简报
+- 使用带作者和时间戳的 JSON 更新包导入、导出同行备注
+- 备注保存在浏览器 `localStorage`，不会上传到服务器
+
+## 使用方法
+
+### 浏览器创建
+
+1. 打开[在线创建器](https://leoxin99.github.io/PixelTravelMap/dist/builder.html)。
+2. 上传 `.docx`，或粘贴旅行计划后点击“解析行程”。
+3. 按引导补齐日期、地点、坐标和每日提醒。
+4. 点击“生成预览”，下载 JSON、交互式 HTML 或 SVG poster。
+5. 在生成的 HTML 中填写备注、打开明日简报或复制分享链接。
+
+分享链接把行程快照放在 URL fragment 中，不会随网页请求发送给服务器。项目保持纯静态架构，因此同行协作采用“导出更新包、导入合并”的异步方式，不宣称实时多人编辑。
+
+### 本地生成
+
+需要 Python 3.10 或以上版本，无第三方依赖。
 
 ```powershell
 git clone git@github.com:leoxin99/PixelTravelMap.git
@@ -38,52 +50,21 @@ cd PixelTravelMap
 python scripts/check_project.py
 ```
 
-生成一个示例地图：
+生成示例：
 
 ```powershell
-python scripts/generate_map.py --input examples/inputs/italy_france_switzerland_self_drive.txt --output dist/italy_france_switzerland_demo.html --dump-json dist/italy_france_switzerland_demo.json --poster-svg dist/italy_france_switzerland_demo_poster.svg
+python scripts/generate_map.py `
+  --input examples/inputs/tokyo_coordinate_trip.txt `
+  --output dist/tokyo_coordinate_demo.html `
+  --dump-json dist/tokyo_coordinate_demo.json `
+  --poster-svg dist/tokyo_coordinate_demo_poster.svg
 ```
 
-生成后打开：
+地点输入示例：
 
 ```text
-dist/italy_france_switzerland_demo.html
-dist/italy_france_switzerland_demo_poster.svg
-```
-
-## 使用自己的行程
-
-### 在线创建
-
-打开 [PixelTravelMap 创建器](https://leoxin99.github.io/PixelTravelMap/dist/builder.html)，可以：
-
-1. 上传 `.docx` 行程文档，或把旅行计划粘贴到文本框。
-2. 点击“解析行程”，检查自动生成的草稿。
-3. 按引导补齐日期、地点等信息；坐标可以手动填写，也可以开启在线定位后选择候选地点。
-4. 点击“生成预览”，下载 JSON、HTML 地图或 SVG poster。
-
-在线定位默认关闭，只在用户主动查找某个地点时请求 OpenStreetMap Nominatim；生成后的 HTML、JSON 和 SVG artifact 仍可离线使用。
-
-### 本地命令
-
-自定义行程可以使用“自然语言 + 坐标”的文本格式。每个地点需要提供 `lat`、`lon`、`city`、`country`、`category` 和 `duration`。
-
-示例：
-
-```text
-标题：日本东京 3 日亲子游
-日期：2026-07-01 到 2026-07-03
-交通：public-transit
-
 Day 1：东京塔和城市观景
-- 东京塔 (lat:35.6586, lon:139.7454, city:Tokyo, country:JP, category:landmark, duration:90)
-- 六本木之丘 (lat:35.6605, lon:139.7292, city:Tokyo, country:JP, category:viewpoint, duration:120)
-```
-
-运行：
-
-```powershell
-python scripts/generate_map.py --input examples/inputs/tokyo_coordinate_trip.txt --output dist/tokyo_coordinate_demo.html --dump-json dist/tokyo_coordinate_demo.json --poster-svg dist/tokyo_coordinate_demo_poster.svg
+- 东京塔 (lat:35.6586, lon:139.7454, city:Tokyo, country:JP, category:landmark, duration:90, arrival:09:30, reservation:true, reservation_time:09:30, buffer:20, caution:提前取票)
 ```
 
 支持的 `category`：
@@ -92,69 +73,36 @@ python scripts/generate_map.py --input examples/inputs/tokyo_coordinate_trip.txt
 landmark, museum, food, hotel, nature, transit, shopping, experience, viewpoint
 ```
 
-## HTML 页面内的 Poster 和备注
+## 常用命令
 
-打开生成的 HTML 后，可以在右侧 `Poster 工具` 中下载：
+```powershell
+# 重建在线创建器和分享查看器
+python scripts/build_builder.py --output dist/builder.html
+python scripts/build_viewer.py --output dist/viewer.html
 
-- 总行程 poster：适合旅行前整体了解路线
-- 每日行程 poster：适合旅行前一天发给同行朋友
-- 旅行记录 poster：适合旅行结束后整理回顾
+# 校验全部源码和产物
+python scripts/check_project.py
 
-页面内还可以填写：
-
-- 全程备注
-- 当前 Day 备注
-- 当前地点备注
-
-这些备注保存在当前浏览器的 `localStorage` 中，不会修改原始 JSON，也不会上传到任何服务器。
+# 校验单个 HTML 或 SVG
+python scripts/check_artifact.py dist/italy_france_switzerland_demo.html
+```
 
 ## 项目结构
 
 ```text
-PixelTravelMap/
-  pixel_travel_map/      # 解析、校验和渲染逻辑
-  scripts/               # 命令行工具
-  examples/              # 示例输入和期望 JSON
-  schemas/               # itinerary JSON schema
-  dist/                  # 示例 HTML / JSON / SVG artifact
-  docs/                  # 补充文档
+pixel_travel_map/   解析、校验与渲染
+scripts/            构建和检查命令
+examples/           示例输入与期望数据
+schemas/            行程 JSON Schema
+dist/               可直接发布的 HTML、JSON、SVG
 ```
 
-## 常用命令
+## 限制
 
-校验行程 JSON：
-
-```powershell
-python scripts/validate_trip.py examples/expected/italy_france_switzerland_self_drive.json
-```
-
-检查生成的 HTML 或 SVG：
-
-```powershell
-python scripts/check_artifact.py dist/italy_france_switzerland_demo.html
-python scripts/check_artifact.py dist/italy_france_switzerland_demo_poster.svg
-```
-
-运行完整项目检查：
-
-```powershell
-python scripts/check_project.py
-```
-
-重新生成在线创建器：
-
-```powershell
-python scripts/build_builder.py --output dist/builder.html
-```
-
-## 注意事项
-
-- 地图距离基于经纬度计算，为直线近似距离，不等同于实际驾车或步行距离。
-- 创建器的在线定位为可选能力，候选坐标需要用户确认；也可以始终保持关闭并手动填写。
-- 公共 Nominatim 只用于少量、用户主动触发的地点查询，不用于输入联想或批量地理编码。
-- 创建器支持 `.docx`，不支持旧版 `.doc`、PDF 或扫描图片。
-- HTML 和 SVG artifact 均为离线文件，不依赖外部脚本或样式。
-- 浏览器中的旅行备注只保存在本机当前浏览器中。
+- 地图距离是基于经纬度的直线近似值，不等同于实际道路距离。
+- 在线定位默认关闭，只在用户主动查询时访问 Nominatim。
+- 支持 `.docx`，暂不支持旧版 `.doc`、PDF 和扫描件。
+- 分享链接可能较长；复杂行程更适合发送下载后的 HTML 文件。
 
 ## License
 

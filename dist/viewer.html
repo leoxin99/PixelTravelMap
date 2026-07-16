@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>北京 3 日亲子慢游 | PixelTravelMap</title>
+  <title>PixelTravelMap 分享查看器 | PixelTravelMap</title>
   <style>
 
     :root {
@@ -435,12 +435,12 @@
   </style>
 </head>
 <body>
-  <script id="trip-data" type="application/json">{"schema_version":"1.0","trip_title":"北京 3 日亲子慢游","start_date":"2024-10-01","end_date":"2024-10-03","travelers":["adult","adult","child_6yo"],"budget_cny":null,"transport":"public-transit","style_theme":"pastel-pixel","lang":"zh-CN","days":[{"day":1,"date":"2024-10-01","summary":"中轴线与轻松登高","stops":[{"id":"forbidden-city","name":"故宫博物院","name_en":"The Palace Museum","city":"北京","country":"CN","lat":39.9163,"lon":116.3972,"crs":"gcj02","category":"museum","duration_min":180,"description":"北京代表性博物馆，适合作为亲子历史启蒙的核心点。","notes":"务必提前预约，现场以官方公告为准。","source":"official_site","source_url":"https://www.dpm.org.cn/","official_url":"https://www.dpm.org.cn/","navigation_url":null,"info_missing":false},{"id":"jingshan-park","name":"景山公园","name_en":"Jingshan Park","city":"北京","country":"CN","lat":39.9251,"lon":116.3967,"crs":"gcj02","category":"viewpoint","duration_min":80,"description":"故宫附近的登高视角，适合用短步行串联。","notes":"孩子体力不足时可跳过登高。","source":"demo_static_cache","source_url":null,"official_url":null,"navigation_url":null,"info_missing":false}]},{"day":2,"date":"2024-10-02","summary":"动物园与皇家园林","stops":[{"id":"beijing-zoo","name":"北京动物园","name_en":"Beijing Zoo","city":"北京","country":"CN","lat":39.9389,"lon":116.3364,"crs":"gcj02","category":"experience","duration_min":180,"description":"适合亲子游的动物主题景点。","notes":"上午安排更从容，注意孩子午休。","source":"official_site","source_url":"https://www.bjzoo.com/","official_url":"https://www.bjzoo.com/","navigation_url":null,"info_missing":false},{"id":"summer-palace","name":"颐和园","name_en":"Summer Palace","city":"北京","country":"CN","lat":39.9999,"lon":116.2755,"crs":"gcj02","category":"landmark","duration_min":180,"description":"湖区和园林空间适合放慢节奏游览。","notes":"不建议把全园逛完，选核心路线即可。","source":"official_site","source_url":"https://www.summerpalace-china.com/","official_url":"https://www.summerpalace-china.com/","navigation_url":null,"info_missing":false}]},{"day":3,"date":"2024-10-03","summary":"孩子友好博物馆与街区","stops":[{"id":"beijing-planetarium","name":"北京天文馆","name_en":"Beijing Planetarium","city":"北京","country":"CN","lat":39.9386,"lon":116.3372,"crs":"gcj02","category":"museum","duration_min":150,"description":"适合亲子科普的室内备选点。","notes":"展映场次请以官网为准。","source":"official_site","source_url":"https://www.bjp.org.cn/","official_url":"https://www.bjp.org.cn/","navigation_url":null,"info_missing":false},{"id":"nanluoguxiang","name":"南锣鼓巷","name_en":"Nanluoguxiang","city":"北京","country":"CN","lat":39.9408,"lon":116.4031,"crs":"gcj02","category":"experience","duration_min":90,"description":"街区信息变化较快，适合作为轻量散步收尾。","notes":"节假日人多，注意儿童安全。","source":"info_missing","source_url":null,"official_url":null,"navigation_url":null,"info_missing":true}]}]}</script>
+  <script id="trip-data" type="application/json">{"schema_version":"1.0","trip_title":"PixelTravelMap 分享查看器","start_date":"2026-01-01","end_date":"2026-01-01","travelers":["traveler"],"budget_cny":null,"transport":"unknown","style_theme":"pastel-pixel","lang":"zh-CN","days":[{"day":1,"date":"2026-01-01","summary":"请通过 PixelTravelMap 生成的分享链接打开此页面。","meeting_time":null,"meeting_point":"","cautions":"","stops":[{"id":"share-viewer-placeholder","name":"等待分享数据","name_en":null,"city":"PixelTravelMap","country":"WEB","lat":0.0,"lon":0.0,"crs":"wgs84","category":"transit","duration_min":0,"arrival_time":null,"reservation_required":false,"reservation_time":null,"reservation_reference":"","transit_buffer_min":0,"cautions":"","description":"此页面需要 URL fragment 中的分享数据。","notes":"请让行程组织者重新复制分享链接。","source":"PixelTravelMap","source_url":null,"official_url":null,"navigation_url":null,"info_missing":false}]}]}</script>
   <div class="app-shell">
     <header class="topbar">
       <div>
         <p class="eyebrow">PixelTravelMap Atlas</p>
-        <h1>北京 3 日亲子慢游</h1>
+        <h1>PixelTravelMap 分享查看器</h1>
         <p class="atlas-note">方位和距离基于 POI 经纬度计算，路线距离为直线近似值，不等同于实际驾车或步行距离。</p>
       </div>
       <div class="toolbar">
@@ -457,7 +457,7 @@
           <span id="view-label">总览地图</span>
           <div class="city-pills" id="city-pills" aria-label="城市 detail view">
             <button class="city-pill active" type="button" data-view="overview">总览</button>
-<button class="city-pill" type="button" data-view="北京">北京</button>
+<button class="city-pill" type="button" data-view="PixelTravelMap">PixelTravelMap</button>
           </div>
         </div>
         
@@ -478,140 +478,60 @@
       <rect x="28" y="28" width="984" height="564" class="atlas-frame-inner"/>
       <text x="48" y="56" class="map-title">总览地图</text>
       <text x="992" y="56" class="north" text-anchor="end">N ↑</text>
-      <polyline class="route-shadow" points="776,544 768,496 504,416 240,72 544,424 800,408"/>
-      <polyline class="route" points="776,544 768,496 504,416 240,72 544,424 800,408" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
-      <text class="distance-label" x="772" y="510" text-anchor="middle">1 km</text><text class="distance-label" x="636" y="446" text-anchor="middle">5 km</text><text class="distance-label" x="372" y="234" text-anchor="middle">9 km</text><text class="distance-label" x="392" y="238" text-anchor="middle">9 km</text><text class="distance-label" x="672" y="406" text-anchor="middle">6 km</text>
-      <text class="city-label" x="605" y="40" text-anchor="middle">北京 · CN</text>
+      <polyline class="route-shadow" points="280,72"/>
+      <polyline class="route" points="280,72" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      
+      <text class="city-label" x="280" y="40" text-anchor="middle">PixelTravelMap · WEB</text>
       <g class="marker-layer" data-view="overview">
         
-            <g class="marker marker-museum" data-stop-index="0" tabindex="0" role="button" aria-label="故宫博物院">
-              <circle class="marker-halo" cx="776" cy="544" r="22"/>
-              <circle class="marker-box" cx="776" cy="544" r="15"/>
-              <text class="marker-num" x="776" y="549" text-anchor="middle">1</text>
-              <text class="poi-label" x="800" y="536" text-anchor="start">故宫博物院</text>
-              <text class="poi-day" x="800" y="554" text-anchor="start">Day 1 · 北京</text>
-            </g>
-            
-            <g class="marker marker-viewpoint" data-stop-index="1" tabindex="0" role="button" aria-label="景山公园">
-              <circle class="marker-halo" cx="768" cy="496" r="22"/>
-              <circle class="marker-box" cx="768" cy="496" r="15"/>
-              <text class="marker-num" x="768" y="501" text-anchor="middle">2</text>
-              <text class="poi-label" x="792" y="488" text-anchor="start">景山公园</text>
-              <text class="poi-day" x="792" y="506" text-anchor="start">Day 1 · 北京</text>
-            </g>
-            
-            <g class="marker marker-experience" data-stop-index="2" tabindex="0" role="button" aria-label="北京动物园">
-              <circle class="marker-halo" cx="504" cy="416" r="22"/>
-              <circle class="marker-box" cx="504" cy="416" r="15"/>
-              <text class="marker-num" x="504" y="421" text-anchor="middle">3</text>
-              <text class="poi-label" x="528" y="408" text-anchor="start">北京动物园</text>
-              <text class="poi-day" x="528" y="426" text-anchor="start">Day 2 · 北京</text>
-            </g>
-            
-            <g class="marker marker-landmark" data-stop-index="3" tabindex="0" role="button" aria-label="颐和园">
-              <circle class="marker-halo" cx="240" cy="72" r="22"/>
-              <circle class="marker-box" cx="240" cy="72" r="15"/>
-              <text class="marker-num" x="240" y="77" text-anchor="middle">4</text>
-              <text class="poi-label" x="264" y="64" text-anchor="start">颐和园</text>
-              <text class="poi-day" x="264" y="82" text-anchor="start">Day 2 · 北京</text>
-            </g>
-            
-            <g class="marker marker-museum" data-stop-index="4" tabindex="0" role="button" aria-label="北京天文馆">
-              <circle class="marker-halo" cx="544" cy="424" r="22"/>
-              <circle class="marker-box" cx="544" cy="424" r="15"/>
-              <text class="marker-num" x="544" y="429" text-anchor="middle">5</text>
-              <text class="poi-label" x="568" y="416" text-anchor="start">北京天文馆</text>
-              <text class="poi-day" x="568" y="434" text-anchor="start">Day 3 · 北京</text>
-            </g>
-            
-            <g class="marker marker-experience" data-stop-index="5" tabindex="0" role="button" aria-label="南锣鼓巷">
-              <circle class="marker-halo" cx="800" cy="408" r="22"/>
-              <circle class="marker-box" cx="800" cy="408" r="15"/>
-              <text class="marker-num" x="800" y="413" text-anchor="middle">6</text>
-              <text class="poi-label" x="824" y="400" text-anchor="start">南锣鼓巷</text>
-              <text class="poi-day" x="824" y="418" text-anchor="start">Day 3 · 北京</text>
+            <g class="marker marker-transit" data-stop-index="0" tabindex="0" role="button" aria-label="等待分享数据">
+              <circle class="marker-halo" cx="280" cy="72" r="22"/>
+              <circle class="marker-box" cx="280" cy="72" r="15"/>
+              <text class="marker-num" x="280" y="77" text-anchor="middle">1</text>
+              <text class="poi-label" x="304" y="64" text-anchor="start">等待分享数据</text>
+              <text class="poi-day" x="304" y="82" text-anchor="start">Day 1 · PixelTravelMap</text>
             </g>
             
       </g>
       
       <g class="scale-bar">
-        <line x1="48" y1="572" x2="115" y2="572" />
+        <line x1="48" y1="572" x2="104" y2="572" />
         <line x1="48" y1="564" x2="48" y2="580" />
-        <line x1="115" y1="564" x2="115" y2="580" />
-        <text x="82" y="558" text-anchor="middle">≈ 1 km</text>
+        <line x1="104" y1="564" x2="104" y2="580" />
+        <text x="76" y="558" text-anchor="middle">≈ 1 km</text>
       </g>
 
     </g>
   </g>
 
   <g transform="translate(0,0)">
-    <g class="map-view" data-view="北京" style="display:none">
+    <g class="map-view" data-view="PixelTravelMap" style="display:none">
       <rect width="1040" height="620" class="atlas-water"/>
       <rect width="1040" height="620" fill="url(#atlas-grid)"/>
       <rect x="28" y="28" width="984" height="564" class="atlas-frame-inner"/>
-      <text x="48" y="56" class="map-title">北京 detail view</text>
+      <text x="48" y="56" class="map-title">PixelTravelMap detail view</text>
       <text x="992" y="56" class="north" text-anchor="end">N ↑</text>
-      <polyline class="route-shadow" points="776,544 768,496 504,416 240,72 544,424 800,408"/>
-      <polyline class="route" points="776,544 768,496 504,416 240,72 544,424 800,408" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
-      <text class="distance-label" x="772" y="510" text-anchor="middle">1 km</text><text class="distance-label" x="636" y="446" text-anchor="middle">5 km</text><text class="distance-label" x="372" y="234" text-anchor="middle">9 km</text><text class="distance-label" x="392" y="238" text-anchor="middle">9 km</text><text class="distance-label" x="672" y="406" text-anchor="middle">6 km</text>
-      <text class="city-label" x="605" y="40" text-anchor="middle">北京 · CN</text>
-      <g class="marker-layer" data-view="北京">
+      <polyline class="route-shadow" points="280,72"/>
+      <polyline class="route" points="280,72" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      
+      <text class="city-label" x="280" y="40" text-anchor="middle">PixelTravelMap · WEB</text>
+      <g class="marker-layer" data-view="PixelTravelMap">
         
-            <g class="marker marker-museum" data-stop-index="0" tabindex="0" role="button" aria-label="故宫博物院">
-              <circle class="marker-halo" cx="776" cy="544" r="22"/>
-              <circle class="marker-box" cx="776" cy="544" r="15"/>
-              <text class="marker-num" x="776" y="549" text-anchor="middle">1</text>
-              <text class="poi-label" x="800" y="536" text-anchor="start">故宫博物院</text>
-              <text class="poi-day" x="800" y="554" text-anchor="start">Day 1 · 北京</text>
-            </g>
-            
-            <g class="marker marker-viewpoint" data-stop-index="1" tabindex="0" role="button" aria-label="景山公园">
-              <circle class="marker-halo" cx="768" cy="496" r="22"/>
-              <circle class="marker-box" cx="768" cy="496" r="15"/>
-              <text class="marker-num" x="768" y="501" text-anchor="middle">2</text>
-              <text class="poi-label" x="792" y="488" text-anchor="start">景山公园</text>
-              <text class="poi-day" x="792" y="506" text-anchor="start">Day 1 · 北京</text>
-            </g>
-            
-            <g class="marker marker-experience" data-stop-index="2" tabindex="0" role="button" aria-label="北京动物园">
-              <circle class="marker-halo" cx="504" cy="416" r="22"/>
-              <circle class="marker-box" cx="504" cy="416" r="15"/>
-              <text class="marker-num" x="504" y="421" text-anchor="middle">3</text>
-              <text class="poi-label" x="528" y="408" text-anchor="start">北京动物园</text>
-              <text class="poi-day" x="528" y="426" text-anchor="start">Day 2 · 北京</text>
-            </g>
-            
-            <g class="marker marker-landmark" data-stop-index="3" tabindex="0" role="button" aria-label="颐和园">
-              <circle class="marker-halo" cx="240" cy="72" r="22"/>
-              <circle class="marker-box" cx="240" cy="72" r="15"/>
-              <text class="marker-num" x="240" y="77" text-anchor="middle">4</text>
-              <text class="poi-label" x="264" y="64" text-anchor="start">颐和园</text>
-              <text class="poi-day" x="264" y="82" text-anchor="start">Day 2 · 北京</text>
-            </g>
-            
-            <g class="marker marker-museum" data-stop-index="4" tabindex="0" role="button" aria-label="北京天文馆">
-              <circle class="marker-halo" cx="544" cy="424" r="22"/>
-              <circle class="marker-box" cx="544" cy="424" r="15"/>
-              <text class="marker-num" x="544" y="429" text-anchor="middle">5</text>
-              <text class="poi-label" x="568" y="416" text-anchor="start">北京天文馆</text>
-              <text class="poi-day" x="568" y="434" text-anchor="start">Day 3 · 北京</text>
-            </g>
-            
-            <g class="marker marker-experience" data-stop-index="5" tabindex="0" role="button" aria-label="南锣鼓巷">
-              <circle class="marker-halo" cx="800" cy="408" r="22"/>
-              <circle class="marker-box" cx="800" cy="408" r="15"/>
-              <text class="marker-num" x="800" y="413" text-anchor="middle">6</text>
-              <text class="poi-label" x="824" y="400" text-anchor="start">南锣鼓巷</text>
-              <text class="poi-day" x="824" y="418" text-anchor="start">Day 3 · 北京</text>
+            <g class="marker marker-transit" data-stop-index="0" tabindex="0" role="button" aria-label="等待分享数据">
+              <circle class="marker-halo" cx="280" cy="72" r="22"/>
+              <circle class="marker-box" cx="280" cy="72" r="15"/>
+              <text class="marker-num" x="280" y="77" text-anchor="middle">1</text>
+              <text class="poi-label" x="304" y="64" text-anchor="start">等待分享数据</text>
+              <text class="poi-day" x="304" y="82" text-anchor="start">Day 1 · PixelTravelMap</text>
             </g>
             
       </g>
       
       <g class="scale-bar">
-        <line x1="48" y1="572" x2="115" y2="572" />
+        <line x1="48" y1="572" x2="104" y2="572" />
         <line x1="48" y1="564" x2="48" y2="580" />
-        <line x1="115" y1="564" x2="115" y2="580" />
-        <text x="82" y="558" text-anchor="middle">≈ 1 km</text>
+        <line x1="104" y1="564" x2="104" y2="580" />
+        <text x="76" y="558" text-anchor="middle">≈ 1 km</text>
       </g>
 
     </g>
@@ -620,10 +540,10 @@
         </svg>
 
         <div class="stats-bar" id="stats-bar">
-          <div class="stat-item"><span>天数</span><strong>3</strong></div>
+          <div class="stat-item"><span>天数</span><strong>1</strong></div>
 <div class="stat-item"><span>城市</span><strong>1</strong></div>
-<div class="stat-item"><span>地点</span><strong>6</strong></div>
-<div class="stat-item"><span>直线路线</span><strong>29 km</strong></div>
+<div class="stat-item"><span>地点</span><strong>1</strong></div>
+<div class="stat-item"><span>直线路线</span><strong>0 km</strong></div>
 <div class="stat-item"><span>预算</span><strong>未填写预算</strong></div>
         </div>
       </section>
@@ -632,65 +552,14 @@
         <section class="panel-section">
           <h2>完整行程</h2>
           <div id="itinerary-list" class="itinerary-list">
-            <div class="day-block"><h3>Day 1 <span>2024-10-01</span></h3>
-<p class="day-summary">中轴线与轻松登高</p>
+            <div class="day-block"><h3>Day 1 <span>2026-01-01</span></h3>
+<p class="day-summary">请通过 PixelTravelMap 生成的分享链接打开此页面。</p>
 
-                <button class="schedule-item" type="button" data-stop-index="0" data-city="北京">
+                <button class="schedule-item" type="button" data-stop-index="0" data-city="PixelTravelMap">
                   <span class="schedule-index">1</span>
                   <span>
-                    <strong>故宫博物院</strong>
-                    <small>北京 · 180 min</small>
-                  </span>
-                </button>
-                
-
-                <button class="schedule-item" type="button" data-stop-index="1" data-city="北京">
-                  <span class="schedule-index">2</span>
-                  <span>
-                    <strong>景山公园</strong>
-                    <small>北京 · 80 min</small>
-                  </span>
-                </button>
-                
-</div>
-<div class="day-block"><h3>Day 2 <span>2024-10-02</span></h3>
-<p class="day-summary">动物园与皇家园林</p>
-
-                <button class="schedule-item" type="button" data-stop-index="2" data-city="北京">
-                  <span class="schedule-index">3</span>
-                  <span>
-                    <strong>北京动物园</strong>
-                    <small>北京 · 180 min</small>
-                  </span>
-                </button>
-                
-
-                <button class="schedule-item" type="button" data-stop-index="3" data-city="北京">
-                  <span class="schedule-index">4</span>
-                  <span>
-                    <strong>颐和园</strong>
-                    <small>北京 · 180 min</small>
-                  </span>
-                </button>
-                
-</div>
-<div class="day-block"><h3>Day 3 <span>2024-10-03</span></h3>
-<p class="day-summary">孩子友好博物馆与街区</p>
-
-                <button class="schedule-item" type="button" data-stop-index="4" data-city="北京">
-                  <span class="schedule-index">5</span>
-                  <span>
-                    <strong>北京天文馆</strong>
-                    <small>北京 · 150 min</small>
-                  </span>
-                </button>
-                
-
-                <button class="schedule-item" type="button" data-stop-index="5" data-city="北京">
-                  <span class="schedule-index">6</span>
-                  <span>
-                    <strong>南锣鼓巷</strong>
-                    <small>北京 · 90 min</small>
+                    <strong>等待分享数据</strong>
+                    <small>PixelTravelMap · 0 min</small>
                   </span>
                 </button>
                 
@@ -722,9 +591,7 @@
             <label class="field-label" for="poster-day-select">每日简报</label>
             <div class="inline-controls">
               <select id="poster-day-select">
-                <option value="1">Day 1 · 2024-10-01</option>
-<option value="2">Day 2 · 2024-10-02</option>
-<option value="3">Day 3 · 2024-10-03</option>
+                <option value="1">Day 1 · 2026-01-01</option>
               </select>
               <button class="text-button compact" id="download-day-poster" type="button">下载每日 poster</button>
             </div>
@@ -750,9 +617,7 @@
         </div>
         <div class="briefing-actions">
           <select id="briefing-day-select" aria-label="选择简报日期">
-            <option value="1">Day 1 · 2024-10-01</option>
-<option value="2">Day 2 · 2024-10-02</option>
-<option value="3">Day 3 · 2024-10-03</option>
+            <option value="1">Day 1 · 2026-01-01</option>
           </select>
           <button class="text-button" id="copy-briefing-link" type="button">复制简报链接</button>
           <button class="text-button" id="briefing-back" type="button">返回地图</button>
