@@ -47,54 +47,55 @@
       <rect x="28" y="28" width="1264" height="504" class="atlas-frame-inner"/>
       <text x="48" y="56" class="map-title">总览地图</text>
       <text x="1272" y="56" class="north" text-anchor="end">N ↑</text>
-      <polyline class="route" points="776,544 768,496 504,416 240,72 512,424 800,408" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
-      <text class="distance-label" x="772" y="510" text-anchor="middle">1 km</text><text class="distance-label" x="636" y="446" text-anchor="middle">5 km</text><text class="distance-label" x="372" y="234" text-anchor="middle">9 km</text><text class="distance-label" x="376" y="238" text-anchor="middle">9 km</text><text class="distance-label" x="656" y="406" text-anchor="middle">6 km</text>
-      <text class="city-label" x="600" y="40" text-anchor="middle">北京 · CN</text>
+      <polyline class="route-shadow" points="776,544 768,496 504,416 240,72 544,424 800,408"/>
+      <polyline class="route" points="776,544 768,496 504,416 240,72 544,424 800,408" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      <text class="distance-label" x="772" y="510" text-anchor="middle">1 km</text><text class="distance-label" x="636" y="446" text-anchor="middle">5 km</text><text class="distance-label" x="372" y="234" text-anchor="middle">9 km</text><text class="distance-label" x="392" y="238" text-anchor="middle">9 km</text><text class="distance-label" x="672" y="406" text-anchor="middle">6 km</text>
+      <text class="city-label" x="605" y="40" text-anchor="middle">北京 · CN</text>
       <g class="marker-layer" data-view="overview">
         
             <g class="marker marker-museum" aria-label="故宫博物院">
-              <circle class="marker-halo" cx="776" cy="544" r="18"/>
-              <rect class="marker-box" x="761" y="529" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="776" cy="544" r="22"/>
+              <circle class="marker-box" cx="776" cy="544" r="15"/>
               <text class="marker-num" x="776" y="549" text-anchor="middle">1</text>
               <text class="poi-label" x="800" y="536">故宫博物院</text>
               <text class="poi-day" x="800" y="554">Day 1 · 北京</text>
             </g>
             
             <g class="marker marker-viewpoint" aria-label="景山公园">
-              <circle class="marker-halo" cx="768" cy="496" r="18"/>
-              <rect class="marker-box" x="753" y="481" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="768" cy="496" r="22"/>
+              <circle class="marker-box" cx="768" cy="496" r="15"/>
               <text class="marker-num" x="768" y="501" text-anchor="middle">2</text>
               <text class="poi-label" x="792" y="488">景山公园</text>
               <text class="poi-day" x="792" y="506">Day 1 · 北京</text>
             </g>
             
             <g class="marker marker-experience" aria-label="北京动物园">
-              <circle class="marker-halo" cx="504" cy="416" r="18"/>
-              <rect class="marker-box" x="489" y="401" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="504" cy="416" r="22"/>
+              <circle class="marker-box" cx="504" cy="416" r="15"/>
               <text class="marker-num" x="504" y="421" text-anchor="middle">3</text>
               <text class="poi-label" x="528" y="408">北京动物园</text>
               <text class="poi-day" x="528" y="426">Day 2 · 北京</text>
             </g>
             
             <g class="marker marker-landmark" aria-label="颐和园">
-              <circle class="marker-halo" cx="240" cy="72" r="18"/>
-              <rect class="marker-box" x="225" y="57" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="240" cy="72" r="22"/>
+              <circle class="marker-box" cx="240" cy="72" r="15"/>
               <text class="marker-num" x="240" y="77" text-anchor="middle">4</text>
               <text class="poi-label" x="264" y="64">颐和园</text>
               <text class="poi-day" x="264" y="82">Day 2 · 北京</text>
             </g>
             
             <g class="marker marker-museum" aria-label="北京天文馆">
-              <circle class="marker-halo" cx="512" cy="424" r="18"/>
-              <rect class="marker-box" x="497" y="409" width="30" height="30" rx="2"/>
-              <text class="marker-num" x="512" y="429" text-anchor="middle">5</text>
-              <text class="poi-label" x="536" y="416">北京天文馆</text>
-              <text class="poi-day" x="536" y="434">Day 3 · 北京</text>
+              <circle class="marker-halo" cx="544" cy="424" r="22"/>
+              <circle class="marker-box" cx="544" cy="424" r="15"/>
+              <text class="marker-num" x="544" y="429" text-anchor="middle">5</text>
+              <text class="poi-label" x="568" y="416">北京天文馆</text>
+              <text class="poi-day" x="568" y="434">Day 3 · 北京</text>
             </g>
             
             <g class="marker marker-experience" aria-label="南锣鼓巷">
-              <circle class="marker-halo" cx="800" cy="408" r="18"/>
-              <rect class="marker-box" x="785" y="393" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="800" cy="408" r="22"/>
+              <circle class="marker-box" cx="800" cy="408" r="15"/>
               <text class="marker-num" x="800" y="413" text-anchor="middle">6</text>
               <text class="poi-label" x="824" y="400">南锣鼓巷</text>
               <text class="poi-day" x="824" y="418">Day 3 · 北京</text>

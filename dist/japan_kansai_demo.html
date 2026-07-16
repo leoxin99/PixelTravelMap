@@ -7,32 +7,29 @@
   <style>
 
     :root {
-      --paper: #f6ecd9;
-      --paper-2: #fffaf0;
-      --ink: #26313d;
-      --muted: #697386;
-      --water: #d9edf0;
-      --grid: rgba(38,49,61,0.12);
-      --route: #d64f3f;
-      --route-soft: #f2a35f;
-      --marker: #1f7a8c;
-      --marker-2: #f5c542;
-      --panel: #fffdf7;
-      --line: #313d4c;
-      --focus: #7a3e9d;
-      --shadow: rgba(38, 49, 61, 0.22);
+      --paper: #edf3f1;
+      --paper-2: #ffffff;
+      --ink: #172522;
+      --muted: #64736f;
+      --water: #dceff1;
+      --grid: rgba(23,37,34,0.09);
+      --route: #e65c4f;
+      --route-soft: #f8c5bf;
+      --marker: #147d75;
+      --marker-2: #f1b82d;
+      --panel: #ffffff;
+      --line: #c9d5d1;
+      --line-strong: #8fa39d;
+      --focus: #0f766e;
+      --shadow: rgba(23, 37, 34, 0.08);
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
       color: var(--ink);
-      background:
-        linear-gradient(90deg, rgba(38,49,61,0.04) 1px, transparent 1px),
-        linear-gradient(rgba(38,49,61,0.04) 1px, transparent 1px),
-        var(--paper);
-      background-size: 18px 18px;
-      font-family: "Courier New", ui-monospace, monospace;
+      background: var(--paper);
+      font-family: Inter, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
       letter-spacing: 0;
     }
     button, a { font: inherit; }
@@ -48,7 +45,7 @@
       margin: 0 0 4px;
       color: var(--focus);
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 750;
       text-transform: uppercase;
     }
     h1, h2, h3, p { margin-top: 0; }
@@ -59,14 +56,15 @@
     .atlas-note { max-width: 760px; margin-bottom: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
     .toolbar { display: flex; gap: 8px; align-items: center; }
     .icon-button, .text-button, .city-pill {
-      border: 2px solid var(--line);
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
       background: var(--panel);
       color: var(--ink);
       cursor: pointer;
-      box-shadow: 3px 3px 0 var(--line);
     }
     .icon-button { width: 42px; height: 38px; font-size: 20px; }
     .text-button { min-height: 38px; padding: 0 14px; font-weight: 700; }
+    .text-button:hover, .city-pill:hover { border-color: var(--focus); color: var(--focus); background: #d9efeb; }
     .text-button.compact { width: 100%; min-height: 34px; padding: 0 10px; font-size: 12px; }
     .text-button.danger { background: #fff0f0; }
     .workspace {
@@ -76,9 +74,10 @@
       align-items: start;
     }
     .map-stage, .side-panel {
-      border: 3px solid var(--line);
+      border: 1px solid var(--line);
+      border-radius: 8px;
       background: var(--paper-2);
-      box-shadow: 6px 6px 0 var(--shadow);
+      box-shadow: 0 16px 40px var(--shadow);
     }
     .map-stage { min-width: 0; overflow: hidden; }
     .map-toolbar {
@@ -87,18 +86,17 @@
       gap: 12px;
       align-items: center;
       padding: 12px;
-      border-bottom: 3px solid var(--line);
-      background: #ebd78f;
+      border-bottom: 1px solid var(--line);
+      background: #f5f8f7;
       font-weight: 700;
     }
     .city-pills { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
     .city-pill {
       min-height: 30px;
       padding: 0 10px;
-      box-shadow: 2px 2px 0 var(--line);
       font-size: 12px;
     }
-    .city-pill.active { background: var(--ink); color: var(--paper-2); }
+    .city-pill.active { border-color: var(--focus); background: var(--focus); color: #fff; }
     .pixel-map {
       display: block;
       width: 100%;
@@ -108,29 +106,37 @@
       shape-rendering: geometricPrecision;
     }
     .atlas-water { fill: var(--water); }
-    .atlas-frame-inner { fill: rgba(255,255,255,0.24); stroke: var(--line); stroke-width: 2; }
+    .atlas-frame-inner { fill: rgba(255,255,255,0.42); stroke: rgba(23,37,34,0.12); stroke-width: 1; }
     .map-title { fill: var(--ink); font-size: 18px; font-weight: 700; }
     .north { fill: var(--line); font-size: 18px; font-weight: 700; }
+    .route-shadow {
+      fill: none;
+      stroke: rgba(255,255,255,0.9);
+      stroke-width: 9;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+    }
     .route {
       fill: none;
       stroke: var(--route);
-      stroke-width: 4;
+      stroke-width: 4.5;
       stroke-linejoin: round;
       stroke-linecap: round;
-      stroke-dasharray: 12 7;
     }
     .arrow-head { fill: var(--route); }
     .distance-label {
+      pointer-events: none;
       paint-order: stroke;
-      stroke: var(--paper-2);
+      stroke: rgba(255,255,255,0.96);
       stroke-width: 5;
-      fill: var(--line);
+      fill: #41514d;
       font-size: 13px;
       font-weight: 700;
     }
     .city-label {
+      pointer-events: none;
       paint-order: stroke;
-      stroke: var(--paper-2);
+      stroke: rgba(255,255,255,0.96);
       stroke-width: 6;
       fill: var(--focus);
       font-size: 17px;
@@ -138,20 +144,22 @@
     }
     .marker { cursor: pointer; outline: none; }
     .marker.context { opacity: 0.45; }
-    .marker-halo { fill: rgba(31, 122, 140, 0.14); }
-    .marker-box { fill: var(--marker); stroke: var(--line); stroke-width: 2; }
-    .marker-num { fill: #fffaf0; font-size: 16px; font-weight: 700; pointer-events: none; }
+    .marker-halo { fill: rgba(20,125,117,0.12); stroke: rgba(20,125,117,0.2); stroke-width: 1; }
+    .marker-box { fill: var(--marker); stroke: #fff; stroke-width: 3; }
+    .marker-num { fill: #fff; font-size: 14px; font-weight: 750; pointer-events: none; }
     .poi-label {
+      pointer-events: none;
       paint-order: stroke;
-      stroke: var(--paper-2);
+      stroke: rgba(255,255,255,0.98);
       stroke-width: 5;
       fill: var(--ink);
       font-size: 15px;
       font-weight: 700;
     }
     .poi-day {
+      pointer-events: none;
       paint-order: stroke;
-      stroke: var(--paper-2);
+      stroke: rgba(255,255,255,0.98);
       stroke-width: 4;
       fill: var(--muted);
       font-size: 11px;
@@ -166,18 +174,18 @@
     .stats-bar {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      border-top: 3px solid var(--line);
+      border-top: 1px solid var(--line);
       background: var(--panel);
     }
-    .stat-item { padding: 10px; border-right: 2px solid var(--line); }
+    .stat-item { padding: 10px; border-right: 1px solid var(--line); }
     .stat-item:last-child { border-right: 0; }
     .stat-item span { display: block; color: var(--muted); font-size: 11px; }
     .stat-item strong { display: block; margin-top: 4px; font-size: 15px; }
     .side-panel { display: grid; gap: 0; }
-    .panel-section { padding: 14px; border-bottom: 3px solid var(--line); }
+    .panel-section { padding: 14px; border-bottom: 1px solid var(--line); }
     .panel-section:last-child { border-bottom: 0; }
     .itinerary-list { display: grid; gap: 12px; max-height: 46vh; overflow: auto; padding-right: 4px; }
-    .day-block { border-left: 4px solid var(--focus); padding-left: 10px; }
+    .day-block { border-left: 3px solid var(--focus); padding-left: 10px; }
     .day-summary { margin-bottom: 8px; color: var(--muted); font-size: 12px; }
     .schedule-item {
       width: 100%;
@@ -187,13 +195,14 @@
       align-items: start;
       margin: 6px 0;
       padding: 8px;
-      border: 2px solid var(--line);
+      border: 1px solid var(--line);
+      border-radius: 6px;
       background: #fff;
       color: var(--ink);
       text-align: left;
       cursor: pointer;
     }
-    .schedule-item.active { background: #e9f6f9; border-color: var(--focus); }
+    .schedule-item.active { background: #d9efeb; border-color: var(--focus); }
     .schedule-item.focus-city:not(.in-city) { opacity: 0.45; }
     .schedule-index {
       display: grid;
@@ -202,7 +211,8 @@
       height: 24px;
       background: var(--marker);
       color: #fff;
-      border: 2px solid var(--line);
+      border: 0;
+      border-radius: 50%;
       font-weight: 700;
     }
     .schedule-item small { display: block; margin-top: 2px; color: var(--muted); }
@@ -215,17 +225,17 @@
       align-items: center;
       min-height: 32px;
       padding: 0 10px;
-      border: 2px solid var(--line);
-      background: var(--paper);
+      border: 1px solid var(--line-strong);
+      border-radius: 5px;
+      background: var(--paper-2);
       color: var(--ink);
       text-decoration: none;
-      box-shadow: 2px 2px 0 var(--line);
     }
     .source-note {
       margin-top: 12px;
       padding: 8px;
-      background: #f4f0ff;
-      border: 2px dashed var(--line);
+      background: #f5f8f7;
+      border-left: 3px solid var(--focus);
       font-size: 12px;
     }
     .empty-state { color: var(--muted); }
@@ -326,78 +336,79 @@
       <rect x="28" y="28" width="984" height="564" class="atlas-frame-inner"/>
       <text x="48" y="56" class="map-title">总览地图</text>
       <text x="992" y="56" class="north" text-anchor="end">N ↑</text>
-      <polyline class="route" points="536,528 512,544 808,128 800,128 792,168 872,528 688,104 752,72 168,536" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
-      <text class="distance-label" x="524" y="526" text-anchor="middle">3 km</text><text class="distance-label" x="660" y="326" text-anchor="middle">45 km</text><text class="distance-label" x="804" y="118" text-anchor="middle">1 km</text><text class="distance-label" x="796" y="138" text-anchor="middle">4 km</text><text class="distance-label" x="832" y="338" text-anchor="middle">32 km</text><text class="distance-label" x="780" y="306" text-anchor="middle">40 km</text><text class="distance-label" x="720" y="78" text-anchor="middle">6 km</text><text class="distance-label" x="460" y="294" text-anchor="middle">64 km</text>
-      <text class="city-label" x="524" y="496" text-anchor="middle">Osaka · JP</text><text class="city-label" x="768" y="40" text-anchor="middle">Kyoto · JP</text><text class="city-label" x="872" y="496" text-anchor="middle">Nara · JP</text><text class="city-label" x="168" y="504" text-anchor="middle">Kobe · JP</text>
+      <polyline class="route-shadow" points="536,528 480,544 808,128 768,128 792,168 872,528 688,104 752,72 168,536"/>
+      <polyline class="route" points="536,528 480,544 808,128 768,128 792,168 872,528 688,104 752,72 168,536" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      <text class="distance-label" x="508" y="526" text-anchor="middle">3 km</text><text class="distance-label" x="644" y="326" text-anchor="middle">45 km</text><text class="distance-label" x="788" y="118" text-anchor="middle">1 km</text><text class="distance-label" x="780" y="138" text-anchor="middle">4 km</text><text class="distance-label" x="832" y="338" text-anchor="middle">32 km</text><text class="distance-label" x="780" y="306" text-anchor="middle">40 km</text><text class="distance-label" x="720" y="78" text-anchor="middle">6 km</text><text class="distance-label" x="460" y="294" text-anchor="middle">64 km</text>
+      <text class="city-label" x="508" y="496" text-anchor="middle">Osaka · JP</text><text class="city-label" x="762" y="40" text-anchor="middle">Kyoto · JP</text><text class="city-label" x="872" y="496" text-anchor="middle">Nara · JP</text><text class="city-label" x="168" y="504" text-anchor="middle">Kobe · JP</text>
       <g class="marker-layer" data-view="overview">
         
             <g class="marker marker-landmark" data-stop-index="0" tabindex="0" role="button" aria-label="大阪城">
-              <circle class="marker-halo" cx="536" cy="528" r="18"/>
-              <rect class="marker-box" x="521" y="513" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="536" cy="528" r="22"/>
+              <circle class="marker-box" cx="536" cy="528" r="15"/>
               <text class="marker-num" x="536" y="533" text-anchor="middle">1</text>
               <text class="poi-label" x="560" y="520">大阪城</text>
               <text class="poi-day" x="560" y="538">Day 1 · Osaka</text>
             </g>
             
             <g class="marker marker-food" data-stop-index="1" tabindex="0" role="button" aria-label="道顿堀">
-              <circle class="marker-halo" cx="512" cy="544" r="18"/>
-              <rect class="marker-box" x="497" y="529" width="30" height="30" rx="2"/>
-              <text class="marker-num" x="512" y="549" text-anchor="middle">2</text>
-              <text class="poi-label" x="536" y="536">道顿堀</text>
-              <text class="poi-day" x="536" y="554">Day 1 · Osaka</text>
+              <circle class="marker-halo" cx="480" cy="544" r="22"/>
+              <circle class="marker-box" cx="480" cy="544" r="15"/>
+              <text class="marker-num" x="480" y="549" text-anchor="middle">2</text>
+              <text class="poi-label" x="504" y="536">道顿堀</text>
+              <text class="poi-day" x="504" y="554">Day 1 · Osaka</text>
             </g>
             
             <g class="marker marker-landmark" data-stop-index="2" tabindex="0" role="button" aria-label="清水寺">
-              <circle class="marker-halo" cx="808" cy="128" r="18"/>
-              <rect class="marker-box" x="793" y="113" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="808" cy="128" r="22"/>
+              <circle class="marker-box" cx="808" cy="128" r="15"/>
               <text class="marker-num" x="808" y="133" text-anchor="middle">3</text>
               <text class="poi-label" x="832" y="120">清水寺</text>
               <text class="poi-day" x="832" y="138">Day 2 · Kyoto</text>
             </g>
             
             <g class="marker marker-experience" data-stop-index="3" tabindex="0" role="button" aria-label="二年坂">
-              <circle class="marker-halo" cx="800" cy="128" r="18"/>
-              <rect class="marker-box" x="785" y="113" width="30" height="30" rx="2"/>
-              <text class="marker-num" x="800" y="133" text-anchor="middle">4</text>
-              <text class="poi-label" x="824" y="120">二年坂</text>
-              <text class="poi-day" x="824" y="138">Day 2 · Kyoto</text>
+              <circle class="marker-halo" cx="768" cy="128" r="22"/>
+              <circle class="marker-box" cx="768" cy="128" r="15"/>
+              <text class="marker-num" x="768" y="133" text-anchor="middle">4</text>
+              <text class="poi-label" x="792" y="120">二年坂</text>
+              <text class="poi-day" x="792" y="138">Day 2 · Kyoto</text>
             </g>
             
             <g class="marker marker-landmark" data-stop-index="4" tabindex="0" role="button" aria-label="伏见稻荷大社">
-              <circle class="marker-halo" cx="792" cy="168" r="18"/>
-              <rect class="marker-box" x="777" y="153" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="792" cy="168" r="22"/>
+              <circle class="marker-box" cx="792" cy="168" r="15"/>
               <text class="marker-num" x="792" y="173" text-anchor="middle">5</text>
               <text class="poi-label" x="816" y="160">伏见稻荷大社</text>
               <text class="poi-day" x="816" y="178">Day 3 · Kyoto</text>
             </g>
             
             <g class="marker marker-nature" data-stop-index="5" tabindex="0" role="button" aria-label="奈良公园">
-              <circle class="marker-halo" cx="872" cy="528" r="18"/>
-              <rect class="marker-box" x="857" y="513" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="872" cy="528" r="22"/>
+              <circle class="marker-box" cx="872" cy="528" r="15"/>
               <text class="marker-num" x="872" y="533" text-anchor="middle">6</text>
               <text class="poi-label" x="896" y="520">奈良公园</text>
               <text class="poi-day" x="896" y="538">Day 3 · Nara</text>
             </g>
             
             <g class="marker marker-nature" data-stop-index="6" tabindex="0" role="button" aria-label="岚山竹林">
-              <circle class="marker-halo" cx="688" cy="104" r="18"/>
-              <rect class="marker-box" x="673" y="89" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="688" cy="104" r="22"/>
+              <circle class="marker-box" cx="688" cy="104" r="15"/>
               <text class="marker-num" x="688" y="109" text-anchor="middle">7</text>
               <text class="poi-label" x="712" y="96">岚山竹林</text>
               <text class="poi-day" x="712" y="114">Day 4 · Kyoto</text>
             </g>
             
             <g class="marker marker-landmark" data-stop-index="7" tabindex="0" role="button" aria-label="金阁寺">
-              <circle class="marker-halo" cx="752" cy="72" r="18"/>
-              <rect class="marker-box" x="737" y="57" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="752" cy="72" r="22"/>
+              <circle class="marker-box" cx="752" cy="72" r="15"/>
               <text class="marker-num" x="752" y="77" text-anchor="middle">8</text>
               <text class="poi-label" x="776" y="64">金阁寺</text>
               <text class="poi-day" x="776" y="82">Day 4 · Kyoto</text>
             </g>
             
             <g class="marker marker-experience" data-stop-index="8" tabindex="0" role="button" aria-label="神户临海乐园">
-              <circle class="marker-halo" cx="168" cy="536" r="18"/>
-              <rect class="marker-box" x="153" y="521" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="168" cy="536" r="22"/>
+              <circle class="marker-box" cx="168" cy="536" r="15"/>
               <text class="marker-num" x="168" y="541" text-anchor="middle">9</text>
               <text class="poi-label" x="192" y="528">神户临海乐园</text>
               <text class="poi-day" x="192" y="546">Day 5 · Kobe</text>
@@ -422,22 +433,23 @@
       <rect x="28" y="28" width="984" height="564" class="atlas-frame-inner"/>
       <text x="48" y="56" class="map-title">Kobe detail view</text>
       <text x="992" y="56" class="north" text-anchor="end">N ↑</text>
+      <polyline class="route-shadow" points="816,72 224,544"/>
       <polyline class="route" points="816,72 224,544" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
       <text class="distance-label" x="520" y="298" text-anchor="middle">64 km</text>
       <text class="city-label" x="816" y="40" text-anchor="middle">Kyoto · JP</text><text class="city-label" x="224" y="512" text-anchor="middle">Kobe · JP</text>
       <g class="marker-layer" data-view="Kobe">
         
             <g class="marker marker-landmark context" aria-label="金阁寺">
-              <circle class="marker-halo" cx="816" cy="72" r="18"/>
-              <rect class="marker-box" x="801" y="57" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="816" cy="72" r="22"/>
+              <circle class="marker-box" cx="816" cy="72" r="15"/>
               <text class="marker-num" x="816" y="77" text-anchor="middle">8</text>
               <text class="poi-label" x="840" y="64">金阁寺</text>
               <text class="poi-day" x="840" y="82">Day 4 · Kyoto</text>
             </g>
             
             <g class="marker marker-experience" data-stop-index="8" tabindex="0" role="button" aria-label="神户临海乐园">
-              <circle class="marker-halo" cx="224" cy="544" r="18"/>
-              <rect class="marker-box" x="209" y="529" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="224" cy="544" r="22"/>
+              <circle class="marker-box" cx="224" cy="544" r="15"/>
               <text class="marker-num" x="224" y="549" text-anchor="middle">9</text>
               <text class="poi-label" x="248" y="536">神户临海乐园</text>
               <text class="poi-day" x="248" y="554">Day 5 · Kobe</text>
@@ -462,46 +474,47 @@
       <rect x="28" y="28" width="984" height="564" class="atlas-frame-inner"/>
       <text x="48" y="56" class="map-title">Kyoto detail view</text>
       <text x="992" y="56" class="north" text-anchor="end">N ↑</text>
-      <polyline class="route" points="800,336 776,320 736,504 240,208 528,72" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
-      <text class="distance-label" x="788" y="318" text-anchor="middle">1 km</text><text class="distance-label" x="756" y="402" text-anchor="middle">4 km</text><text class="distance-label" x="488" y="346" text-anchor="middle">11 km</text><text class="distance-label" x="384" y="130" text-anchor="middle">6 km</text>
-      <text class="city-label" x="616" y="40" text-anchor="middle">Kyoto · JP</text>
+      <polyline class="route-shadow" points="800,336 744,320 736,504 240,208 528,72"/>
+      <polyline class="route" points="800,336 744,320 736,504 240,208 528,72" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      <text class="distance-label" x="772" y="318" text-anchor="middle">1 km</text><text class="distance-label" x="740" y="402" text-anchor="middle">4 km</text><text class="distance-label" x="488" y="346" text-anchor="middle">11 km</text><text class="distance-label" x="384" y="130" text-anchor="middle">6 km</text>
+      <text class="city-label" x="610" y="40" text-anchor="middle">Kyoto · JP</text>
       <g class="marker-layer" data-view="Kyoto">
         
             <g class="marker marker-landmark" data-stop-index="2" tabindex="0" role="button" aria-label="清水寺">
-              <circle class="marker-halo" cx="800" cy="336" r="18"/>
-              <rect class="marker-box" x="785" y="321" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="800" cy="336" r="22"/>
+              <circle class="marker-box" cx="800" cy="336" r="15"/>
               <text class="marker-num" x="800" y="341" text-anchor="middle">3</text>
               <text class="poi-label" x="824" y="328">清水寺</text>
               <text class="poi-day" x="824" y="346">Day 2 · Kyoto</text>
             </g>
             
             <g class="marker marker-experience" data-stop-index="3" tabindex="0" role="button" aria-label="二年坂">
-              <circle class="marker-halo" cx="776" cy="320" r="18"/>
-              <rect class="marker-box" x="761" y="305" width="30" height="30" rx="2"/>
-              <text class="marker-num" x="776" y="325" text-anchor="middle">4</text>
-              <text class="poi-label" x="800" y="312">二年坂</text>
-              <text class="poi-day" x="800" y="330">Day 2 · Kyoto</text>
+              <circle class="marker-halo" cx="744" cy="320" r="22"/>
+              <circle class="marker-box" cx="744" cy="320" r="15"/>
+              <text class="marker-num" x="744" y="325" text-anchor="middle">4</text>
+              <text class="poi-label" x="768" y="312">二年坂</text>
+              <text class="poi-day" x="768" y="330">Day 2 · Kyoto</text>
             </g>
             
             <g class="marker marker-landmark" data-stop-index="4" tabindex="0" role="button" aria-label="伏见稻荷大社">
-              <circle class="marker-halo" cx="736" cy="504" r="18"/>
-              <rect class="marker-box" x="721" y="489" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="736" cy="504" r="22"/>
+              <circle class="marker-box" cx="736" cy="504" r="15"/>
               <text class="marker-num" x="736" y="509" text-anchor="middle">5</text>
               <text class="poi-label" x="760" y="496">伏见稻荷大社</text>
               <text class="poi-day" x="760" y="514">Day 3 · Kyoto</text>
             </g>
             
             <g class="marker marker-nature" data-stop-index="6" tabindex="0" role="button" aria-label="岚山竹林">
-              <circle class="marker-halo" cx="240" cy="208" r="18"/>
-              <rect class="marker-box" x="225" y="193" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="240" cy="208" r="22"/>
+              <circle class="marker-box" cx="240" cy="208" r="15"/>
               <text class="marker-num" x="240" y="213" text-anchor="middle">7</text>
               <text class="poi-label" x="264" y="200">岚山竹林</text>
               <text class="poi-day" x="264" y="218">Day 4 · Kyoto</text>
             </g>
             
             <g class="marker marker-landmark" data-stop-index="7" tabindex="0" role="button" aria-label="金阁寺">
-              <circle class="marker-halo" cx="528" cy="72" r="18"/>
-              <rect class="marker-box" x="513" y="57" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="528" cy="72" r="22"/>
+              <circle class="marker-box" cx="528" cy="72" r="15"/>
               <text class="marker-num" x="528" y="77" text-anchor="middle">8</text>
               <text class="poi-label" x="552" y="64">金阁寺</text>
               <text class="poi-day" x="552" y="82">Day 4 · Kyoto</text>
@@ -526,30 +539,31 @@
       <rect x="28" y="28" width="984" height="564" class="atlas-frame-inner"/>
       <text x="48" y="56" class="map-title">Nara detail view</text>
       <text x="992" y="56" class="north" text-anchor="end">N ↑</text>
+      <polyline class="route-shadow" points="536,144 624,544 416,72"/>
       <polyline class="route" points="536,144 624,544 416,72" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
       <text class="distance-label" x="580" y="334" text-anchor="middle">32 km</text><text class="distance-label" x="520" y="298" text-anchor="middle">40 km</text>
       <text class="city-label" x="476" y="40" text-anchor="middle">Kyoto · JP</text><text class="city-label" x="624" y="512" text-anchor="middle">Nara · JP</text>
       <g class="marker-layer" data-view="Nara">
         
             <g class="marker marker-landmark context" aria-label="伏见稻荷大社">
-              <circle class="marker-halo" cx="536" cy="144" r="18"/>
-              <rect class="marker-box" x="521" y="129" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="536" cy="144" r="22"/>
+              <circle class="marker-box" cx="536" cy="144" r="15"/>
               <text class="marker-num" x="536" y="149" text-anchor="middle">5</text>
               <text class="poi-label" x="560" y="136">伏见稻荷大社</text>
               <text class="poi-day" x="560" y="154">Day 3 · Kyoto</text>
             </g>
             
             <g class="marker marker-nature" data-stop-index="5" tabindex="0" role="button" aria-label="奈良公园">
-              <circle class="marker-halo" cx="624" cy="544" r="18"/>
-              <rect class="marker-box" x="609" y="529" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="624" cy="544" r="22"/>
+              <circle class="marker-box" cx="624" cy="544" r="15"/>
               <text class="marker-num" x="624" y="549" text-anchor="middle">6</text>
               <text class="poi-label" x="648" y="536">奈良公园</text>
               <text class="poi-day" x="648" y="554">Day 3 · Nara</text>
             </g>
             
             <g class="marker marker-nature context" aria-label="岚山竹林">
-              <circle class="marker-halo" cx="416" cy="72" r="18"/>
-              <rect class="marker-box" x="401" y="57" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="416" cy="72" r="22"/>
+              <circle class="marker-box" cx="416" cy="72" r="15"/>
               <text class="marker-num" x="416" y="77" text-anchor="middle">7</text>
               <text class="poi-label" x="440" y="64">岚山竹林</text>
               <text class="poi-day" x="440" y="82">Day 4 · Kyoto</text>
@@ -574,22 +588,23 @@
       <rect x="28" y="28" width="984" height="564" class="atlas-frame-inner"/>
       <text x="48" y="56" class="map-title">Osaka detail view</text>
       <text x="992" y="56" class="north" text-anchor="end">N ↑</text>
+      <polyline class="route-shadow" points="400,72 280,184"/>
       <polyline class="route" points="400,72 280,184" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
       <text class="distance-label" x="340" y="118" text-anchor="middle">3 km</text>
       <text class="city-label" x="340" y="40" text-anchor="middle">Osaka · JP</text>
       <g class="marker-layer" data-view="Osaka">
         
             <g class="marker marker-landmark" data-stop-index="0" tabindex="0" role="button" aria-label="大阪城">
-              <circle class="marker-halo" cx="400" cy="72" r="18"/>
-              <rect class="marker-box" x="385" y="57" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="400" cy="72" r="22"/>
+              <circle class="marker-box" cx="400" cy="72" r="15"/>
               <text class="marker-num" x="400" y="77" text-anchor="middle">1</text>
               <text class="poi-label" x="424" y="64">大阪城</text>
               <text class="poi-day" x="424" y="82">Day 1 · Osaka</text>
             </g>
             
             <g class="marker marker-food" data-stop-index="1" tabindex="0" role="button" aria-label="道顿堀">
-              <circle class="marker-halo" cx="280" cy="184" r="18"/>
-              <rect class="marker-box" x="265" y="169" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="280" cy="184" r="22"/>
+              <circle class="marker-box" cx="280" cy="184" r="15"/>
               <text class="marker-num" x="280" y="189" text-anchor="middle">2</text>
               <text class="poi-label" x="304" y="176">道顿堀</text>
               <text class="poi-day" x="304" y="194">Day 1 · Osaka</text>

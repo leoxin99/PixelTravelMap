@@ -47,73 +47,74 @@
       <rect x="28" y="28" width="1264" height="504" class="atlas-frame-inner"/>
       <text x="48" y="56" class="map-title">总览地图</text>
       <text x="1272" y="56" class="north" text-anchor="end">N ↑</text>
-      <polyline class="route" points="952,544 968,392 776,80 680,184 344,328 336,416 72,456 952,536" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
-      <text class="distance-label" x="960" y="458" text-anchor="middle">58 km</text><text class="distance-label" x="872" y="226" text-anchor="middle">139 km</text><text class="distance-label" x="728" y="122" text-anchor="middle">52 km</text><text class="distance-label" x="512" y="246" text-anchor="middle">141 km</text><text class="distance-label" x="340" y="362" text-anchor="middle">34 km</text><text class="distance-label" x="204" y="426" text-anchor="middle">102 km</text><text class="distance-label" x="512" y="486" text-anchor="middle">340 km</text>
-      <text class="city-label" x="952" y="504" text-anchor="middle">Milan · IT</text><text class="city-label" x="968" y="360" text-anchor="middle">Como · IT</text><text class="city-label" x="776" y="48" text-anchor="middle">Lucerne · CH</text><text class="city-label" x="680" y="152" text-anchor="middle">Interlaken · CH</text><text class="city-label" x="344" y="296" text-anchor="middle">Geneva · CH</text><text class="city-label" x="336" y="384" text-anchor="middle">Annecy · FR</text><text class="city-label" x="72" y="424" text-anchor="middle">Lyon · FR</text>
+      <polyline class="route-shadow" points="952,544 968,392 776,80 680,184 344,328 336,416 72,456 952,504"/>
+      <polyline class="route" points="952,544 968,392 776,80 680,184 344,328 336,416 72,456 952,504" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      <text class="distance-label" x="960" y="458" text-anchor="middle">58 km</text><text class="distance-label" x="872" y="226" text-anchor="middle">139 km</text><text class="distance-label" x="728" y="122" text-anchor="middle">52 km</text><text class="distance-label" x="512" y="246" text-anchor="middle">141 km</text><text class="distance-label" x="340" y="362" text-anchor="middle">34 km</text><text class="distance-label" x="204" y="426" text-anchor="middle">102 km</text><text class="distance-label" x="512" y="470" text-anchor="middle">340 km</text>
+      <text class="city-label" x="952" y="472" text-anchor="middle">Milan · IT</text><text class="city-label" x="968" y="360" text-anchor="middle">Como · IT</text><text class="city-label" x="776" y="48" text-anchor="middle">Lucerne · CH</text><text class="city-label" x="680" y="152" text-anchor="middle">Interlaken · CH</text><text class="city-label" x="344" y="296" text-anchor="middle">Geneva · CH</text><text class="city-label" x="336" y="384" text-anchor="middle">Annecy · FR</text><text class="city-label" x="72" y="424" text-anchor="middle">Lyon · FR</text>
       <g class="marker-layer" data-view="overview">
         
             <g class="marker marker-landmark" aria-label="米兰大教堂">
-              <circle class="marker-halo" cx="952" cy="544" r="18"/>
-              <rect class="marker-box" x="937" y="529" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="952" cy="544" r="22"/>
+              <circle class="marker-box" cx="952" cy="544" r="15"/>
               <text class="marker-num" x="952" y="549" text-anchor="middle">1</text>
               <text class="poi-label" x="976" y="536">米兰大教堂</text>
               <text class="poi-day" x="976" y="554">Day 1 · Milan</text>
             </g>
             
             <g class="marker marker-nature" aria-label="科莫湖">
-              <circle class="marker-halo" cx="968" cy="392" r="18"/>
-              <rect class="marker-box" x="953" y="377" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="968" cy="392" r="22"/>
+              <circle class="marker-box" cx="968" cy="392" r="15"/>
               <text class="marker-num" x="968" y="397" text-anchor="middle">2</text>
               <text class="poi-label" x="992" y="384">科莫湖</text>
               <text class="poi-day" x="992" y="402">Day 2 · Como</text>
             </g>
             
             <g class="marker marker-landmark" aria-label="卡佩尔廊桥">
-              <circle class="marker-halo" cx="776" cy="80" r="18"/>
-              <rect class="marker-box" x="761" y="65" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="776" cy="80" r="22"/>
+              <circle class="marker-box" cx="776" cy="80" r="15"/>
               <text class="marker-num" x="776" y="85" text-anchor="middle">3</text>
               <text class="poi-label" x="800" y="72">卡佩尔廊桥</text>
               <text class="poi-day" x="800" y="90">Day 3 · Lucerne</text>
             </g>
             
             <g class="marker marker-viewpoint" aria-label="哈德昆观景台">
-              <circle class="marker-halo" cx="680" cy="184" r="18"/>
-              <rect class="marker-box" x="665" y="169" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="680" cy="184" r="22"/>
+              <circle class="marker-box" cx="680" cy="184" r="15"/>
               <text class="marker-num" x="680" y="189" text-anchor="middle">4</text>
               <text class="poi-label" x="704" y="176">哈德昆观景台</text>
               <text class="poi-day" x="704" y="194">Day 4 · Interlaken</text>
             </g>
             
             <g class="marker marker-landmark" aria-label="日内瓦大喷泉">
-              <circle class="marker-halo" cx="344" cy="328" r="18"/>
-              <rect class="marker-box" x="329" y="313" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="344" cy="328" r="22"/>
+              <circle class="marker-box" cx="344" cy="328" r="15"/>
               <text class="marker-num" x="344" y="333" text-anchor="middle">5</text>
               <text class="poi-label" x="368" y="320">日内瓦大喷泉</text>
               <text class="poi-day" x="368" y="338">Day 5 · Geneva</text>
             </g>
             
             <g class="marker marker-experience" aria-label="安纳西老城">
-              <circle class="marker-halo" cx="336" cy="416" r="18"/>
-              <rect class="marker-box" x="321" y="401" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="336" cy="416" r="22"/>
+              <circle class="marker-box" cx="336" cy="416" r="15"/>
               <text class="marker-num" x="336" y="421" text-anchor="middle">6</text>
               <text class="poi-label" x="360" y="408">安纳西老城</text>
               <text class="poi-day" x="360" y="426">Day 6 · Annecy</text>
             </g>
             
             <g class="marker marker-landmark" aria-label="里昂老城">
-              <circle class="marker-halo" cx="72" cy="456" r="18"/>
-              <rect class="marker-box" x="57" y="441" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="72" cy="456" r="22"/>
+              <circle class="marker-box" cx="72" cy="456" r="15"/>
               <text class="marker-num" x="72" y="461" text-anchor="middle">7</text>
               <text class="poi-label" x="96" y="448">里昂老城</text>
               <text class="poi-day" x="96" y="466">Day 7 · Lyon</text>
             </g>
             
             <g class="marker marker-museum" aria-label="斯福尔扎城堡">
-              <circle class="marker-halo" cx="952" cy="536" r="18"/>
-              <rect class="marker-box" x="937" y="521" width="30" height="30" rx="2"/>
-              <text class="marker-num" x="952" y="541" text-anchor="middle">8</text>
-              <text class="poi-label" x="976" y="528">斯福尔扎城堡</text>
-              <text class="poi-day" x="976" y="546">Day 8 · Milan</text>
+              <circle class="marker-halo" cx="952" cy="504" r="22"/>
+              <circle class="marker-box" cx="952" cy="504" r="15"/>
+              <text class="marker-num" x="952" y="509" text-anchor="middle">8</text>
+              <text class="poi-label" x="976" y="496">斯福尔扎城堡</text>
+              <text class="poi-day" x="976" y="514">Day 8 · Milan</text>
             </g>
             
       </g>

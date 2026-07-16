@@ -47,78 +47,79 @@
       <rect x="28" y="28" width="1264" height="504" class="atlas-frame-inner"/>
       <text x="48" y="56" class="map-title">总览地图</text>
       <text x="1272" y="56" class="north" text-anchor="end">N ↑</text>
-      <polyline class="route" points="536,528 512,544 808,128 800,128 792,168 872,528 688,104 752,72 168,536" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
-      <text class="distance-label" x="524" y="526" text-anchor="middle">3 km</text><text class="distance-label" x="660" y="326" text-anchor="middle">45 km</text><text class="distance-label" x="804" y="118" text-anchor="middle">1 km</text><text class="distance-label" x="796" y="138" text-anchor="middle">4 km</text><text class="distance-label" x="832" y="338" text-anchor="middle">32 km</text><text class="distance-label" x="780" y="306" text-anchor="middle">40 km</text><text class="distance-label" x="720" y="78" text-anchor="middle">6 km</text><text class="distance-label" x="460" y="294" text-anchor="middle">64 km</text>
-      <text class="city-label" x="524" y="496" text-anchor="middle">Osaka · JP</text><text class="city-label" x="768" y="40" text-anchor="middle">Kyoto · JP</text><text class="city-label" x="872" y="496" text-anchor="middle">Nara · JP</text><text class="city-label" x="168" y="504" text-anchor="middle">Kobe · JP</text>
+      <polyline class="route-shadow" points="536,528 480,544 808,128 768,128 792,168 872,528 688,104 752,72 168,536"/>
+      <polyline class="route" points="536,528 480,544 808,128 768,128 792,168 872,528 688,104 752,72 168,536" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      <text class="distance-label" x="508" y="526" text-anchor="middle">3 km</text><text class="distance-label" x="644" y="326" text-anchor="middle">45 km</text><text class="distance-label" x="788" y="118" text-anchor="middle">1 km</text><text class="distance-label" x="780" y="138" text-anchor="middle">4 km</text><text class="distance-label" x="832" y="338" text-anchor="middle">32 km</text><text class="distance-label" x="780" y="306" text-anchor="middle">40 km</text><text class="distance-label" x="720" y="78" text-anchor="middle">6 km</text><text class="distance-label" x="460" y="294" text-anchor="middle">64 km</text>
+      <text class="city-label" x="508" y="496" text-anchor="middle">Osaka · JP</text><text class="city-label" x="762" y="40" text-anchor="middle">Kyoto · JP</text><text class="city-label" x="872" y="496" text-anchor="middle">Nara · JP</text><text class="city-label" x="168" y="504" text-anchor="middle">Kobe · JP</text>
       <g class="marker-layer" data-view="overview">
         
             <g class="marker marker-landmark" aria-label="大阪城">
-              <circle class="marker-halo" cx="536" cy="528" r="18"/>
-              <rect class="marker-box" x="521" y="513" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="536" cy="528" r="22"/>
+              <circle class="marker-box" cx="536" cy="528" r="15"/>
               <text class="marker-num" x="536" y="533" text-anchor="middle">1</text>
               <text class="poi-label" x="560" y="520">大阪城</text>
               <text class="poi-day" x="560" y="538">Day 1 · Osaka</text>
             </g>
             
             <g class="marker marker-food" aria-label="道顿堀">
-              <circle class="marker-halo" cx="512" cy="544" r="18"/>
-              <rect class="marker-box" x="497" y="529" width="30" height="30" rx="2"/>
-              <text class="marker-num" x="512" y="549" text-anchor="middle">2</text>
-              <text class="poi-label" x="536" y="536">道顿堀</text>
-              <text class="poi-day" x="536" y="554">Day 1 · Osaka</text>
+              <circle class="marker-halo" cx="480" cy="544" r="22"/>
+              <circle class="marker-box" cx="480" cy="544" r="15"/>
+              <text class="marker-num" x="480" y="549" text-anchor="middle">2</text>
+              <text class="poi-label" x="504" y="536">道顿堀</text>
+              <text class="poi-day" x="504" y="554">Day 1 · Osaka</text>
             </g>
             
             <g class="marker marker-landmark" aria-label="清水寺">
-              <circle class="marker-halo" cx="808" cy="128" r="18"/>
-              <rect class="marker-box" x="793" y="113" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="808" cy="128" r="22"/>
+              <circle class="marker-box" cx="808" cy="128" r="15"/>
               <text class="marker-num" x="808" y="133" text-anchor="middle">3</text>
               <text class="poi-label" x="832" y="120">清水寺</text>
               <text class="poi-day" x="832" y="138">Day 2 · Kyoto</text>
             </g>
             
             <g class="marker marker-experience" aria-label="二年坂">
-              <circle class="marker-halo" cx="800" cy="128" r="18"/>
-              <rect class="marker-box" x="785" y="113" width="30" height="30" rx="2"/>
-              <text class="marker-num" x="800" y="133" text-anchor="middle">4</text>
-              <text class="poi-label" x="824" y="120">二年坂</text>
-              <text class="poi-day" x="824" y="138">Day 2 · Kyoto</text>
+              <circle class="marker-halo" cx="768" cy="128" r="22"/>
+              <circle class="marker-box" cx="768" cy="128" r="15"/>
+              <text class="marker-num" x="768" y="133" text-anchor="middle">4</text>
+              <text class="poi-label" x="792" y="120">二年坂</text>
+              <text class="poi-day" x="792" y="138">Day 2 · Kyoto</text>
             </g>
             
             <g class="marker marker-landmark" aria-label="伏见稻荷大社">
-              <circle class="marker-halo" cx="792" cy="168" r="18"/>
-              <rect class="marker-box" x="777" y="153" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="792" cy="168" r="22"/>
+              <circle class="marker-box" cx="792" cy="168" r="15"/>
               <text class="marker-num" x="792" y="173" text-anchor="middle">5</text>
               <text class="poi-label" x="816" y="160">伏见稻荷大社</text>
               <text class="poi-day" x="816" y="178">Day 3 · Kyoto</text>
             </g>
             
             <g class="marker marker-nature" aria-label="奈良公园">
-              <circle class="marker-halo" cx="872" cy="528" r="18"/>
-              <rect class="marker-box" x="857" y="513" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="872" cy="528" r="22"/>
+              <circle class="marker-box" cx="872" cy="528" r="15"/>
               <text class="marker-num" x="872" y="533" text-anchor="middle">6</text>
               <text class="poi-label" x="896" y="520">奈良公园</text>
               <text class="poi-day" x="896" y="538">Day 3 · Nara</text>
             </g>
             
             <g class="marker marker-nature" aria-label="岚山竹林">
-              <circle class="marker-halo" cx="688" cy="104" r="18"/>
-              <rect class="marker-box" x="673" y="89" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="688" cy="104" r="22"/>
+              <circle class="marker-box" cx="688" cy="104" r="15"/>
               <text class="marker-num" x="688" y="109" text-anchor="middle">7</text>
               <text class="poi-label" x="712" y="96">岚山竹林</text>
               <text class="poi-day" x="712" y="114">Day 4 · Kyoto</text>
             </g>
             
             <g class="marker marker-landmark" aria-label="金阁寺">
-              <circle class="marker-halo" cx="752" cy="72" r="18"/>
-              <rect class="marker-box" x="737" y="57" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="752" cy="72" r="22"/>
+              <circle class="marker-box" cx="752" cy="72" r="15"/>
               <text class="marker-num" x="752" y="77" text-anchor="middle">8</text>
               <text class="poi-label" x="776" y="64">金阁寺</text>
               <text class="poi-day" x="776" y="82">Day 4 · Kyoto</text>
             </g>
             
             <g class="marker marker-experience" aria-label="神户临海乐园">
-              <circle class="marker-halo" cx="168" cy="536" r="18"/>
-              <rect class="marker-box" x="153" y="521" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="168" cy="536" r="22"/>
+              <circle class="marker-box" cx="168" cy="536" r="15"/>
               <text class="marker-num" x="168" y="541" text-anchor="middle">9</text>
               <text class="poi-label" x="192" y="528">神户临海乐园</text>
               <text class="poi-day" x="192" y="546">Day 5 · Kobe</text>

@@ -233,7 +233,6 @@ def check_builder_artifact(html_path: Path, max_bytes: int = 2_500_000) -> list[
     forbidden_patterns = {
         r"<script[^>]+src=": "external script tag",
         r"<link[^>]+rel=[\"']?stylesheet": "external stylesheet link",
-        r"\bfetch\s*\(": "fetch call",
         r"\bXMLHttpRequest\b": "XMLHttpRequest usage",
         r"\bimport\s*\(": "dynamic import",
         r"@import": "CSS import",
@@ -242,6 +241,12 @@ def check_builder_artifact(html_path: Path, max_bytes: int = 2_500_000) -> list[
     for pattern, label in forbidden_patterns.items():
         if re.search(pattern, html, flags=re.IGNORECASE):
             errors.append(f"builder contains forbidden {label}")
+
+    fetch_calls = len(re.findall(r"\bfetch\s*\(", html))
+    if fetch_calls > 1:
+        errors.append(f"builder contains {fetch_calls} fetch calls, expected at most 1")
+    if fetch_calls == 1 and "https://nominatim.openstreetmap.org/search" not in html:
+        errors.append("builder fetch call is not restricted to the approved geocoder")
 
     required_snippets = [
         'id="docx-input"',
@@ -255,6 +260,14 @@ def check_builder_artifact(html_path: Path, max_bytes: int = 2_500_000) -> list[
         'id="download-overview-poster"',
         'id="download-day-poster"',
         'id="download-record-poster"',
+        'id="guide-log"',
+        'id="guide-question"',
+        'id="geocoder-provider"',
+        'id="geocode-candidates"',
+        'id="confirm-geocode"',
+        "GEOCODER_CACHE_KEY",
+        "waitForGeocoderSlot",
+        "OpenStreetMap contributors",
         "DecompressionStream",
         "word/document.xml",
         "lat",

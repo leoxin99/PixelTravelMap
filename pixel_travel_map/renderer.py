@@ -109,20 +109,42 @@ def _projection(
     top = (height - used_h) / 2
 
     points: dict[str, tuple[int, int]] = {}
-    occupied: dict[tuple[int, int], int] = {}
+    placed: list[tuple[int, int]] = []
+    offsets = [
+        (0, 0),
+        (32, 0),
+        (-32, 0),
+        (0, 32),
+        (0, -32),
+        (32, 32),
+        (-32, 32),
+        (32, -32),
+        (-32, -32),
+        (64, 0),
+        (-64, 0),
+        (0, 64),
+        (0, -64),
+        (64, 32),
+        (-64, 32),
+        (64, -32),
+        (-64, -32),
+    ]
     for stop, x_value, y_value in zip(stops, xs, ys):
         raw_x = left + (x_value - min_x) * fit
         raw_y = top + (max_y - y_value) * fit
-        x = int(round(raw_x / GRID) * GRID)
-        y = int(round(raw_y / GRID) * GRID)
-        key = (x, y)
-        hit = occupied.get(key, 0)
-        occupied[key] = hit + 1
-        if hit:
-            x += ((hit % 3) - 1) * 26
-            y += (hit // 3 + 1) * 22
-        x = min(max(x, 44), width - 44)
-        y = min(max(y, 44), height - 44)
+        origin_x = int(round(raw_x / GRID) * GRID)
+        origin_y = int(round(raw_y / GRID) * GRID)
+        x, y = origin_x, origin_y
+        for dx, dy in offsets:
+            candidate_x = min(max(origin_x + dx, 44), width - 44)
+            candidate_y = min(max(origin_y + dy, 44), height - 44)
+            if all(
+                math.hypot(candidate_x - prior_x, candidate_y - prior_y) >= 34
+                for prior_x, prior_y in placed
+            ):
+                x, y = candidate_x, candidate_y
+                break
+        placed.append((x, y))
         points[stop["id"]] = (x, y)
 
     km_per_lon_degree = 111.32 * cos_lat
@@ -423,8 +445,8 @@ def _render_static_map_view(
         markers.append(
             f"""
             <g class="marker marker-{html.escape(stop["category"])}{dim}"{data} aria-label="{html.escape(stop["name"])}">
-              <circle class="marker-halo" cx="{sx}" cy="{sy}" r="18"/>
-              <rect class="marker-box" x="{sx - 15}" y="{sy - 15}" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="{sx}" cy="{sy}" r="22"/>
+              <circle class="marker-box" cx="{sx}" cy="{sy}" r="15"/>
               <text class="marker-num" x="{sx}" y="{sy + 5}" text-anchor="middle">{stop["ordinal"]}</text>
               <text class="poi-label" x="{sx + 24}" y="{sy - 8}">{html.escape(_trim(stop["name"], 14))}</text>
               <text class="poi-day" x="{sx + 24}" y="{sy + 10}">Day {stop["day"]} · {html.escape(stop["city"])}</text>
@@ -440,6 +462,7 @@ def _render_static_map_view(
       <rect x="28" y="28" width="{width - 56}" height="{height - 56}" class="atlas-frame-inner"/>
       <text x="48" y="56" class="map-title">{html.escape(view.label)}</text>
       <text x="{width - 48}" y="56" class="north" text-anchor="end">N ↑</text>
+      <polyline class="route-shadow" points="{route_points}"/>
       <polyline class="route" points="{route_points}" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
       {"".join(segments)}
       {"".join(city_labels)}
@@ -541,32 +564,29 @@ def _trim(value: Any, limit: int) -> str:
 def _css() -> str:
     return """
     :root {
-      --paper: #f6ecd9;
-      --paper-2: #fffaf0;
-      --ink: #26313d;
-      --muted: #697386;
-      --water: #d9edf0;
-      --grid: rgba(38,49,61,0.12);
-      --route: #d64f3f;
-      --route-soft: #f2a35f;
-      --marker: #1f7a8c;
-      --marker-2: #f5c542;
-      --panel: #fffdf7;
-      --line: #313d4c;
-      --focus: #7a3e9d;
-      --shadow: rgba(38, 49, 61, 0.22);
+      --paper: #edf3f1;
+      --paper-2: #ffffff;
+      --ink: #172522;
+      --muted: #64736f;
+      --water: #dceff1;
+      --grid: rgba(23,37,34,0.09);
+      --route: #e65c4f;
+      --route-soft: #f8c5bf;
+      --marker: #147d75;
+      --marker-2: #f1b82d;
+      --panel: #ffffff;
+      --line: #c9d5d1;
+      --line-strong: #8fa39d;
+      --focus: #0f766e;
+      --shadow: rgba(23, 37, 34, 0.08);
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
       color: var(--ink);
-      background:
-        linear-gradient(90deg, rgba(38,49,61,0.04) 1px, transparent 1px),
-        linear-gradient(rgba(38,49,61,0.04) 1px, transparent 1px),
-        var(--paper);
-      background-size: 18px 18px;
-      font-family: "Courier New", ui-monospace, monospace;
+      background: var(--paper);
+      font-family: Inter, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
       letter-spacing: 0;
     }
     button, a { font: inherit; }
@@ -582,7 +602,7 @@ def _css() -> str:
       margin: 0 0 4px;
       color: var(--focus);
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 750;
       text-transform: uppercase;
     }
     h1, h2, h3, p { margin-top: 0; }
@@ -593,14 +613,15 @@ def _css() -> str:
     .atlas-note { max-width: 760px; margin-bottom: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
     .toolbar { display: flex; gap: 8px; align-items: center; }
     .icon-button, .text-button, .city-pill {
-      border: 2px solid var(--line);
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
       background: var(--panel);
       color: var(--ink);
       cursor: pointer;
-      box-shadow: 3px 3px 0 var(--line);
     }
     .icon-button { width: 42px; height: 38px; font-size: 20px; }
     .text-button { min-height: 38px; padding: 0 14px; font-weight: 700; }
+    .text-button:hover, .city-pill:hover { border-color: var(--focus); color: var(--focus); background: #d9efeb; }
     .text-button.compact { width: 100%; min-height: 34px; padding: 0 10px; font-size: 12px; }
     .text-button.danger { background: #fff0f0; }
     .workspace {
@@ -610,9 +631,10 @@ def _css() -> str:
       align-items: start;
     }
     .map-stage, .side-panel {
-      border: 3px solid var(--line);
+      border: 1px solid var(--line);
+      border-radius: 8px;
       background: var(--paper-2);
-      box-shadow: 6px 6px 0 var(--shadow);
+      box-shadow: 0 16px 40px var(--shadow);
     }
     .map-stage { min-width: 0; overflow: hidden; }
     .map-toolbar {
@@ -621,18 +643,17 @@ def _css() -> str:
       gap: 12px;
       align-items: center;
       padding: 12px;
-      border-bottom: 3px solid var(--line);
-      background: #ebd78f;
+      border-bottom: 1px solid var(--line);
+      background: #f5f8f7;
       font-weight: 700;
     }
     .city-pills { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
     .city-pill {
       min-height: 30px;
       padding: 0 10px;
-      box-shadow: 2px 2px 0 var(--line);
       font-size: 12px;
     }
-    .city-pill.active { background: var(--ink); color: var(--paper-2); }
+    .city-pill.active { border-color: var(--focus); background: var(--focus); color: #fff; }
     .pixel-map {
       display: block;
       width: 100%;
@@ -642,29 +663,37 @@ def _css() -> str:
       shape-rendering: geometricPrecision;
     }
     .atlas-water { fill: var(--water); }
-    .atlas-frame-inner { fill: rgba(255,255,255,0.24); stroke: var(--line); stroke-width: 2; }
+    .atlas-frame-inner { fill: rgba(255,255,255,0.42); stroke: rgba(23,37,34,0.12); stroke-width: 1; }
     .map-title { fill: var(--ink); font-size: 18px; font-weight: 700; }
     .north { fill: var(--line); font-size: 18px; font-weight: 700; }
+    .route-shadow {
+      fill: none;
+      stroke: rgba(255,255,255,0.9);
+      stroke-width: 9;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+    }
     .route {
       fill: none;
       stroke: var(--route);
-      stroke-width: 4;
+      stroke-width: 4.5;
       stroke-linejoin: round;
       stroke-linecap: round;
-      stroke-dasharray: 12 7;
     }
     .arrow-head { fill: var(--route); }
     .distance-label {
+      pointer-events: none;
       paint-order: stroke;
-      stroke: var(--paper-2);
+      stroke: rgba(255,255,255,0.96);
       stroke-width: 5;
-      fill: var(--line);
+      fill: #41514d;
       font-size: 13px;
       font-weight: 700;
     }
     .city-label {
+      pointer-events: none;
       paint-order: stroke;
-      stroke: var(--paper-2);
+      stroke: rgba(255,255,255,0.96);
       stroke-width: 6;
       fill: var(--focus);
       font-size: 17px;
@@ -672,20 +701,22 @@ def _css() -> str:
     }
     .marker { cursor: pointer; outline: none; }
     .marker.context { opacity: 0.45; }
-    .marker-halo { fill: rgba(31, 122, 140, 0.14); }
-    .marker-box { fill: var(--marker); stroke: var(--line); stroke-width: 2; }
-    .marker-num { fill: #fffaf0; font-size: 16px; font-weight: 700; pointer-events: none; }
+    .marker-halo { fill: rgba(20,125,117,0.12); stroke: rgba(20,125,117,0.2); stroke-width: 1; }
+    .marker-box { fill: var(--marker); stroke: #fff; stroke-width: 3; }
+    .marker-num { fill: #fff; font-size: 14px; font-weight: 750; pointer-events: none; }
     .poi-label {
+      pointer-events: none;
       paint-order: stroke;
-      stroke: var(--paper-2);
+      stroke: rgba(255,255,255,0.98);
       stroke-width: 5;
       fill: var(--ink);
       font-size: 15px;
       font-weight: 700;
     }
     .poi-day {
+      pointer-events: none;
       paint-order: stroke;
-      stroke: var(--paper-2);
+      stroke: rgba(255,255,255,0.98);
       stroke-width: 4;
       fill: var(--muted);
       font-size: 11px;
@@ -700,18 +731,18 @@ def _css() -> str:
     .stats-bar {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      border-top: 3px solid var(--line);
+      border-top: 1px solid var(--line);
       background: var(--panel);
     }
-    .stat-item { padding: 10px; border-right: 2px solid var(--line); }
+    .stat-item { padding: 10px; border-right: 1px solid var(--line); }
     .stat-item:last-child { border-right: 0; }
     .stat-item span { display: block; color: var(--muted); font-size: 11px; }
     .stat-item strong { display: block; margin-top: 4px; font-size: 15px; }
     .side-panel { display: grid; gap: 0; }
-    .panel-section { padding: 14px; border-bottom: 3px solid var(--line); }
+    .panel-section { padding: 14px; border-bottom: 1px solid var(--line); }
     .panel-section:last-child { border-bottom: 0; }
     .itinerary-list { display: grid; gap: 12px; max-height: 46vh; overflow: auto; padding-right: 4px; }
-    .day-block { border-left: 4px solid var(--focus); padding-left: 10px; }
+    .day-block { border-left: 3px solid var(--focus); padding-left: 10px; }
     .day-summary { margin-bottom: 8px; color: var(--muted); font-size: 12px; }
     .schedule-item {
       width: 100%;
@@ -721,13 +752,14 @@ def _css() -> str:
       align-items: start;
       margin: 6px 0;
       padding: 8px;
-      border: 2px solid var(--line);
+      border: 1px solid var(--line);
+      border-radius: 6px;
       background: #fff;
       color: var(--ink);
       text-align: left;
       cursor: pointer;
     }
-    .schedule-item.active { background: #e9f6f9; border-color: var(--focus); }
+    .schedule-item.active { background: #d9efeb; border-color: var(--focus); }
     .schedule-item.focus-city:not(.in-city) { opacity: 0.45; }
     .schedule-index {
       display: grid;
@@ -736,7 +768,8 @@ def _css() -> str:
       height: 24px;
       background: var(--marker);
       color: #fff;
-      border: 2px solid var(--line);
+      border: 0;
+      border-radius: 50%;
       font-weight: 700;
     }
     .schedule-item small { display: block; margin-top: 2px; color: var(--muted); }
@@ -749,17 +782,17 @@ def _css() -> str:
       align-items: center;
       min-height: 32px;
       padding: 0 10px;
-      border: 2px solid var(--line);
-      background: var(--paper);
+      border: 1px solid var(--line-strong);
+      border-radius: 5px;
+      background: var(--paper-2);
       color: var(--ink);
       text-decoration: none;
-      box-shadow: 2px 2px 0 var(--line);
     }
     .source-note {
       margin-top: 12px;
       padding: 8px;
-      background: #f4f0ff;
-      border: 2px dashed var(--line);
+      background: #f5f8f7;
+      border-left: 3px solid var(--focus);
       font-size: 12px;
     }
     .empty-state { color: var(--muted); }

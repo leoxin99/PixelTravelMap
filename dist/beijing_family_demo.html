@@ -7,32 +7,29 @@
   <style>
 
     :root {
-      --paper: #f6ecd9;
-      --paper-2: #fffaf0;
-      --ink: #26313d;
-      --muted: #697386;
-      --water: #d9edf0;
-      --grid: rgba(38,49,61,0.12);
-      --route: #d64f3f;
-      --route-soft: #f2a35f;
-      --marker: #1f7a8c;
-      --marker-2: #f5c542;
-      --panel: #fffdf7;
-      --line: #313d4c;
-      --focus: #7a3e9d;
-      --shadow: rgba(38, 49, 61, 0.22);
+      --paper: #edf3f1;
+      --paper-2: #ffffff;
+      --ink: #172522;
+      --muted: #64736f;
+      --water: #dceff1;
+      --grid: rgba(23,37,34,0.09);
+      --route: #e65c4f;
+      --route-soft: #f8c5bf;
+      --marker: #147d75;
+      --marker-2: #f1b82d;
+      --panel: #ffffff;
+      --line: #c9d5d1;
+      --line-strong: #8fa39d;
+      --focus: #0f766e;
+      --shadow: rgba(23, 37, 34, 0.08);
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
       color: var(--ink);
-      background:
-        linear-gradient(90deg, rgba(38,49,61,0.04) 1px, transparent 1px),
-        linear-gradient(rgba(38,49,61,0.04) 1px, transparent 1px),
-        var(--paper);
-      background-size: 18px 18px;
-      font-family: "Courier New", ui-monospace, monospace;
+      background: var(--paper);
+      font-family: Inter, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
       letter-spacing: 0;
     }
     button, a { font: inherit; }
@@ -48,7 +45,7 @@
       margin: 0 0 4px;
       color: var(--focus);
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 750;
       text-transform: uppercase;
     }
     h1, h2, h3, p { margin-top: 0; }
@@ -59,14 +56,15 @@
     .atlas-note { max-width: 760px; margin-bottom: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
     .toolbar { display: flex; gap: 8px; align-items: center; }
     .icon-button, .text-button, .city-pill {
-      border: 2px solid var(--line);
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
       background: var(--panel);
       color: var(--ink);
       cursor: pointer;
-      box-shadow: 3px 3px 0 var(--line);
     }
     .icon-button { width: 42px; height: 38px; font-size: 20px; }
     .text-button { min-height: 38px; padding: 0 14px; font-weight: 700; }
+    .text-button:hover, .city-pill:hover { border-color: var(--focus); color: var(--focus); background: #d9efeb; }
     .text-button.compact { width: 100%; min-height: 34px; padding: 0 10px; font-size: 12px; }
     .text-button.danger { background: #fff0f0; }
     .workspace {
@@ -76,9 +74,10 @@
       align-items: start;
     }
     .map-stage, .side-panel {
-      border: 3px solid var(--line);
+      border: 1px solid var(--line);
+      border-radius: 8px;
       background: var(--paper-2);
-      box-shadow: 6px 6px 0 var(--shadow);
+      box-shadow: 0 16px 40px var(--shadow);
     }
     .map-stage { min-width: 0; overflow: hidden; }
     .map-toolbar {
@@ -87,18 +86,17 @@
       gap: 12px;
       align-items: center;
       padding: 12px;
-      border-bottom: 3px solid var(--line);
-      background: #ebd78f;
+      border-bottom: 1px solid var(--line);
+      background: #f5f8f7;
       font-weight: 700;
     }
     .city-pills { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
     .city-pill {
       min-height: 30px;
       padding: 0 10px;
-      box-shadow: 2px 2px 0 var(--line);
       font-size: 12px;
     }
-    .city-pill.active { background: var(--ink); color: var(--paper-2); }
+    .city-pill.active { border-color: var(--focus); background: var(--focus); color: #fff; }
     .pixel-map {
       display: block;
       width: 100%;
@@ -108,29 +106,37 @@
       shape-rendering: geometricPrecision;
     }
     .atlas-water { fill: var(--water); }
-    .atlas-frame-inner { fill: rgba(255,255,255,0.24); stroke: var(--line); stroke-width: 2; }
+    .atlas-frame-inner { fill: rgba(255,255,255,0.42); stroke: rgba(23,37,34,0.12); stroke-width: 1; }
     .map-title { fill: var(--ink); font-size: 18px; font-weight: 700; }
     .north { fill: var(--line); font-size: 18px; font-weight: 700; }
+    .route-shadow {
+      fill: none;
+      stroke: rgba(255,255,255,0.9);
+      stroke-width: 9;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+    }
     .route {
       fill: none;
       stroke: var(--route);
-      stroke-width: 4;
+      stroke-width: 4.5;
       stroke-linejoin: round;
       stroke-linecap: round;
-      stroke-dasharray: 12 7;
     }
     .arrow-head { fill: var(--route); }
     .distance-label {
+      pointer-events: none;
       paint-order: stroke;
-      stroke: var(--paper-2);
+      stroke: rgba(255,255,255,0.96);
       stroke-width: 5;
-      fill: var(--line);
+      fill: #41514d;
       font-size: 13px;
       font-weight: 700;
     }
     .city-label {
+      pointer-events: none;
       paint-order: stroke;
-      stroke: var(--paper-2);
+      stroke: rgba(255,255,255,0.96);
       stroke-width: 6;
       fill: var(--focus);
       font-size: 17px;
@@ -138,20 +144,22 @@
     }
     .marker { cursor: pointer; outline: none; }
     .marker.context { opacity: 0.45; }
-    .marker-halo { fill: rgba(31, 122, 140, 0.14); }
-    .marker-box { fill: var(--marker); stroke: var(--line); stroke-width: 2; }
-    .marker-num { fill: #fffaf0; font-size: 16px; font-weight: 700; pointer-events: none; }
+    .marker-halo { fill: rgba(20,125,117,0.12); stroke: rgba(20,125,117,0.2); stroke-width: 1; }
+    .marker-box { fill: var(--marker); stroke: #fff; stroke-width: 3; }
+    .marker-num { fill: #fff; font-size: 14px; font-weight: 750; pointer-events: none; }
     .poi-label {
+      pointer-events: none;
       paint-order: stroke;
-      stroke: var(--paper-2);
+      stroke: rgba(255,255,255,0.98);
       stroke-width: 5;
       fill: var(--ink);
       font-size: 15px;
       font-weight: 700;
     }
     .poi-day {
+      pointer-events: none;
       paint-order: stroke;
-      stroke: var(--paper-2);
+      stroke: rgba(255,255,255,0.98);
       stroke-width: 4;
       fill: var(--muted);
       font-size: 11px;
@@ -166,18 +174,18 @@
     .stats-bar {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      border-top: 3px solid var(--line);
+      border-top: 1px solid var(--line);
       background: var(--panel);
     }
-    .stat-item { padding: 10px; border-right: 2px solid var(--line); }
+    .stat-item { padding: 10px; border-right: 1px solid var(--line); }
     .stat-item:last-child { border-right: 0; }
     .stat-item span { display: block; color: var(--muted); font-size: 11px; }
     .stat-item strong { display: block; margin-top: 4px; font-size: 15px; }
     .side-panel { display: grid; gap: 0; }
-    .panel-section { padding: 14px; border-bottom: 3px solid var(--line); }
+    .panel-section { padding: 14px; border-bottom: 1px solid var(--line); }
     .panel-section:last-child { border-bottom: 0; }
     .itinerary-list { display: grid; gap: 12px; max-height: 46vh; overflow: auto; padding-right: 4px; }
-    .day-block { border-left: 4px solid var(--focus); padding-left: 10px; }
+    .day-block { border-left: 3px solid var(--focus); padding-left: 10px; }
     .day-summary { margin-bottom: 8px; color: var(--muted); font-size: 12px; }
     .schedule-item {
       width: 100%;
@@ -187,13 +195,14 @@
       align-items: start;
       margin: 6px 0;
       padding: 8px;
-      border: 2px solid var(--line);
+      border: 1px solid var(--line);
+      border-radius: 6px;
       background: #fff;
       color: var(--ink);
       text-align: left;
       cursor: pointer;
     }
-    .schedule-item.active { background: #e9f6f9; border-color: var(--focus); }
+    .schedule-item.active { background: #d9efeb; border-color: var(--focus); }
     .schedule-item.focus-city:not(.in-city) { opacity: 0.45; }
     .schedule-index {
       display: grid;
@@ -202,7 +211,8 @@
       height: 24px;
       background: var(--marker);
       color: #fff;
-      border: 2px solid var(--line);
+      border: 0;
+      border-radius: 50%;
       font-weight: 700;
     }
     .schedule-item small { display: block; margin-top: 2px; color: var(--muted); }
@@ -215,17 +225,17 @@
       align-items: center;
       min-height: 32px;
       padding: 0 10px;
-      border: 2px solid var(--line);
-      background: var(--paper);
+      border: 1px solid var(--line-strong);
+      border-radius: 5px;
+      background: var(--paper-2);
       color: var(--ink);
       text-decoration: none;
-      box-shadow: 2px 2px 0 var(--line);
     }
     .source-note {
       margin-top: 12px;
       padding: 8px;
-      background: #f4f0ff;
-      border: 2px dashed var(--line);
+      background: #f5f8f7;
+      border-left: 3px solid var(--focus);
       font-size: 12px;
     }
     .empty-state { color: var(--muted); }
@@ -323,54 +333,55 @@
       <rect x="28" y="28" width="984" height="564" class="atlas-frame-inner"/>
       <text x="48" y="56" class="map-title">总览地图</text>
       <text x="992" y="56" class="north" text-anchor="end">N ↑</text>
-      <polyline class="route" points="776,544 768,496 504,416 240,72 512,424 800,408" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
-      <text class="distance-label" x="772" y="510" text-anchor="middle">1 km</text><text class="distance-label" x="636" y="446" text-anchor="middle">5 km</text><text class="distance-label" x="372" y="234" text-anchor="middle">9 km</text><text class="distance-label" x="376" y="238" text-anchor="middle">9 km</text><text class="distance-label" x="656" y="406" text-anchor="middle">6 km</text>
-      <text class="city-label" x="600" y="40" text-anchor="middle">北京 · CN</text>
+      <polyline class="route-shadow" points="776,544 768,496 504,416 240,72 544,424 800,408"/>
+      <polyline class="route" points="776,544 768,496 504,416 240,72 544,424 800,408" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      <text class="distance-label" x="772" y="510" text-anchor="middle">1 km</text><text class="distance-label" x="636" y="446" text-anchor="middle">5 km</text><text class="distance-label" x="372" y="234" text-anchor="middle">9 km</text><text class="distance-label" x="392" y="238" text-anchor="middle">9 km</text><text class="distance-label" x="672" y="406" text-anchor="middle">6 km</text>
+      <text class="city-label" x="605" y="40" text-anchor="middle">北京 · CN</text>
       <g class="marker-layer" data-view="overview">
         
             <g class="marker marker-museum" data-stop-index="0" tabindex="0" role="button" aria-label="故宫博物院">
-              <circle class="marker-halo" cx="776" cy="544" r="18"/>
-              <rect class="marker-box" x="761" y="529" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="776" cy="544" r="22"/>
+              <circle class="marker-box" cx="776" cy="544" r="15"/>
               <text class="marker-num" x="776" y="549" text-anchor="middle">1</text>
               <text class="poi-label" x="800" y="536">故宫博物院</text>
               <text class="poi-day" x="800" y="554">Day 1 · 北京</text>
             </g>
             
             <g class="marker marker-viewpoint" data-stop-index="1" tabindex="0" role="button" aria-label="景山公园">
-              <circle class="marker-halo" cx="768" cy="496" r="18"/>
-              <rect class="marker-box" x="753" y="481" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="768" cy="496" r="22"/>
+              <circle class="marker-box" cx="768" cy="496" r="15"/>
               <text class="marker-num" x="768" y="501" text-anchor="middle">2</text>
               <text class="poi-label" x="792" y="488">景山公园</text>
               <text class="poi-day" x="792" y="506">Day 1 · 北京</text>
             </g>
             
             <g class="marker marker-experience" data-stop-index="2" tabindex="0" role="button" aria-label="北京动物园">
-              <circle class="marker-halo" cx="504" cy="416" r="18"/>
-              <rect class="marker-box" x="489" y="401" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="504" cy="416" r="22"/>
+              <circle class="marker-box" cx="504" cy="416" r="15"/>
               <text class="marker-num" x="504" y="421" text-anchor="middle">3</text>
               <text class="poi-label" x="528" y="408">北京动物园</text>
               <text class="poi-day" x="528" y="426">Day 2 · 北京</text>
             </g>
             
             <g class="marker marker-landmark" data-stop-index="3" tabindex="0" role="button" aria-label="颐和园">
-              <circle class="marker-halo" cx="240" cy="72" r="18"/>
-              <rect class="marker-box" x="225" y="57" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="240" cy="72" r="22"/>
+              <circle class="marker-box" cx="240" cy="72" r="15"/>
               <text class="marker-num" x="240" y="77" text-anchor="middle">4</text>
               <text class="poi-label" x="264" y="64">颐和园</text>
               <text class="poi-day" x="264" y="82">Day 2 · 北京</text>
             </g>
             
             <g class="marker marker-museum" data-stop-index="4" tabindex="0" role="button" aria-label="北京天文馆">
-              <circle class="marker-halo" cx="512" cy="424" r="18"/>
-              <rect class="marker-box" x="497" y="409" width="30" height="30" rx="2"/>
-              <text class="marker-num" x="512" y="429" text-anchor="middle">5</text>
-              <text class="poi-label" x="536" y="416">北京天文馆</text>
-              <text class="poi-day" x="536" y="434">Day 3 · 北京</text>
+              <circle class="marker-halo" cx="544" cy="424" r="22"/>
+              <circle class="marker-box" cx="544" cy="424" r="15"/>
+              <text class="marker-num" x="544" y="429" text-anchor="middle">5</text>
+              <text class="poi-label" x="568" y="416">北京天文馆</text>
+              <text class="poi-day" x="568" y="434">Day 3 · 北京</text>
             </g>
             
             <g class="marker marker-experience" data-stop-index="5" tabindex="0" role="button" aria-label="南锣鼓巷">
-              <circle class="marker-halo" cx="800" cy="408" r="18"/>
-              <rect class="marker-box" x="785" y="393" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="800" cy="408" r="22"/>
+              <circle class="marker-box" cx="800" cy="408" r="15"/>
               <text class="marker-num" x="800" y="413" text-anchor="middle">6</text>
               <text class="poi-label" x="824" y="400">南锣鼓巷</text>
               <text class="poi-day" x="824" y="418">Day 3 · 北京</text>
@@ -395,54 +406,55 @@
       <rect x="28" y="28" width="984" height="564" class="atlas-frame-inner"/>
       <text x="48" y="56" class="map-title">北京 detail view</text>
       <text x="992" y="56" class="north" text-anchor="end">N ↑</text>
-      <polyline class="route" points="776,544 768,496 504,416 240,72 512,424 800,408" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
-      <text class="distance-label" x="772" y="510" text-anchor="middle">1 km</text><text class="distance-label" x="636" y="446" text-anchor="middle">5 km</text><text class="distance-label" x="372" y="234" text-anchor="middle">9 km</text><text class="distance-label" x="376" y="238" text-anchor="middle">9 km</text><text class="distance-label" x="656" y="406" text-anchor="middle">6 km</text>
-      <text class="city-label" x="600" y="40" text-anchor="middle">北京 · CN</text>
+      <polyline class="route-shadow" points="776,544 768,496 504,416 240,72 544,424 800,408"/>
+      <polyline class="route" points="776,544 768,496 504,416 240,72 544,424 800,408" marker-mid="url(#route-arrow)" marker-end="url(#route-arrow)"/>
+      <text class="distance-label" x="772" y="510" text-anchor="middle">1 km</text><text class="distance-label" x="636" y="446" text-anchor="middle">5 km</text><text class="distance-label" x="372" y="234" text-anchor="middle">9 km</text><text class="distance-label" x="392" y="238" text-anchor="middle">9 km</text><text class="distance-label" x="672" y="406" text-anchor="middle">6 km</text>
+      <text class="city-label" x="605" y="40" text-anchor="middle">北京 · CN</text>
       <g class="marker-layer" data-view="北京">
         
             <g class="marker marker-museum" data-stop-index="0" tabindex="0" role="button" aria-label="故宫博物院">
-              <circle class="marker-halo" cx="776" cy="544" r="18"/>
-              <rect class="marker-box" x="761" y="529" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="776" cy="544" r="22"/>
+              <circle class="marker-box" cx="776" cy="544" r="15"/>
               <text class="marker-num" x="776" y="549" text-anchor="middle">1</text>
               <text class="poi-label" x="800" y="536">故宫博物院</text>
               <text class="poi-day" x="800" y="554">Day 1 · 北京</text>
             </g>
             
             <g class="marker marker-viewpoint" data-stop-index="1" tabindex="0" role="button" aria-label="景山公园">
-              <circle class="marker-halo" cx="768" cy="496" r="18"/>
-              <rect class="marker-box" x="753" y="481" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="768" cy="496" r="22"/>
+              <circle class="marker-box" cx="768" cy="496" r="15"/>
               <text class="marker-num" x="768" y="501" text-anchor="middle">2</text>
               <text class="poi-label" x="792" y="488">景山公园</text>
               <text class="poi-day" x="792" y="506">Day 1 · 北京</text>
             </g>
             
             <g class="marker marker-experience" data-stop-index="2" tabindex="0" role="button" aria-label="北京动物园">
-              <circle class="marker-halo" cx="504" cy="416" r="18"/>
-              <rect class="marker-box" x="489" y="401" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="504" cy="416" r="22"/>
+              <circle class="marker-box" cx="504" cy="416" r="15"/>
               <text class="marker-num" x="504" y="421" text-anchor="middle">3</text>
               <text class="poi-label" x="528" y="408">北京动物园</text>
               <text class="poi-day" x="528" y="426">Day 2 · 北京</text>
             </g>
             
             <g class="marker marker-landmark" data-stop-index="3" tabindex="0" role="button" aria-label="颐和园">
-              <circle class="marker-halo" cx="240" cy="72" r="18"/>
-              <rect class="marker-box" x="225" y="57" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="240" cy="72" r="22"/>
+              <circle class="marker-box" cx="240" cy="72" r="15"/>
               <text class="marker-num" x="240" y="77" text-anchor="middle">4</text>
               <text class="poi-label" x="264" y="64">颐和园</text>
               <text class="poi-day" x="264" y="82">Day 2 · 北京</text>
             </g>
             
             <g class="marker marker-museum" data-stop-index="4" tabindex="0" role="button" aria-label="北京天文馆">
-              <circle class="marker-halo" cx="512" cy="424" r="18"/>
-              <rect class="marker-box" x="497" y="409" width="30" height="30" rx="2"/>
-              <text class="marker-num" x="512" y="429" text-anchor="middle">5</text>
-              <text class="poi-label" x="536" y="416">北京天文馆</text>
-              <text class="poi-day" x="536" y="434">Day 3 · 北京</text>
+              <circle class="marker-halo" cx="544" cy="424" r="22"/>
+              <circle class="marker-box" cx="544" cy="424" r="15"/>
+              <text class="marker-num" x="544" y="429" text-anchor="middle">5</text>
+              <text class="poi-label" x="568" y="416">北京天文馆</text>
+              <text class="poi-day" x="568" y="434">Day 3 · 北京</text>
             </g>
             
             <g class="marker marker-experience" data-stop-index="5" tabindex="0" role="button" aria-label="南锣鼓巷">
-              <circle class="marker-halo" cx="800" cy="408" r="18"/>
-              <rect class="marker-box" x="785" y="393" width="30" height="30" rx="2"/>
+              <circle class="marker-halo" cx="800" cy="408" r="22"/>
+              <circle class="marker-box" cx="800" cy="408" r="15"/>
               <text class="marker-num" x="800" y="413" text-anchor="middle">6</text>
               <text class="poi-label" x="824" y="400">南锣鼓巷</text>
               <text class="poi-day" x="824" y="418">Day 3 · 北京</text>
