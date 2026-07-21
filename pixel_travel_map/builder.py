@@ -95,11 +95,12 @@ def render_builder_html() -> str:
     h2 { margin-bottom: 12px; font-size: 17px; }
     h3 { margin-bottom: 8px; font-size: 14px; }
     .atlas-note { max-width: 820px; margin-bottom: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    [hidden] { display: none !important; }
     .builder-layout {
       display: grid;
-      grid-template-columns: minmax(340px, 410px) minmax(0, 1fr);
       gap: 18px;
-      align-items: start;
+      width: min(1120px, 100%);
+      margin: 0 auto;
     }
     .panel {
       min-width: 0;
@@ -110,6 +111,10 @@ def render_builder_html() -> str:
       padding: 18px;
     }
     .stack { display: grid; gap: 16px; min-width: 0; }
+    .step-panel { scroll-margin-top: 18px; }
+    .step-intro { margin: -4px 0 14px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .import-details > summary { cursor: pointer; color: var(--brand-dark); font-size: 13px; font-weight: 750; }
+    .import-content { display: grid; gap: 10px; margin-top: 12px; }
     .section-heading {
       display: flex;
       align-items: center;
@@ -288,12 +293,18 @@ def render_builder_html() -> str:
       white-space: nowrap;
     }
     .check-field input { width: auto; margin: 0; }
-    .table-wrap { width: 100%; min-width: 0; max-width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
-    table { width: 100%; border-collapse: collapse; min-width: 1080px; }
-    th, td { border-bottom: 1px solid var(--line); padding: 7px; vertical-align: top; }
-    th { text-align: left; color: var(--muted); font-size: 12px; background: #edf3f1; }
-    td input, td select { padding: 7px 8px; }
-    .row-actions { width: 112px; }
+    .stop-list { display: grid; gap: 8px; }
+    .stop-editor { border: 1px solid var(--line); border-radius: 7px; background: var(--surface); padding: 10px; }
+    .stop-main { display: grid; grid-template-columns: minmax(180px, 1.4fr) minmax(130px, .8fr) 105px auto; gap: 8px; align-items: end; }
+    .stop-location { display: grid; gap: 6px; }
+    .location-state { color: var(--muted); font-size: 11px; font-weight: 650; }
+    .location-state.ready { color: var(--ok); }
+    details.advanced { margin-top: 9px; border-top: 1px solid var(--line); padding-top: 8px; }
+    details.advanced > summary { color: var(--brand-dark); cursor: pointer; font-size: 12px; font-weight: 700; }
+    .advanced-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+    .advanced-grid .wide { grid-column: span 2; }
+    .advanced-tools { margin-top: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface-soft); }
+    .advanced-tools > summary { cursor: pointer; font-weight: 700; }
     .row-action-stack { display: flex; gap: 5px; }
     .mini-button {
       min-height: 32px;
@@ -305,7 +316,7 @@ def render_builder_html() -> str:
       font-weight: 700;
     }
     .mini-button.locate { color: var(--brand-dark); }
-    .missing input, .missing select { border-color: #e1988f; background: var(--warn-soft); }
+    .missing .required-field { border-color: #e1988f; background: var(--warn-soft); }
     .preview-box {
       display: grid;
       gap: 12px;
@@ -418,12 +429,14 @@ def render_builder_html() -> str:
     .preview-itinerary h3 { margin-bottom: 4px; }
     .preview-itinerary p { margin-bottom: 8px; color: var(--muted); font-size: 12px; }
     .preview-itinerary ol { margin: 0 0 14px 22px; padding: 0; line-height: 1.5; }
-    .download-panel { display: grid; gap: 10px; }
+    .result-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 18px 18px; }
+    .download-panel { display: grid; gap: 10px; margin: 0 18px 18px; border-top: 1px solid var(--line); padding-top: 12px; }
     .download-grid select { width: auto; min-width: 150px; }
     .help-text { color: var(--muted); font-size: 12px; line-height: 1.45; }
     @media (max-width: 1060px) {
-      .builder-layout { grid-template-columns: 1fr; }
       .day-head { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stop-main { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .advanced-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 680px) {
       .app-shell { padding: 12px; }
@@ -431,9 +444,13 @@ def render_builder_html() -> str:
       .status-chip { display: none; }
       .field-grid, .summary-grid { grid-template-columns: 1fr; }
       .day-head, .day-brief-grid { grid-template-columns: 1fr; }
+      .stop-main, .advanced-grid { grid-template-columns: 1fr; }
+      .advanced-grid .wide { grid-column: auto; }
       .geocoder-controls { grid-template-columns: 1fr; }
       .button-row .text-button { flex: 1 1 150px; }
       .preview-map, .preview-map .empty { min-height: 300px; }
+      .preview-map { min-height: 0; overflow-x: auto; }
+      .preview-map .pixel-map { min-width: 720px; }
       textarea { min-height: 220px; }
     }
   </style>
@@ -458,96 +475,122 @@ Day 2：浅草和上野
         <div>
           <p class="eyebrow">PixelTravelMap Builder</p>
           <h1>把传统行程变成可分享的旅行地图</h1>
-          <p class="atlas-note">上传 Word 或粘贴简要安排，创建器会追问缺失信息，并可按需推荐地点坐标。最终地图和 poster 仍可离线保存。</p>
+          <p class="atlas-note">导入已有行程，确认少量关键信息，得到可分享的互动地图和每日简报。</p>
         </div>
       </div>
-      <span class="status-chip">本地解析 · 在线定位可选</span>
+      <span class="status-chip">三步完成 · 城市级方位</span>
     </header>
 
     <main class="builder-layout">
-      <div class="stack">
-        <section class="panel">
-          <div class="section-heading">
-            <div class="section-title"><span class="step-number">1</span><h2>导入行程</h2></div>
+      <section id="step-import" class="panel step-panel">
+        <div class="section-heading">
+          <div class="section-title"><span class="step-number">1</span><h2>给我你的行程</h2></div>
+        </div>
+        <p class="step-intro">上传 Word，或者直接粘贴已有安排。地点不需要附带经纬度。</p>
+        <details id="import-details" class="import-details" open>
+          <summary id="import-summary">上传 Word 或粘贴行程内容</summary>
+          <div class="import-content">
+            <label for="docx-input">Word 文档（.docx）
+              <input id="docx-input" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+            </label>
+            <p id="docx-status" class="status">也可以跳过上传，直接使用下面的文本框。</p>
+            <label for="builder-data-input">行程内容
+              <textarea id="builder-data-input" placeholder="例如：第 1 天到哈尔滨，上午去中央大街，下午去索菲亚教堂。"></textarea>
+            </label>
+            <div class="button-row">
+              <button class="text-button primary" id="parse-input" type="button">整理我的行程</button>
+              <button class="text-button ghost" id="load-sample" type="button">试用示例</button>
+            </div>
+            <p id="parse-status" class="status">你的文档和行程内容默认只在当前浏览器中处理。</p>
+            <p class="privacy-note">为了绘制城市之间的大致方位，后续可由你主动使用 OpenStreetMap 查询城市位置；小景点不会被当作精确导航点。</p>
           </div>
-          <label for="docx-input">Word 文档（.docx）
-            <input id="docx-input" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-          </label>
-          <p id="docx-status" class="status">旧版 .doc、PDF 和扫描图片暂不支持。</p>
-          <label for="builder-data-input">自然语言行程
-            <textarea id="builder-data-input" placeholder="粘贴传统旅行行程，或写 Day 1 / 第1天 / D1 格式的简要计划。"></textarea>
-          </label>
-          <div class="button-row">
-            <button class="text-button" id="load-sample" type="button">填入示例</button>
-            <button class="text-button primary" id="parse-input" type="button">解析行程</button>
-          </div>
-          <p id="parse-status" class="status">解析后会进入引导补全；不完整的信息不会被静默猜测。</p>
-          <p class="privacy-note">Word 正文和行程草稿只在当前浏览器处理。只有启用在线定位并主动查找某个地点时，地点名称和城市才会发送给地理编码服务。</p>
-        </section>
+        </details>
+      </section>
 
-        <section class="panel guide-panel">
-          <div class="section-heading">
-            <div class="section-title"><span class="step-number">2</span><h2>引导补全</h2></div>
-            <span id="guide-progress" class="progress-chip">等待解析</span>
-          </div>
+      <section id="step-confirm" class="panel step-panel" hidden>
+        <div class="section-heading">
+          <div class="section-title"><span class="step-number">2</span><h2>确认关键信息</h2></div>
+          <span id="guide-progress" class="progress-chip">等待解析</span>
+        </div>
+        <p class="step-intro">只确认标题、日期、城市和地点顺序。预约、备注与精确坐标都不是生成故事地图的前置条件。</p>
+        <div class="field-grid">
+          <label for="trip-title">行程标题
+            <input id="trip-title" type="text">
+          </label>
+          <label for="trip-transport">主要交通
+            <select id="trip-transport">
+              <option value="mixed">混合交通</option>
+              <option value="public-transit">公共交通</option>
+              <option value="self-drive">自驾</option>
+              <option value="train">火车</option>
+              <option value="walk">步行</option>
+              <option value="unknown">暂不确定</option>
+            </select>
+          </label>
+          <label for="trip-start">开始日期
+            <input id="trip-start" type="date">
+          </label>
+          <label for="trip-end">结束日期
+            <input id="trip-end" type="date">
+          </label>
+        </div>
+
+        <div class="guide-panel">
           <div id="guide-log" class="guide-log" aria-live="polite">
-            <div class="message assistant">先导入一份行程。我会逐项确认标题、日期、每天地点和位置。</div>
+            <div class="message assistant">我会只追问无法确定的标题、日期和城市。</div>
           </div>
           <div id="guide-question" class="guide-question" hidden>
             <div id="guide-prompt" class="guide-prompt"></div>
             <input id="guide-answer" type="text" autocomplete="off">
             <div class="button-row">
               <button class="text-button primary" id="guide-submit" type="button">确认并继续</button>
-              <button class="text-button" id="guide-geocode" type="button" hidden>查找地点推荐</button>
+              <button class="text-button" id="guide-geocode" type="button" hidden>补全城市方位</button>
             </div>
           </div>
+        </div>
+
+        <div id="draft-table" class="draft-days"></div>
+        <div class="button-row">
+          <button class="text-button" id="add-day" type="button">增加一天</button>
+          <button class="text-button" id="geocode-next" type="button">补全下一座城市方位</button>
+          <button class="text-button primary" id="build-preview" type="button">生成旅行地图</button>
+        </div>
+        <p id="validation-status" class="status">地图只需要城市级方位，小景点会围绕所在城市自动排布。</p>
+
+        <details class="advanced-tools">
+          <summary>定位与高级设置</summary>
           <div class="geocoder-controls">
-            <label for="geocoder-provider">在线定位
+            <label for="geocoder-provider">城市方位来源
               <select id="geocoder-provider">
-                <option value="offline">关闭，仅手动填写</option>
-                <option value="nominatim">OpenStreetMap Nominatim</option>
+                <option value="nominatim">OpenStreetMap 城市查询</option>
+                <option value="offline">关闭，手动填写</option>
               </select>
             </label>
-            <button class="text-button" id="geocode-next" type="button">定位下一个缺失地点</button>
           </div>
-          <p class="attribution">在线定位只在点击后请求，不做输入联想或后台批量查询；结果会缓存在当前浏览器。数据来自 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap contributors</a>。</p>
-        </section>
+          <p class="attribution">只有点击“补全城市方位”后，城市名和国家才会发送给 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap contributors</a>。结果缓存在当前浏览器。</p>
+        </details>
 
-        <section class="panel">
+        <section id="geocode-panel" class="geocode-panel advanced-tools" hidden>
           <div class="section-heading">
-            <div class="section-title"><span class="step-number">3</span><h2>行程信息</h2></div>
+            <h2 id="geocode-title">确认城市方位</h2>
+            <button class="text-button ghost" id="close-geocode" type="button">关闭</button>
           </div>
-          <div class="field-grid">
-            <label for="trip-title">标题
-              <input id="trip-title" type="text">
-            </label>
-            <label for="trip-transport">交通方式
-              <select id="trip-transport">
-                <option value="mixed">mixed</option>
-                <option value="public-transit">public-transit</option>
-                <option value="self-drive">self-drive</option>
-                <option value="train">train</option>
-                <option value="walk">walk</option>
-                <option value="unknown">unknown</option>
-              </select>
-            </label>
-            <label for="trip-start">开始日期
-              <input id="trip-start" type="date">
-            </label>
-            <label for="trip-end">结束日期
-              <input id="trip-end" type="date">
-            </label>
+          <p id="geocode-status" class="status">选择与行程最符合的城市。</p>
+          <div id="geocode-candidates" class="candidate-list"></div>
+          <div class="button-row">
+            <button class="text-button primary" id="confirm-geocode" type="button" disabled>使用这个城市方位</button>
+            <button class="text-button" id="manual-geocode" type="button">手动填写</button>
           </div>
         </section>
-      </div>
+        <span id="missing-count" class="count-chip">等待解析</span>
+      </section>
 
-      <div class="stack">
-        <section class="panel preview-box">
+      <section id="step-result" class="panel preview-box step-panel" hidden>
           <div class="section-heading">
-            <div class="section-title"><span class="step-number">4</span><h2>地图预览</h2></div>
+            <div class="section-title"><span class="step-number">3</span><h2>得到旅行地图</h2></div>
           </div>
           <div class="map-meta">
-            <span>基于经纬度的相对方位与直线距离</span>
+            <span>城市级相对方位 · 不替代导航</span>
             <span>N ↑</span>
           </div>
           <div id="map-preview" class="preview-map"><div class="empty">解析并补全地点后，这里会显示路线地图。</div></div>
@@ -555,59 +598,21 @@ Day 2：浅草和上野
             <div id="summary-grid" class="summary-grid"></div>
             <div id="preview-itinerary" class="preview-itinerary"></div>
           </div>
-        </section>
-
-        <section id="geocode-panel" class="panel geocode-panel" hidden>
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Location confirmation</p>
-              <h2 id="geocode-title">确认地点位置</h2>
+          <div class="result-actions">
+            <button class="text-button primary" id="download-map-html" type="button" disabled>下载互动地图</button>
+            <select id="poster-day-select" aria-label="选择每日简报" disabled></select>
+            <button class="text-button" id="download-day-poster" type="button" disabled>下载每日简报</button>
+          </div>
+          <details class="download-panel">
+            <summary>更多导出格式</summary>
+            <div class="download-grid">
+              <button class="text-button" id="download-overview-poster" type="button" disabled>总行程 Poster</button>
+              <button class="text-button" id="download-record-poster" type="button" disabled>旅行记录 Poster</button>
+              <button class="text-button" id="download-json" type="button" disabled>行程 JSON</button>
             </div>
-            <button class="text-button ghost" id="close-geocode" type="button">关闭</button>
-          </div>
-          <p id="geocode-status" class="status">选择与行程最符合的地点。</p>
-          <div id="geocode-candidates" class="candidate-list"></div>
-          <div class="button-row">
-            <button class="text-button primary" id="confirm-geocode" type="button" disabled>确认这个位置</button>
-            <button class="text-button" id="manual-geocode" type="button">都不符合，手动填写</button>
-          </div>
-          <p class="attribution">候选地址及坐标来自 OpenStreetMap Nominatim。确认前可以打开 OpenStreetMap 核对具体位置。</p>
-        </section>
-
-        <section class="panel">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Structured draft</p>
-              <h2>行程草稿</h2>
-            </div>
-            <span id="missing-count" class="count-chip">等待解析</span>
-          </div>
-          <div id="draft-table" class="draft-days"></div>
-          <div class="button-row">
-            <button class="text-button" id="add-day" type="button">增加 Day</button>
-            <button class="text-button primary" id="build-preview" type="button">生成预览</button>
-          </div>
-          <p id="validation-status" class="status">至少需要 1 个地点；每个地点必须填写 name、city、country、lat、lon。</p>
-        </section>
-
-        <section class="panel download-panel">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Export</p>
-              <h2>下载与分享</h2>
-            </div>
-          </div>
-          <div class="download-grid">
-            <button class="text-button" id="download-json" type="button" disabled>下载 JSON</button>
-            <button class="text-button" id="download-map-html" type="button" disabled>下载 HTML 地图</button>
-            <button class="text-button" id="download-overview-poster" type="button" disabled>总行程 poster</button>
-            <select id="poster-day-select" disabled></select>
-            <button class="text-button" id="download-day-poster" type="button" disabled>每日 poster</button>
-            <button class="text-button" id="download-record-poster" type="button" disabled>旅行记录 poster</button>
-          </div>
-          <p class="help-text">下载后的 HTML 是独立离线文件，包含地图、详情、备注区和 poster 工具。</p>
-        </section>
-      </div>
+            <p class="help-text">互动地图是独立离线 HTML，包含地图、明日简报、备注和 Poster 工具。</p>
+          </details>
+      </section>
     </main>
   </div>
 
@@ -645,6 +650,10 @@ Day 2：浅草和上野
     const geocodeCandidates = document.getElementById("geocode-candidates");
     const confirmGeocode = document.getElementById("confirm-geocode");
     const missingCount = document.getElementById("missing-count");
+    const stepConfirm = document.getElementById("step-confirm");
+    const stepResult = document.getElementById("step-result");
+    const importDetails = document.getElementById("import-details");
+    const importSummary = document.getElementById("import-summary");
     let draft = emptyDraft();
     let activeTrip = null;
     let hasParsed = false;
@@ -1021,28 +1030,22 @@ Day 2：浅草和上野
             </label>
             <button class="text-button" type="button" data-action="add-stop" data-day-index="${dayIndex}">增加地点</button>
           </div>
-          <div class="day-brief-grid">
-            <label>集合时间
-              <input type="time" value="${esc(day.meeting_time || "")}" data-kind="day" data-field="meeting_time">
-            </label>
-            <label>集合地点
-              <input type="text" value="${esc(day.meeting_point || "")}" data-kind="day" data-field="meeting_point" placeholder="酒店大堂、车站出口等">
-            </label>
-            <label>当日注意事项
-              <input type="text" value="${esc(day.cautions || "")}" data-kind="day" data-field="cautions" placeholder="证件、天气、着装、迟到处理等">
-            </label>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>地点</th><th>城市</th><th>国家</th><th>lat</th><th>lon</th><th>到达</th><th>类型</th><th>停留</th><th>交通缓冲</th><th>预约</th><th>预约时间</th><th>预约凭证</th><th>注意事项</th><th>备注</th><th class="row-actions">操作</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${day.stops.map((stop, stopIndex) => renderStopRow(stop, dayIndex, stopIndex)).join("") || `<tr><td colspan="15" class="help-text">此 Day 还没有地点。</td></tr>`}
-              </tbody>
-            </table>
+          <details class="advanced">
+            <summary>每日简报信息（可选）</summary>
+            <div class="day-brief-grid">
+              <label>集合时间
+                <input type="time" value="${esc(day.meeting_time || "")}" data-kind="day" data-field="meeting_time">
+              </label>
+              <label>集合地点
+                <input type="text" value="${esc(day.meeting_point || "")}" data-kind="day" data-field="meeting_point" placeholder="酒店大堂、车站出口等">
+              </label>
+              <label>当日注意事项
+                <input type="text" value="${esc(day.cautions || "")}" data-kind="day" data-field="cautions" placeholder="证件、天气、着装、迟到处理等">
+              </label>
+            </div>
+          </details>
+          <div class="stop-list">
+            ${day.stops.map((stop, stopIndex) => renderStopRow(stop, dayIndex, stopIndex)).join("") || `<p class="help-text">这一天还没有地点。</p>`}
           </div>
         </section>
       `).join("");
@@ -1051,33 +1054,44 @@ Day 2：浅草和上野
 
     function renderStopRow(stop, dayIndex, stopIndex) {
       const missing = ["name", "city", "country", "lat", "lon"].some(field => !String(stop[field] ?? "").trim());
+      const positioned = String(stop.lat ?? "").trim() && String(stop.lon ?? "").trim();
       return `
-        <tr class="${missing ? "missing" : ""}" data-day-index="${dayIndex}" data-stop-index="${stopIndex}">
-          <td><input type="text" value="${esc(stop.name)}" data-kind="stop" data-field="name"></td>
-          <td><input type="text" value="${esc(stop.city)}" data-kind="stop" data-field="city"></td>
-          <td><input type="text" value="${esc(stop.country)}" data-kind="stop" data-field="country"></td>
-          <td><input type="number" step="0.0001" value="${esc(stop.lat)}" data-kind="stop" data-field="lat"></td>
-          <td><input type="number" step="0.0001" value="${esc(stop.lon)}" data-kind="stop" data-field="lon"></td>
-          <td><input type="time" value="${esc(stop.arrival_time || "")}" data-kind="stop" data-field="arrival_time"></td>
-          <td>
-            <select data-kind="stop" data-field="category">
-              ${CATEGORY_VALUES.map(category => `<option value="${category}" ${stop.category === category ? "selected" : ""}>${category}</option>`).join("")}
-            </select>
-          </td>
-          <td><input type="number" min="0" step="5" value="${esc(stop.duration_min)}" data-kind="stop" data-field="duration_min"></td>
-          <td><input type="number" min="0" max="360" step="5" value="${esc(stop.transit_buffer_min ?? 20)}" data-kind="stop" data-field="transit_buffer_min"></td>
-          <td><label class="check-field"><input type="checkbox" ${stop.reservation_required ? "checked" : ""} data-kind="stop" data-field="reservation_required">需要</label></td>
-          <td><input type="time" value="${esc(stop.reservation_time || "")}" data-kind="stop" data-field="reservation_time"></td>
-          <td><input type="text" value="${esc(stop.reservation_reference || "")}" data-kind="stop" data-field="reservation_reference" placeholder="订单号/取票说明"></td>
-          <td><input type="text" value="${esc(stop.cautions || "")}" data-kind="stop" data-field="cautions" placeholder="闭馆、着装、安检等"></td>
-          <td><input type="text" value="${esc(stop.notes)}" data-kind="stop" data-field="notes"></td>
-          <td>
-            <div class="row-action-stack">
-              <button class="mini-button locate" type="button" data-action="geocode-stop" data-day-index="${dayIndex}" data-stop-index="${stopIndex}">定位</button>
-              <button class="mini-button" type="button" data-action="remove-stop" data-day-index="${dayIndex}" data-stop-index="${stopIndex}">删除</button>
+        <article class="stop-editor ${missing ? "missing" : ""}" data-day-index="${dayIndex}" data-stop-index="${stopIndex}">
+          <div class="stop-main">
+            <label>地点
+              <input class="required-field" type="text" value="${esc(stop.name)}" data-kind="stop" data-field="name">
+            </label>
+            <label>城市
+              <input class="required-field" type="text" value="${esc(stop.city)}" data-kind="stop" data-field="city" placeholder="例如：哈尔滨">
+            </label>
+            <label>到达时间
+              <input type="time" value="${esc(stop.arrival_time || "")}" data-kind="stop" data-field="arrival_time">
+            </label>
+            <div class="stop-location">
+              <span class="location-state ${positioned ? "ready" : ""}">${positioned ? "城市方位已就绪" : "城市方位待补全"}</span>
+              <div class="row-action-stack">
+                <button class="mini-button locate" type="button" data-action="geocode-stop" data-day-index="${dayIndex}" data-stop-index="${stopIndex}">补全方位</button>
+                <button class="mini-button" type="button" data-action="remove-stop" data-day-index="${dayIndex}" data-stop-index="${stopIndex}">删除</button>
+              </div>
             </div>
-          </td>
-        </tr>
+          </div>
+          <details class="advanced">
+            <summary>高级信息</summary>
+            <div class="advanced-grid">
+              <label>国家/地区<input class="required-field" type="text" value="${esc(stop.country)}" data-kind="stop" data-field="country" placeholder="CN"></label>
+              <label>纬度<input type="number" step="0.0001" value="${esc(stop.lat)}" data-kind="stop" data-field="lat"></label>
+              <label>经度<input type="number" step="0.0001" value="${esc(stop.lon)}" data-kind="stop" data-field="lon"></label>
+              <label>类型<select data-kind="stop" data-field="category">${CATEGORY_VALUES.map(category => `<option value="${category}" ${stop.category === category ? "selected" : ""}>${category}</option>`).join("")}</select></label>
+              <label>停留分钟<input type="number" min="0" step="5" value="${esc(stop.duration_min)}" data-kind="stop" data-field="duration_min"></label>
+              <label>交通缓冲<input type="number" min="0" max="360" step="5" value="${esc(stop.transit_buffer_min ?? 20)}" data-kind="stop" data-field="transit_buffer_min"></label>
+              <label class="check-field"><input type="checkbox" ${stop.reservation_required ? "checked" : ""} data-kind="stop" data-field="reservation_required">需要预约</label>
+              <label>预约时间<input type="time" value="${esc(stop.reservation_time || "")}" data-kind="stop" data-field="reservation_time"></label>
+              <label class="wide">预约凭证<input type="text" value="${esc(stop.reservation_reference || "")}" data-kind="stop" data-field="reservation_reference" placeholder="订单号/取票说明"></label>
+              <label class="wide">注意事项<input type="text" value="${esc(stop.cautions || "")}" data-kind="stop" data-field="cautions" placeholder="闭馆、着装、安检等"></label>
+              <label class="wide">备注<input type="text" value="${esc(stop.notes)}" data-kind="stop" data-field="notes"></label>
+            </div>
+          </details>
+        </article>
       `;
     }
 
@@ -1152,17 +1166,8 @@ Day 2：浅草和上野
               type: "context",
               dayIndex,
               stopIndex,
-              prompt: `「${stop.name}」位于哪个城市和国家？`,
-              placeholder: "例如：Tokyo, JP"
-            });
-          }
-          if (isBlank(stop.lat) || isBlank(stop.lon)) {
-            questions.push({
-              type: "coordinates",
-              dayIndex,
-              stopIndex,
-              prompt: `需要确认「${stop.name}」的具体位置。你可以输入坐标，或使用在线定位查找候选地点。`,
-              placeholder: "例如：35.6586, 139.7454"
+              prompt: `Day ${day.day} 主要位于哪个城市和国家/地区？同一天的其他地点会沿用。`,
+              placeholder: "例如：哈尔滨, CN"
             });
           }
         });
@@ -1178,7 +1183,7 @@ Day 2：浅草和上野
     function renderGuideLog() {
       const intro = hasParsed
         ? []
-        : [{ role: "assistant", value: "先导入一份行程。我会逐项确认标题、日期、每天地点和位置。" }];
+        : [{ role: "assistant", value: "先导入一份行程。我只会确认标题、日期、城市和地点顺序。" }];
       guideLog.innerHTML = [...intro, ...guideHistory].map(item =>
         `<div class="message ${item.role === "user" ? "user" : "assistant"}">${esc(item.value)}</div>`
       ).join("");
@@ -1196,14 +1201,23 @@ Day 2：浅草和上野
       }
       const questions = collectGuideQuestions();
       const missingStops = draft.days.reduce((sum, day) => sum + day.stops.filter(stop =>
-        ["name", "city", "country", "lat", "lon"].some(field => isBlank(stop[field]))
+        ["name", "city", "country"].some(field => isBlank(stop[field]))
       ).length, 0);
-      missingCount.textContent = questions.length ? `${questions.length} 项待确认` : "信息完整";
-      guideProgress.textContent = questions.length ? `还需确认 ${questions.length} 项` : "补全完成";
+      const missingCities = new Set();
+      draft.days.forEach(day => day.stops.forEach(stop => {
+        if ((isBlank(stop.lat) || isBlank(stop.lon)) && !isBlank(stop.city)) missingCities.add(`${stop.city}|${stop.country}`);
+      }));
+      missingCount.textContent = questions.length
+        ? `${questions.length} 项待确认`
+        : missingCities.size ? `${missingCities.size} 座城市待补方位` : "可以生成地图";
+      guideProgress.textContent = questions.length
+        ? `还需确认 ${questions.length} 项`
+        : missingCities.size ? "关键信息已确认" : "准备完成";
       currentGuideQuestion = questions[0] || null;
+      guideLog.hidden = questions.length === 0;
       if (!currentGuideQuestion) {
         guideQuestion.hidden = false;
-        guideQuestion.innerHTML = `<div class="guide-complete">行程信息已经完整。现在可以生成地图预览并下载分享文件。</div>`;
+        guideQuestion.innerHTML = `<div class="guide-complete">关键信息已经完整。若城市方位仍未补全，点击下方按钮确认一次即可。</div>`;
         return;
       }
       if (!document.getElementById("guide-answer")) {
@@ -1212,7 +1226,7 @@ Day 2：浅草和上野
           <input id="guide-answer" type="text" autocomplete="off">
           <div class="button-row">
             <button class="text-button primary" id="guide-submit" type="button">确认并继续</button>
-            <button class="text-button" id="guide-geocode" type="button" hidden>查找地点推荐</button>
+            <button class="text-button" id="guide-geocode" type="button" hidden>补全城市方位</button>
           </div>`;
       }
       const promptElement = document.getElementById("guide-prompt");
@@ -1222,7 +1236,7 @@ Day 2：浅草和上野
       promptElement.textContent = currentGuideQuestion.prompt;
       answerElement.value = "";
       answerElement.placeholder = currentGuideQuestion.placeholder || "";
-      geocodeElement.hidden = currentGuideQuestion.type !== "coordinates";
+      geocodeElement.hidden = true;
       if (missingStops === 0 && questions.length === 0) missingCount.textContent = "信息完整";
     }
 
@@ -1265,20 +1279,11 @@ Day 2：浅草和上野
         draft.days[question.dayIndex].stops[question.stopIndex].name = answer;
       } else if (question.type === "context") {
         const parsed = parseCityCountry(answer);
-        const stop = draft.days[question.dayIndex].stops[question.stopIndex];
-        stop.city = parsed.city;
-        if (parsed.country) stop.country = parsed.country;
-      } else if (question.type === "coordinates") {
-        const matches = answer.match(/-?\d+(?:\.\d+)?/g) || [];
-        if (matches.length < 2) throw new Error("请输入纬度和经度，例如 35.6586, 139.7454。");
-        const lat = Number(matches[0]);
-        const lon = Number(matches[1]);
-        if (!Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lon) || lon < -180 || lon > 180) {
-          throw new Error("坐标范围不正确，请重新确认。");
-        }
-        const stop = draft.days[question.dayIndex].stops[question.stopIndex];
-        stop.lat = String(lat);
-        stop.lon = String(lon);
+        if (!parsed.city || !parsed.country) throw new Error("请同时填写城市和国家/地区，例如：哈尔滨, CN。");
+        draft.days[question.dayIndex].stops.forEach(stop => {
+          if (isBlank(stop.city)) stop.city = parsed.city;
+          if (isBlank(stop.country)) stop.country = parsed.country;
+        });
       }
       guideMessage("user", answer);
       guideMessage("assistant", "已记录，我继续检查下一项。");
@@ -1315,7 +1320,7 @@ Day 2：浅草和上野
     }
 
     function geocodeQuery(stop) {
-      return [stop.name, stop.city, stop.country].map(value => text(value)).filter(Boolean).join(", ");
+      return [stop.city || stop.name, stop.country].map(value => text(value)).filter(Boolean).join(", ");
     }
 
     function normalizeGeocodeCandidate(item) {
@@ -1402,13 +1407,13 @@ Day 2：浅草和上野
       const stop = draft.days[dayIndex] && draft.days[dayIndex].stops[stopIndex];
       if (!stop) return;
       if (geocoderProvider.value !== "nominatim") {
-        setStatus(validationStatus, "在线定位当前关闭。请先在左侧选择 OpenStreetMap Nominatim，或手动填写坐标。", "error");
+        setStatus(validationStatus, "城市方位查询当前关闭。请在高级设置中启用 OpenStreetMap，或手动填写。", "error");
         geocoderProvider.focus();
         return;
       }
       currentGeocodeTarget = { dayIndex, stopIndex };
       geocodePanel.hidden = false;
-      geocodeTitle.textContent = `确认「${stop.name}」的位置`;
+      geocodeTitle.textContent = `确认「${stop.city || stop.name}」的城市方位`;
       geocodeCandidates.innerHTML = "";
       setStatus(geocodeStatus, `正在查找：${geocodeQuery(stop)}`);
       geocodePanel.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1431,14 +1436,27 @@ Day 2：浅草和上野
     function confirmSelectedGeocode() {
       if (!currentGeocodeTarget || !selectedGeocodeCandidate) return;
       const stop = draft.days[currentGeocodeTarget.dayIndex].stops[currentGeocodeTarget.stopIndex];
-      stop.lat = String(selectedGeocodeCandidate.lat);
-      stop.lon = String(selectedGeocodeCandidate.lon);
-      if (selectedGeocodeCandidate.city) stop.city = selectedGeocodeCandidate.city;
-      if (selectedGeocodeCandidate.country) stop.country = selectedGeocodeCandidate.country;
-      stop.source = "OpenStreetMap Nominatim";
-      stop.source_url = osmObjectUrl(selectedGeocodeCandidate);
+      const targetCity = text(stop.city || selectedGeocodeCandidate.city).toLowerCase();
+      const targetCountry = text(stop.country || selectedGeocodeCandidate.country).toUpperCase();
+      let updated = 0;
+      draft.days.forEach(day => day.stops.forEach(item => {
+        const sameCity = text(item.city).toLowerCase() === targetCity;
+        const sameCountry = !targetCountry || !text(item.country) || text(item.country).toUpperCase() === targetCountry;
+        if (sameCity && sameCountry && (isBlank(item.lat) || isBlank(item.lon))) {
+          item.lat = String(selectedGeocodeCandidate.lat);
+          item.lon = String(selectedGeocodeCandidate.lon);
+          if (!item.city && selectedGeocodeCandidate.city) item.city = selectedGeocodeCandidate.city;
+          if (!item.country && selectedGeocodeCandidate.country) item.country = selectedGeocodeCandidate.country;
+          item.source = "OpenStreetMap Nominatim city anchor";
+          item.source_url = osmObjectUrl(selectedGeocodeCandidate);
+          updated += 1;
+        }
+      }));
       guideMessage("user", `确认位置：${selectedGeocodeCandidate.label}`);
-      guideMessage("assistant", `已保存「${stop.name}」的坐标，继续检查下一项。`);
+      guideMessage("assistant", `已为「${stop.city || stop.name}」的 ${updated} 个地点补全城市方位。`);
+      activeTrip = null;
+      stepResult.hidden = true;
+      updateDownloads(false);
       closeGeocodePanel();
       renderDraft();
     }
@@ -1451,7 +1469,7 @@ Day 2：浅草和上野
           return;
         }
       }
-      setStatus(validationStatus, "所有地点都已经有坐标。", "ok");
+      setStatus(validationStatus, "所有城市方位都已经就绪。", "ok");
     }
 
     function slugify(value) {
@@ -1464,8 +1482,29 @@ Day 2：浅草和上野
       return (ascii || "stop") + "-" + suffix;
     }
 
+    function reuseKnownCityAnchors() {
+      const anchors = new Map();
+      draft.days.forEach(day => day.stops.forEach(stop => {
+        const key = `${text(stop.city).toLowerCase()}|${text(stop.country).toUpperCase()}`;
+        if (text(stop.city) && text(stop.lat) && text(stop.lon) && !anchors.has(key)) {
+          anchors.set(key, { lat: String(stop.lat), lon: String(stop.lon), source: stop.source, source_url: stop.source_url });
+        }
+      }));
+      draft.days.forEach(day => day.stops.forEach(stop => {
+        const key = `${text(stop.city).toLowerCase()}|${text(stop.country).toUpperCase()}`;
+        const anchor = anchors.get(key);
+        if (anchor && (isBlank(stop.lat) || isBlank(stop.lon))) {
+          stop.lat = anchor.lat;
+          stop.lon = anchor.lon;
+          stop.source = anchor.source || "reused city anchor";
+          stop.source_url = anchor.source_url || "";
+        }
+      }));
+    }
+
     function buildTripFromDraft() {
       syncMetaToDraft();
+      reuseKnownCityAnchors();
       const errors = [];
       const days = draft.days
         .map((day, dayIndex) => ({
@@ -1508,8 +1547,8 @@ Day 2：浅草和上野
       if (!text(stop.name)) errors.push(`${prefix} 缺少地点名。`);
       if (!text(stop.city)) errors.push(`${prefix} 缺少 city。`);
       if (!text(stop.country)) errors.push(`${prefix} 缺少 country。`);
-      if (!latRaw || !Number.isFinite(lat) || lat < -90 || lat > 90) errors.push(`${prefix} lat 不正确。`);
-      if (!lonRaw || !Number.isFinite(lon) || lon < -180 || lon > 180) errors.push(`${prefix} lon 不正确。`);
+      if (!latRaw || !Number.isFinite(lat) || lat < -90 || lat > 90) errors.push(`${prefix} 的城市方位未补全。`);
+      if (!lonRaw || !Number.isFinite(lon) || lon < -180 || lon > 180) errors.push(`${prefix} 的城市方位未补全。`);
       return {
         id: slugify(`day-${day.day || dayIndex + 1}-${stop.name}-${stopIndex + 1}`),
         name: text(stop.name),
@@ -2531,6 +2570,7 @@ initViewer();${closeScript}
 
     function renderActivePreview() {
       if (!activeTrip) return;
+      stepResult.hidden = false;
       mapPreview.innerHTML = renderMapSvg(activeTrip, false);
       summaryGrid.innerHTML = renderStatsHtml(activeTrip);
       previewItinerary.innerHTML = renderPreviewItinerary(activeTrip);
@@ -2618,7 +2658,8 @@ initViewer();${closeScript}
 
     document.getElementById("load-sample").addEventListener("click", () => {
       textInput.value = document.getElementById("sample-trip-text").textContent.trim();
-      setStatus(parseStatus, "已填入示例；其中第 2 天仍缺少坐标，可体验补全流程。", "ok");
+      setStatus(parseStatus, "已填入示例，正在整理。", "ok");
+      document.getElementById("parse-input").click();
     });
 
     document.getElementById("parse-input").addEventListener("click", () => {
@@ -2630,11 +2671,16 @@ initViewer();${closeScript}
         guideMessage("assistant", `我读到了 ${draft.days.length} 天、${stopCount} 个地点。下面只追问无法可靠确定的信息。`);
         renderDraft();
         activeTrip = null;
+        stepConfirm.hidden = false;
+        stepResult.hidden = true;
         updateDownloads(false);
-        mapPreview.innerHTML = `<div class="empty">草稿已生成，补齐坐标后点击“生成预览”。</div>`;
+        mapPreview.innerHTML = `<div class="empty">确认关键信息并补全城市方位后，即可生成地图。</div>`;
         summaryGrid.innerHTML = "";
         previewItinerary.innerHTML = "";
         setStatus(parseStatus, `已解析 ${draft.days.length} 天、${stopCount} 个地点。`, "ok");
+        importSummary.textContent = `已整理 ${draft.days.length} 天、${stopCount} 个地点 · 展开修改原始内容`;
+        importDetails.open = false;
+        stepConfirm.scrollIntoView({ behavior: "smooth", block: "start" });
       } catch (error) {
         setStatus(parseStatus, error.message, "error");
       }
@@ -2668,6 +2714,7 @@ initViewer();${closeScript}
           target.type === "checkbox" ? target.checked : target.value;
       }
       activeTrip = null;
+      stepResult.hidden = true;
       updateDownloads(false);
       refreshGuide();
     });
@@ -2684,6 +2731,9 @@ initViewer();${closeScript}
       if (action === "remove-stop") {
         const stopIndex = Number(event.target.dataset.stopIndex);
         draft.days[dayIndex].stops.splice(stopIndex, 1);
+        activeTrip = null;
+        stepResult.hidden = true;
+        updateDownloads(false);
         renderDraft();
       }
     });
@@ -2697,6 +2747,7 @@ initViewer();${closeScript}
           draft.days.forEach((day, index) => { day.date = addDays(startInput.value, index); });
         }
         activeTrip = null;
+        stepResult.hidden = true;
         updateDownloads(false);
         refreshGuide();
       });
@@ -2746,6 +2797,8 @@ initViewer();${closeScript}
       if (!target) return;
       const row = draftTable.querySelector(`[data-day-index="${target.dayIndex}"][data-stop-index="${target.stopIndex}"]`);
       if (row) {
+        const advanced = row.querySelector("details.advanced");
+        if (advanced) advanced.open = true;
         const latInput = row.querySelector('[data-field="lat"]');
         latInput.scrollIntoView({ behavior: "smooth", block: "center" });
         latInput.focus();
@@ -2765,14 +2818,19 @@ initViewer();${closeScript}
         cautions: "",
         stops: []
       });
+      activeTrip = null;
+      stepResult.hidden = true;
+      updateDownloads(false);
       renderDraft();
     });
 
     document.getElementById("build-preview").addEventListener("click", () => {
       try {
         activeTrip = buildTripFromDraft();
+        renderDraft();
         renderActivePreview();
-        setStatus(validationStatus, "校验通过，可以下载 artifact。", "ok");
+        setStatus(validationStatus, "旅行地图已生成。你可以下载互动地图或每日简报。", "ok");
+        stepResult.scrollIntoView({ behavior: "smooth", block: "start" });
       } catch (error) {
         setStatus(validationStatus, error.message, "error");
         activeTrip = null;
