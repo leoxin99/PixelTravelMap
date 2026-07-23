@@ -1,13 +1,10 @@
 from __future__ import annotations
 
 import argparse
-import sys
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
-
-from pixel_travel_map.renderer import write_share_viewer_html
 
 
 def main() -> int:
@@ -22,7 +19,19 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    write_share_viewer_html(args.output)
+    builder_path = ROOT / "dist" / "index.html"
+    if not builder_path.exists():
+        raise SystemExit("dist/index.html is missing; run scripts/build_builder.py first")
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(
+        [
+            "node",
+            str(ROOT / "scripts" / "render_viewer_from_builder.mjs"),
+            str(builder_path),
+            str(args.output),
+        ],
+        check=True,
+    )
     print(f"Wrote {args.output}")
     return 0
 

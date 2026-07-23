@@ -288,6 +288,7 @@ def check_builder_artifact(html_path: Path, max_bytes: int = 2_500_000) -> list[
         'id="draft-table"',
         'id="build-preview"',
         'id="map-preview"',
+        'id="map-scope-select"',
         'id="download-json"',
         'id="download-map-html"',
         'id="download-overview-poster"',
@@ -314,7 +315,9 @@ def check_builder_artifact(html_path: Path, max_bytes: int = 2_500_000) -> list[
         "GEOCODER_CACHE_KEY",
         "PixelTravelMap:replan:last:v1",
         "PixelTravelMap:events:v1",
-        "sanitized_demo_itinerary",
+        "curated_demo_itinerary",
+        "atlas-paper-pattern",
+        'data-view="day-',
         "成都东站前往重庆",
         "reservation:true",
         "waitForGeocoderSlot",
@@ -358,8 +361,8 @@ def check_sanitized_demo_privacy(html_path: Path) -> list[str]:
     for pattern, label in forbidden_patterns.items():
         if re.search(pattern, demo, flags=re.IGNORECASE):
             errors.append(f"sanitized demo contains possible {label}")
-    if "sanitized_demo_itinerary" not in html:
-        errors.append("sanitized demo source marker is missing")
+    if "curated_demo_itinerary" not in html:
+        errors.append("curated demo source marker is missing")
     return errors
 
 

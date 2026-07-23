@@ -134,6 +134,22 @@ clickHandler("load-sample");
 if (!activeTrip || activeTrip.days.length !== 7) throw new Error("demo did not create a seven-day active trip");
 if (!activeTrip.trip_title.includes("川北九寨与重庆")) throw new Error("demo title was overwritten by the initial form state");
 if (!flattenStops(activeTrip).some(stop => stop.name === "乐山大佛")) throw new Error("demo route should initially contain Leshan");
+const initialStops = flattenStops(activeTrip);
+const initialViews = buildMapViews(initialStops);
+if (initialViews[0].stops.length !== new Set(initialStops.map(stop => stop.city)).size) {
+  throw new Error("overview map should render one hub per city");
+}
+if (!initialViews.some(view => view.key === "day-6")) throw new Error("daily map view is missing");
+for (const view of initialViews) {
+  const labels = Object.values(layoutMapLabels(view.contextStops, view.points, MAP_W, MAP_H, view.mode));
+  for (let i = 0; i < labels.length; i += 1) {
+    for (let j = i + 1; j < labels.length; j += 1) {
+      if (boxesOverlap(labels[i], labels[j], 0)) {
+        throw new Error(`map labels overlap in ${view.key}`);
+      }
+    }
+  }
+}
 clickHandler("open-disruption");
 if (!pendingProposal) throw new Error("demo disruption did not produce a proposal: " + elements.get("replan-status").textContent);
 clickHandler("apply-replan");
@@ -143,7 +159,13 @@ if (!flattenStops(activeTrip).some(stop => stop.name === "成都东站前往重�
 }
 if (elements.get("map-preview").innerHTML.includes("乐山大佛")) throw new Error("map preview did not refresh from activeTrip");
 if (renderViewerHtml(activeTrip).includes("乐山大佛")) throw new Error("downloaded viewer did not use activeTrip");
-if (renderDayPosterSvgForTrip(activeTrip, 5).includes("乐山大佛")) throw new Error("daily briefing did not use activeTrip");
+const overviewPoster = renderOverviewPosterSvgForTrip(activeTrip);
+const dayPoster = renderDayPosterSvgForTrip(activeTrip, 5);
+if (!overviewPoster.includes("poster-paper-pattern") || !overviewPoster.includes("城市方位经视觉优化")) {
+  throw new Error("overview poster did not use the ancient atlas layout");
+}
+if (dayPoster.includes("乐山大佛")) throw new Error("daily briefing did not use activeTrip");
+if (!dayPoster.includes("当天地点独立放大")) throw new Error("daily poster did not use an independent map layout");
 clickHandler("map-view-button");
 if (location.hash !== "#map") throw new Error("map view hash was not updated");
 clickHandler("plan-view-button");
