@@ -1932,6 +1932,20 @@ Day 7：重庆城市漫游
       }
     }
 
+    function migrateStoredTripCopy(trip) {
+      if (!trip) return null;
+      const migrated = clone(trip);
+      migrated.trip_title = String(migrated.trip_title || "")
+        .replace("（脱敏演示）", "（示例）")
+        .replace("(脱敏演示)", "（示例）");
+      (migrated.days || []).forEach(day => {
+        (day.stops || []).forEach(stop => {
+          if (stop.source === "sanitized_demo_itinerary") stop.source = "curated_demo_itinerary";
+        });
+      });
+      return migrated;
+    }
+
     function minutesFromTime(value) {
       const match = String(value || "").match(/^([01]\d|2[0-3]):([0-5]\d)$/);
       return match ? Number(match[1]) * 60 + Number(match[2]) : null;
@@ -2171,9 +2185,9 @@ Day 7：重庆城市漫游
         if (!key) return false;
         const payload = JSON.parse(localStorage.getItem(key) || "null");
         if (!payload || !payload.activeTrip || !payload.originalTrip) return false;
-        activeTrip = payload.activeTrip;
-        originalTrip = payload.originalTrip;
-        previousTrip = payload.previousTrip || null;
+        activeTrip = migrateStoredTripCopy(payload.activeTrip);
+        originalTrip = migrateStoredTripCopy(payload.originalTrip);
+        previousTrip = migrateStoredTripCopy(payload.previousTrip);
         changeHistory = Array.isArray(payload.changeHistory) ? payload.changeHistory : [];
         draft = draftFromTrip(activeTrip);
         hasParsed = true;
@@ -2184,6 +2198,7 @@ Day 7：重庆城市漫游
         renderChangeHistory();
         const requested = location.hash === "#map" ? "map" : "plan";
         showProductView(requested, false);
+        persistTripState();
         return true;
       } catch {
         return false;

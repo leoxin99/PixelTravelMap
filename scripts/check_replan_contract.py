@@ -130,6 +130,13 @@ function clickHandler(id) {
   if (handlers.length !== 1) throw new Error(`expected one click handler for ${id}, got ${handlers.length}`);
   handlers[0]({ target: elements.get(id) });
 }
+const migratedLegacy = migrateStoredTripCopy({
+  trip_title: "川北九寨与重庆 7 日旅行（脱敏演示）",
+  days: [{ stops: [{ source: "sanitized_demo_itinerary" }] }]
+});
+if (migratedLegacy.trip_title.includes("脱敏") || migratedLegacy.days[0].stops[0].source !== "curated_demo_itinerary") {
+  throw new Error("legacy stored demo state was not migrated");
+}
 clickHandler("load-sample");
 if (!activeTrip || activeTrip.days.length !== 7) throw new Error("demo did not create a seven-day active trip");
 if (!activeTrip.trip_title.includes("川北九寨与重庆")) throw new Error("demo title was overwritten by the initial form state");
