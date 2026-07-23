@@ -132,6 +132,7 @@ function clickHandler(id) {
 }
 clickHandler("load-sample");
 if (!activeTrip || activeTrip.days.length !== 7) throw new Error("demo did not create a seven-day active trip");
+if (!activeTrip.trip_title.includes("川北九寨与重庆")) throw new Error("demo title was overwritten by the initial form state");
 if (!flattenStops(activeTrip).some(stop => stop.name === "乐山大佛")) throw new Error("demo route should initially contain Leshan");
 clickHandler("open-disruption");
 if (!pendingProposal) throw new Error("demo disruption did not produce a proposal: " + elements.get("replan-status").textContent);

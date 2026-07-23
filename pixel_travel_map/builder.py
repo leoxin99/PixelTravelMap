@@ -3263,6 +3263,7 @@ initViewer();${closeScript}
           }
         });
         hasParsed = true;
+        renderDraft();
         const trip = buildTripFromDraft();
         setTripReady(trip);
         setStatus(parseStatus, "已加载脱敏演示行程。", "ok");
