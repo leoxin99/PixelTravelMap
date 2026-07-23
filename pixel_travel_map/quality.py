@@ -298,6 +298,13 @@ def check_builder_artifact(html_path: Path, max_bytes: int = 2_500_000) -> list[
         'id="geocoder-provider"',
         'id="geocode-candidates"',
         'id="confirm-geocode"',
+        'id="plan-view-button"',
+        'id="map-view-button"',
+        'id="open-disruption"',
+        'id="replan-diff"',
+        'id="apply-replan"',
+        'id="undo-replan"',
+        'id="reset-replan"',
         'id="copy-trip-link"',
         'id="export-notes"',
         'id="import-notes"',
@@ -305,6 +312,11 @@ def check_builder_artifact(html_path: Path, max_bytes: int = 2_500_000) -> list[
         "PixelTravelMapCollaboration",
         "SHARE_VIEWER_URL",
         "GEOCODER_CACHE_KEY",
+        "PixelTravelMap:replan:last:v1",
+        "PixelTravelMap:events:v1",
+        "sanitized_demo_itinerary",
+        "成都东站前往重庆",
+        "reservation:true",
         "waitForGeocoderSlot",
         "OpenStreetMap contributors",
         "DecompressionStream",
@@ -316,6 +328,38 @@ def check_builder_artifact(html_path: Path, max_bytes: int = 2_500_000) -> list[
         if snippet not in html:
             errors.append(f"builder missing required snippet: {snippet}")
 
+    return errors
+
+
+def check_sanitized_demo_privacy(html_path: Path) -> list[str]:
+    """Check the embedded public demo for common personal or commercial identifiers."""
+
+    if not html_path.exists():
+        return [f"missing artifact: {html_path}"]
+    html = html_path.read_text(encoding="utf-8")
+    match = re.search(
+        r'<script id="sample-trip-text" type="text/plain">(.*?)</script>',
+        html,
+        flags=re.DOTALL,
+    )
+    if not match:
+        return ["builder missing sanitized demo itinerary"]
+    demo = match.group(1)
+    forbidden_patterns = {
+        r"(?<!\d)1[3-9]\d{9}(?!\d)": "mobile phone number",
+        r"[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}": "email address",
+        r"(?<!\d)\d{17}[\dXx](?!\d)": "Chinese identity number",
+        r"\b[A-Z]{2}\d{3,4}\b": "flight number",
+        r"(?:报价|团号|许可证|合同价|元/人|元／人)": "commercial term",
+        r"(?:旅行社|疗休养中心|有限公司|协会|组织部)": "organization name",
+        r"(?:酒店|宾馆|饭店)\s*[:：]": "hotel detail",
+    }
+    errors: list[str] = []
+    for pattern, label in forbidden_patterns.items():
+        if re.search(pattern, demo, flags=re.IGNORECASE):
+            errors.append(f"sanitized demo contains possible {label}")
+    if "sanitized_demo_itinerary" not in html:
+        errors.append("sanitized demo source marker is missing")
     return errors
 
 

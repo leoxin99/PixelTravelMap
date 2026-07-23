@@ -1,108 +1,77 @@
 # PixelTravelMap
 
-PixelTravelMap 是一个离线优先的旅行行程工具：把 Word 或自然语言行程整理成可交互地图、同行明日简报和一页式 SVG 海报。
+PixelTravelMap 是一个离线优先的旅行行程助手。它把已有 Word 或文字行程整理成时间线和城市关系地图；旅行中出现晚点、闭馆、天气或体力变化时，可以在保护固定预约的前提下，局部调整当天后续安排。
 
-项目无需后端和 API key。生成的 HTML、JSON 与 SVG 可独立保存和打开，适合旅行前规划、途中协作和旅行后记录。
+项目无需账号、后端或 API key，生成的 HTML、JSON 和 SVG 可以独立保存与分享。
 
 ## 在线体验
 
-- [创建自己的地图](https://leoxin99.github.io/PixelTravelMap/dist/builder.html)
+- [统一产品入口](https://leoxin99.github.io/PixelTravelMap/dist/index.html)
+- [同行分享查看器](https://leoxin99.github.io/PixelTravelMap/dist/viewer.html)
 - [意法瑞 8 日自驾 Demo](https://leoxin99.github.io/PixelTravelMap/dist/italy_france_switzerland_demo.html)
-- [日本关西城市旅行 Demo](https://leoxin99.github.io/PixelTravelMap/dist/japan_kansai_demo.html)
-- [北京亲子游 Demo](https://leoxin99.github.io/PixelTravelMap/dist/beijing_family_demo.html)
 
-## 成果展示
+## 核心功能
 
-| 桌面端行程地图 | 手机端明日简报 |
-| --- | --- |
-| ![桌面端行程地图](docs/assets/pixeltravelmap-map-desktop.png) | ![手机端明日简报](docs/assets/pixeltravelmap-briefing-mobile.png) |
-
-## 主要功能
-
-- 上传 `.docx` 或粘贴自然语言行程，生成可编辑草稿
-- 可选使用 OpenStreetMap 确认城市级方位，同城景点自动复用
-- 以旅行故事地图展示城市方向、路线关系和近似距离，不替代导航
-- 记录集合时间、到达时间、预约信息、交通缓冲和注意事项
-- 生成总行程、每日简报和旅行记录 SVG poster
-- 通过链接分享完整行程或指定日期的手机简报
-- 使用带作者和时间戳的 JSON 更新包导入、导出同行备注
-- 备注保存在浏览器 `localStorage`，不会上传到服务器
+- 上传 `.docx` 或粘贴文字行程，整理为可编辑的 Day 时间线
+- 使用城市级方位展示路线关系，小景点不承担精确导航
+- 报告晚点、地点关闭、天气影响或体力不足
+- 先展示“保留、顺延、跳过”差异，再由使用者确认调整
+- 自动保护已预约项目，不跨天移动，也不编造替代景点
+- 同步更新当前行程、地图、每日简报和下载内容
+- 导出同行查看版 HTML、每日简报及旅行 Poster
+- 当前计划、原计划和变化记录仅保存在浏览器本地
 
 ## 使用方法
 
-### 浏览器创建
+1. 打开[统一产品入口](https://leoxin99.github.io/PixelTravelMap/dist/index.html)。
+2. 点击“加载脱敏演示行程”，可直接体验完整流程；也可以上传自己的 `.docx`。
+3. 在“行程”页点击“行程有变”，选择变化并查看调整建议。
+4. 确认差异后应用，切换到“地图”查看更新路线或下载每日简报。
 
-1. 打开[在线创建器](https://leoxin99.github.io/PixelTravelMap/dist/builder.html)。
-2. 上传 `.docx` 或粘贴旅行计划，点击“整理我的行程”。
-3. 确认标题、日期、城市和地点顺序；无需逐个填写景点坐标。
-4. 缺少方位时按城市确认一次，然后点击“生成旅行地图”。
-5. 下载互动 HTML 或指定日期的每日简报；更多格式收在导出菜单中。
+演示主线只需要三次操作：
 
-分享链接把行程快照放在 URL fragment 中，不会随网页请求发送给服务器。项目保持纯静态架构，因此同行协作采用“导出更新包、导入合并”的异步方式，不宣称实时多人编辑。
+```text
+加载脱敏演示行程 -> 行程有变 -> 应用调整
+```
 
-### 本地生成
+内置 Demo 源自一份传统旅行行程单，只保留公共地点和 Day 顺序；联系人、机构、原始日期、交通编号、人数、价格及住宿信息均已删除。
+
+## 本地运行
 
 需要 Python 3.10 或以上版本，无第三方依赖。
 
 ```powershell
 git clone git@github.com:leoxin99/PixelTravelMap.git
 cd PixelTravelMap
+python scripts/build_builder.py
+python scripts/build_viewer.py
 python scripts/check_project.py
 ```
 
-生成示例：
-
-```powershell
-python scripts/generate_map.py `
-  --input examples/inputs/tokyo_coordinate_trip.txt `
-  --output dist/tokyo_coordinate_demo.html `
-  --dump-json dist/tokyo_coordinate_demo.json `
-  --poster-svg dist/tokyo_coordinate_demo_poster.svg
-```
-
-地点输入示例：
-
-```text
-Day 1：东京塔和城市观景
-- 东京塔 (lat:35.6586, lon:139.7454, city:Tokyo, country:JP, category:landmark, duration:90, arrival:09:30, reservation:true, reservation_time:09:30, buffer:20, caution:提前取票)
-```
-
-支持的 `category`：
-
-```text
-landmark, museum, food, hotel, nature, transit, shopping, experience, viewpoint
-```
-
-## 常用命令
-
-```powershell
-# 重建在线创建器和分享查看器
-python scripts/build_builder.py --output dist/builder.html
-python scripts/build_viewer.py --output dist/viewer.html
-
-# 校验全部源码和产物
-python scripts/check_project.py
-
-# 校验单个 HTML 或 SVG
-python scripts/check_artifact.py dist/italy_france_switzerland_demo.html
-```
+直接打开 `dist/index.html` 即可使用。
 
 ## 项目结构
 
 ```text
-pixel_travel_map/   解析、校验与渲染
-scripts/            构建和检查命令
+pixel_travel_map/   导入、校验、地图与 Poster 渲染
+scripts/            构建和自动检查
 examples/           示例输入与期望数据
 schemas/            行程 JSON Schema
-dist/               可直接发布的 HTML、JSON、SVG
+dist/               GitHub Pages 可发布产物
 ```
+
+## 当前状态
+
+已完成的 Prototype 闭环：离线导入、差异预览、局部重规划、撤销与恢复、地图和简报同步、本地匿名事件记录。
+
+仍待真实使用验证：调整建议接受率、完成一次改行程所需时间、手工改回比例、每日简报分享率。项目不会把合成用户研究或演示数据表述为真实市场验证。
 
 ## 限制
 
-- 地图距离是基于经纬度的直线近似值，不等同于实际道路距离。
-- 在线定位不会自动请求，只在用户主动点击补全城市方位时访问 Nominatim。
-- 支持 `.docx`，暂不支持旧版 `.doc`、PDF 和扫描件。
-- 分享链接可能较长；复杂行程更适合发送下载后的 HTML 文件。
+- “实时更新”指使用者报告变化后在浏览器即时计算，不接入实时天气或交通。
+- 地图呈现城市级相对方位，距离为直线近似值，不替代导航。
+- 自动规则只调整已有行程；信息不足或固定安排发生冲突时会停止并要求人工确认。
+- 第一版支持 `.docx`，暂不支持旧版 `.doc`、PDF 和扫描件。
 
 ## License
 

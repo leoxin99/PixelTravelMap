@@ -15,13 +15,18 @@ def main() -> int:
     parser.add_argument(
         "--output",
         type=Path,
-        default=ROOT / "dist" / "builder.html",
-        help="Output builder HTML path.",
+        default=None,
+        help="Optional single output path. By default writes dist/index.html and dist/builder.html.",
     )
     args = parser.parse_args()
 
-    write_builder_html(args.output)
-    print(f"Wrote {args.output}")
+    outputs = [args.output] if args.output else [
+        ROOT / "dist" / "index.html",
+        ROOT / "dist" / "builder.html",
+    ]
+    for output in outputs:
+        write_builder_html(output)
+        print(f"Wrote {output}")
     return 0
 
 

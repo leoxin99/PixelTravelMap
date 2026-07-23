@@ -12,10 +12,12 @@ from pixel_travel_map.parser import ParseNeedInput, parse_travel_text
 from pixel_travel_map.quality import (
     check_artifact,
     check_builder_artifact,
+    check_sanitized_demo_privacy,
     check_svg_artifact,
     load_json,
     validate_trip,
 )
+from scripts.check_replan_contract import check_replan_contract
 
 
 PYTHON_FILES = [
@@ -28,6 +30,7 @@ PYTHON_FILES = [
     ROOT / "scripts" / "build_viewer.py",
     ROOT / "scripts" / "check_artifact.py",
     ROOT / "scripts" / "check_project.py",
+    ROOT / "scripts" / "check_replan_contract.py",
     ROOT / "scripts" / "generate_map.py",
     ROOT / "scripts" / "render_map.py",
     ROOT / "scripts" / "validate_trip.py",
@@ -56,6 +59,7 @@ POSTERS = [
 ]
 
 BUILDER_ARTIFACT = ROOT / "dist" / "builder.html"
+INDEX_ARTIFACT = ROOT / "dist" / "index.html"
 VIEWER_ARTIFACT = ROOT / "dist" / "viewer.html"
 
 
@@ -95,6 +99,13 @@ def main() -> int:
 
     for error in check_builder_artifact(BUILDER_ARTIFACT):
         failures.append(f"{BUILDER_ARTIFACT.relative_to(ROOT)}: {error}")
+
+    for error in check_builder_artifact(INDEX_ARTIFACT):
+        failures.append(f"{INDEX_ARTIFACT.relative_to(ROOT)}: {error}")
+    for error in check_sanitized_demo_privacy(INDEX_ARTIFACT):
+        failures.append(f"{INDEX_ARTIFACT.relative_to(ROOT)}: {error}")
+    for error in check_replan_contract(INDEX_ARTIFACT):
+        failures.append(f"{INDEX_ARTIFACT.relative_to(ROOT)}: {error}")
 
     for error in check_artifact(VIEWER_ARTIFACT):
         failures.append(f"{VIEWER_ARTIFACT.relative_to(ROOT)}: {error}")

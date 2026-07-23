@@ -1,89 +1,83 @@
-# PixelTravelMap Interview Narrative
+# PixelTravelMap 面试介绍
 
-## 30-Second Version
+## 30 秒版本
 
-PixelTravelMap is a portfolio MVP for an AI travel artifact generator. The user
-describes a trip in natural language, the system turns it into structured
-itinerary JSON, validates the schema, and renders offline artifacts: an
-interactive HTML atlas plus a one-page SVG poster with coordinate-projected
-POIs, route distance labels, itinerary panels, source notes, and artifact
-quality checks.
+PixelTravelMap 是一个面向“已经有旅行计划，但途中经常发生变化”的离线行程助手。使用者可以导入 Word 或文字行程；遇到晚点、闭馆、天气或体力变化时，系统会保护已预约安排，只对受影响的当天后续行程给出“保留、顺延、跳过”建议。确认后，时间线、城市关系地图和同行简报会同步更新。
 
-The HTML artifact also works as a lightweight trip companion: before the trip,
-it can generate an overall poster and per-day briefing posters for companions;
-during the trip, notes are saved locally in the browser; after the trip, those
-notes can be turned into a travel record poster.
+## 90 秒展示脚本
 
-## Why Start With an HTML Artifact
+1. **加载既有计划**：点击“加载脱敏演示行程”，页面直接进入 7 日时间线。
+2. **报告突发变化**：点击“行程有变”。演示情境是 Day 5 从茂县出发晚点 3 小时。
+3. **解释产品判断**：系统建议跳过乐山绕行、直接前往成都，同时明确保留 Day 6 固定动车。它不会跨天移动，也不会编造替代景点。
+4. **确认并同步**：点击“应用调整”。行程和地图同时移除乐山，下载的每日简报与同行查看版也读取更新后的当前计划。
+5. **说明边界**：当前是确定性离线 Prototype，“实时”指用户报告变化后立即计算，不宣称拥有实时天气或交通数据。
 
-I intentionally did not start with a full SaaS. The risky assumption is whether
-the output itself is valuable: can a user get a beautiful, shareable, offline
-travel artifact from one description? HTML and SVG files validate that core
-loop quickly without accounts, databases, deployment, billing, or map-provider
-licensing.
+## 产品问题
 
-This is also a good fit for AI application engineering because the boundary is
-clear:
+传统行程单适合旅行前查看，但真正费时间的是途中变化后的连锁修改：组织者需要确认哪些预约不能动、哪些项目可以放弃，并重新同步给同行者。
+
+本项目把重点从“再生成一份旅行计划”转为“保护固定安排，减少局部改计划的成本”。
+
+## 为什么这样设计
+
+- **输入已有行程**：避免与通用旅行 Agent 比拼从零推荐。
+- **先展示差异再应用**：AI 或规则不能替使用者承担关键旅行决策。
+- **只改当天后续**：缩小错误影响范围，结果更容易理解和撤销。
+- **信息不足就停止**：不猜测时间、道路或替代景点。
+- **地图使用城市级方位**：用于理解旅行关系，不与专业导航产品竞争。
+- **离线和本地存储**：无需账号或后端，传统行程单不会被默认上传。
+
+## 技术结构
 
 ```text
-unstructured input -> structured JSON -> deterministic renderer -> evaluable artifact
+Word / 文字行程
+        ↓
+结构化 itinerary JSON
+        ↓
+固定安排与时间约束
+        ↓
+确定性局部重规划
+        ↓
+activeTrip
+        ↓
+时间线 / 地图 / HTML / SVG 简报
 ```
 
-## How To Keep LLM Output Stable
+`activeTrip` 是所有展示和导出的唯一当前数据源。原计划、当前计划、单步撤销和变化记录保存在 `localStorage`；事件记录只包含变化类型、Day、数量和耗时，不保存 Word 正文或地点自由文本。
 
-The project treats schema as the contract, not the prompt as the contract.
+## 已完成与待验证
 
-- Define required fields and value ranges in `trip.schema.json`.
-- Ask the LLM for structured output only.
-- Validate JSON before rendering.
-- Reject or repair invalid output with structured error messages.
-- Mark missing POI facts as `info_missing=true` instead of inventing facts.
-- Keep renderer deterministic so layout bugs are separate from model mistakes.
+**已完成**
 
-In phase 1, the parser is local and heuristic so the project is runnable without
-API keys. The same parser boundary can later be replaced by OpenAI/Claude
-structured output.
+- `.docx` 与文字导入、城市级地图、离线 HTML/SVG 导出
+- 晚点、关闭、天气、体力不足四类确定性调整
+- 固定预约保护、差异预览、确认、撤销和恢复原行程
+- 行程、地图、每日简报及下载内容同步更新
+- 脱敏真实格式 Demo、隐私扫描和静态产物自动检查
 
-## How To Evaluate Usefulness
+**待真实用户验证**
 
-The MVP can be evaluated without subjective vibes:
+- 重规划建议接受率
+- 从报告变化到完成同步所需时间
+- 使用者手工改回或继续编辑的比例
+- 每日简报下载和分享率
 
-- JSON validity rate.
-- Required-field completion rate.
-- POI source coverage.
-- Artifact open rate for HTML and SVG.
-- Offline compliance: no external scripts/styles/fetch.
-- Interaction success: marker click, itinerary click, city detail view, download.
-- Poster success: overall trip, daily briefing, and travel record posters download from the HTML artifact.
-- Note persistence: browser-local trip/day/POI notes survive refresh and appear in the record poster.
-- Map readability: POI labels, relative direction, scale bar, and segment distance labels are legible.
-- Human review: does the itinerary map communicate the trip clearly?
+这些指标是下一轮实验目标，不是当前已经取得的增长结果。
 
-## Product Tradeoffs
+## 常见追问
 
-Chose:
+### 为什么不用 LLM 直接重排？
 
-- local CLI before web app;
-- static/demo POI before live APIs;
-- offline coordinate-projected SVG/HTML artifacts before precise navigation;
-- validation and quality checks before extra themes.
+当前最重要的是让调整可解释、可撤销，并严格保护固定安排。确定性规则更适合作为第一版基线。后续可以让模型生成候选方案，但仍需通过同一约束检查和人工确认。
 
-Deferred:
+### 为什么不接实时地图或天气？
 
-- accounts and collaboration;
-- real-time maps;
-- official POI fetching;
-- PNG export;
-- PDF/screenshot import.
+本轮验证的是“局部重规划与同行同步”是否有价值。外部数据会增加成本、授权和错误来源；因此先把接口边界保留清楚，不把尚未接入的数据包装成能力。
 
-## Resume Description
+### 产品壁垒可能在哪里？
 
-English:
+不是像素风本身，而是不断积累的“突发事件、固定约束、使用者选择和最终结果”数据。如果真实使用证明有效，这些数据可以形成更准确的冲突识别、调整策略和个性化偏好。
 
-Built a local PixelTravelMap MVP that converts natural-language trip plans into
-validated itinerary JSON and renders offline HTML atlas and SVG poster artifacts
-with coordinate-projected POIs, route distances, citations, itinerary panels, and artifact quality checks.
+## 简历描述
 
-Chinese:
-
-完成 PixelTravelMap 本地 MVP，将自然语言旅行描述转化为可校验 itinerary JSON，并生成离线可用的 HTML atlas 和一页式 SVG 海报，支持坐标投影 POI、路线距离、来源标注、日程面板和 artifact 质量检查。
+设计并实现 PixelTravelMap 离线旅行行程助手，将 Word/文字行程结构化为统一数据模型；针对晚点、闭馆、天气和体力变化提供可解释的局部重规划，保护固定预约并同步更新时间线、城市关系地图、同行简报及离线导出。建立脱敏 Demo、本地匿名事件记录与静态产物质量检查，并明确区分 Prototype 能力和待验证产品指标。

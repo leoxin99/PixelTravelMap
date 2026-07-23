@@ -11,7 +11,7 @@ def render_builder_html() -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PixelTravelMap 创建器</title>
+  <title>PixelTravelMap 行程助手</title>
   <style>
     :root {
       --canvas: #edf3f1;
@@ -433,10 +433,110 @@ def render_builder_html() -> str:
     .download-panel { display: grid; gap: 10px; margin: 0 18px 18px; border-top: 1px solid var(--line); padding-top: 12px; }
     .download-grid select { width: auto; min-width: 150px; }
     .help-text { color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .product-nav {
+      display: flex;
+      gap: 4px;
+      padding: 0 18px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .product-nav button {
+      min-width: 92px;
+      min-height: 38px;
+      border: 0;
+      border-bottom: 3px solid transparent;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      font-weight: 750;
+    }
+    .product-nav button.active { color: var(--brand-dark); border-bottom-color: var(--brand); }
+    .product-view { min-width: 0; }
+    .plan-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px 0;
+    }
+    .plan-toolbar p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .plan-tools { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+    .replan-panel {
+      display: grid;
+      gap: 14px;
+      margin: 16px 18px;
+      padding: 16px;
+      border: 1px solid #e4b4ad;
+      border-left: 4px solid var(--route);
+      border-radius: 7px;
+      background: #fffaf8;
+    }
+    .replan-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .lock-list { display: grid; gap: 7px; }
+    .lock-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 12px;
+    }
+    .lock-item input { width: auto; margin: 0; }
+    .diff-panel {
+      display: grid;
+      gap: 9px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--surface);
+    }
+    .diff-list { display: grid; gap: 7px; }
+    .diff-item {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 9px;
+      align-items: start;
+      padding: 9px 10px;
+      border-left: 3px solid var(--line-strong);
+      background: var(--surface-soft);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .diff-item.keep { border-left-color: var(--ok); }
+    .diff-item.shift { border-left-color: var(--sun); }
+    .diff-item.skip { border-left-color: var(--route); }
+    .diff-label { font-weight: 800; }
+    .change-banner {
+      margin: 14px 18px 0;
+      padding: 10px 12px;
+      border-left: 3px solid var(--ok);
+      color: var(--ok);
+      background: var(--ok-soft);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .change-log {
+      margin: 0 18px 18px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      color: var(--muted);
+      background: var(--surface-soft);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .change-log strong { color: var(--ink); }
     @media (max-width: 1060px) {
       .day-head { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .stop-main { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .advanced-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .replan-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 680px) {
       .app-shell { padding: 12px; }
@@ -449,36 +549,66 @@ def render_builder_html() -> str:
       .geocoder-controls { grid-template-columns: 1fr; }
       .button-row .text-button { flex: 1 1 150px; }
       .preview-map, .preview-map .empty { min-height: 300px; }
-      .preview-map { min-height: 0; overflow-x: auto; }
-      .preview-map .pixel-map { min-width: 720px; }
+      .preview-map { min-height: 0; overflow: hidden; }
+      .preview-map .pixel-map { min-width: 0; }
+      .plan-toolbar { align-items: flex-start; flex-direction: column; }
+      .plan-tools { width: 100%; justify-content: flex-start; }
+      .replan-grid { grid-template-columns: 1fr; }
+      .product-nav button { flex: 1; }
       textarea { min-height: 220px; }
     }
   </style>
 </head>
 <body>
-  <script id="sample-trip-text" type="text/plain">标题：东京 2 日城市旅行
-日期：2026-07-01 到 2026-07-02
-交通：public-transit
+  <script id="sample-trip-text" type="text/plain">标题：川北九寨与重庆 7 日旅行（脱敏演示）
+日期：2026-10-12 到 2026-10-18
+交通：mixed
 
-Day 1：东京塔和六本木夜景
-- 09:30 东京塔 (lat:35.6586, lon:139.7454, city:Tokyo, country:JP, category:landmark, duration:90)
-- 13:00 麻布台之丘 (lat:35.6602, lon:139.7404, city:Tokyo, country:JP, category:viewpoint, duration:120)
-- 17:00 六本木之丘 (lat:35.6605, lon:139.7292, city:Tokyo, country:JP, category:viewpoint, duration:120)
+Day 1：南充集合，前往阆中
+- 09:30 南充集合点 (lat:30.8378, lon:106.1107, city:南充, country:CN, category:transit, duration:45, buffer:20)
+- 13:30 阆中古城 (lat:31.5583, lon:105.9750, city:阆中, country:CN, category:landmark, duration:180, buffer:30)
 
-Day 2：浅草和上野
-- 浅草寺 (city:Tokyo, country:JP, duration:90)
-- 上野公园 (city:Tokyo, country:JP, category:nature, duration:120)</script>
+Day 2：阆中前往九寨沟
+- 09:00 阆中古城晨游 (lat:31.5583, lon:105.9750, city:阆中, country:CN, category:experience, duration:90, buffer:30)
+- 16:00 九寨沟沟口 (lat:33.2524, lon:103.9186, city:九寨沟, country:CN, category:transit, duration:60, buffer:30)
+
+Day 3：九寨沟全天游览
+- 08:30 九寨沟景区入口 (lat:33.2524, lon:103.9186, city:九寨沟, country:CN, category:nature, duration:60, buffer:20)
+- 10:00 五花海 (lat:33.2524, lon:103.9186, city:九寨沟, country:CN, category:nature, duration:120, buffer:20)
+- 14:00 诺日朗瀑布 (lat:33.2524, lon:103.9186, city:九寨沟, country:CN, category:nature, duration:120, buffer:30)
+
+Day 4：黄龙游览，抵达茂县
+- 08:00 九寨沟出发点 (lat:33.2524, lon:103.9186, city:九寨沟, country:CN, category:transit, duration:30, buffer:30)
+- 11:30 黄龙风景区 (lat:32.7534, lon:103.8300, city:黄龙, country:CN, category:nature, duration:240, buffer:40)
+- 18:30 茂县抵达点 (lat:31.6800, lon:103.8533, city:茂县, country:CN, category:transit, duration:30, buffer:30)
+
+Day 5：茂县经乐山前往成都
+- 08:00 茂县出发点 (lat:31.6800, lon:103.8533, city:茂县, country:CN, category:transit, duration:30, buffer:30)
+- 13:00 乐山大佛 (lat:29.5522, lon:103.7655, city:乐山, country:CN, category:landmark, duration:180, buffer:40)
+- 18:30 成都抵达点 (lat:30.5728, lon:104.0668, city:成都, country:CN, category:transit, duration:30, buffer:30)
+
+Day 6：成都游览后乘动车前往重庆
+- 09:00 东郊记忆 (lat:30.5728, lon:104.0668, city:成都, country:CN, category:experience, duration:90, buffer:20)
+- 11:30 宽窄巷子 (lat:30.5728, lon:104.0668, city:成都, country:CN, category:landmark, duration:120, buffer:40)
+- 15:00 成都东站前往重庆 (lat:30.6280, lon:104.1410, city:成都, country:CN, category:transit, duration:120, reservation:true, reservation_time:15:00, buffer:45, caution:固定动车不可自动修改)
+- 18:00 李子坝观景平台 (lat:29.5630, lon:106.5516, city:重庆, country:CN, category:viewpoint, duration:60, buffer:20)
+- 20:00 洪崖洞 (lat:29.5630, lon:106.5516, city:重庆, country:CN, category:landmark, duration:90, buffer:30)
+
+Day 7：重庆城市漫游
+- 09:30 魁星楼 (lat:29.5630, lon:106.5516, city:重庆, country:CN, category:viewpoint, duration:60, buffer:20)
+- 11:30 鹅岭二厂 (lat:29.5630, lon:106.5516, city:重庆, country:CN, category:experience, duration:90, buffer:30)
+- 15:00 磁器口古镇 (lat:29.5630, lon:106.5516, city:重庆, country:CN, category:landmark, duration:120, buffer:30)</script>
   <div class="app-shell">
     <header class="topbar">
       <div class="brand-row">
         <div class="brand-mark" aria-hidden="true">P</div>
         <div>
-          <p class="eyebrow">PixelTravelMap Builder</p>
-          <h1>把传统行程变成可分享的旅行地图</h1>
-          <p class="atlas-note">导入已有行程，确认少量关键信息，得到可分享的互动地图和每日简报。</p>
+          <p class="eyebrow">PixelTravelMap Trip Companion</p>
+          <h1>行程变了，也不用从头重排</h1>
+          <p class="atlas-note">导入已有行程；遇到晚点、闭馆、天气或体力变化时，只调整受影响的部分，并保护已预约安排。</p>
         </div>
       </div>
-      <span class="status-chip">三步完成 · 城市级方位</span>
+      <span class="status-chip">离线原型 · 局部重规划</span>
     </header>
 
     <main class="builder-layout">
@@ -499,7 +629,7 @@ Day 2：浅草和上野
             </label>
             <div class="button-row">
               <button class="text-button primary" id="parse-input" type="button">整理我的行程</button>
-              <button class="text-button ghost" id="load-sample" type="button">试用示例</button>
+              <button class="text-button ghost" id="load-sample" type="button">加载脱敏演示行程</button>
             </div>
             <p id="parse-status" class="status">你的文档和行程内容默认只在当前浏览器中处理。</p>
             <p class="privacy-note">为了绘制城市之间的大致方位，后续可由你主动使用 OpenStreetMap 查询城市位置；小景点不会被当作精确导航点。</p>
@@ -586,32 +716,102 @@ Day 2：浅草和上野
       </section>
 
       <section id="step-result" class="panel preview-box step-panel" hidden>
-          <div class="section-heading">
-            <div class="section-title"><span class="step-number">3</span><h2>得到旅行地图</h2></div>
+        <div class="section-heading">
+          <div class="section-title"><span class="step-number">3</span><h2 id="result-title">当前行程</h2></div>
+          <button class="text-button ghost" id="start-new-trip" type="button">导入另一份行程</button>
+        </div>
+        <nav class="product-nav" aria-label="产品主视图">
+          <button id="plan-view-button" class="active" type="button">行程</button>
+          <button id="map-view-button" type="button">地图</button>
+        </nav>
+
+        <div id="product-plan-view" class="product-view">
+          <div class="plan-toolbar">
+            <p>固定预约会被优先保护；每次调整都会先展示差异，再由你确认。</p>
+            <div class="plan-tools">
+              <button class="text-button primary" id="open-disruption" type="button">行程有变</button>
+              <button class="text-button" id="undo-replan" type="button" disabled>撤销调整</button>
+              <button class="text-button ghost" id="reset-replan" type="button" disabled>恢复原行程</button>
+            </div>
           </div>
+          <div id="change-banner" class="change-banner" hidden></div>
+          <section id="replan-panel" class="replan-panel" hidden aria-labelledby="replan-title">
+            <div class="section-heading">
+              <div>
+                <h2 id="replan-title">报告突发变化</h2>
+                <p class="help-text">只调整当天尚未完成且未锁定的安排，不跨天移动。</p>
+              </div>
+              <button class="text-button ghost" id="close-disruption" type="button">关闭</button>
+            </div>
+            <div class="replan-grid">
+              <label for="disruption-type">变化类型
+                <select id="disruption-type">
+                  <option value="delay">晚点</option>
+                  <option value="closure">地点关闭</option>
+                  <option value="weather">天气影响</option>
+                  <option value="fatigue">体力不足</option>
+                </select>
+              </label>
+              <label for="disruption-day">受影响日期
+                <select id="disruption-day"></select>
+              </label>
+              <label for="disruption-stop">受影响地点
+                <select id="disruption-stop"></select>
+              </label>
+              <label id="delay-field" for="disruption-delay">延误时长
+                <select id="disruption-delay">
+                  <option value="60">1 小时</option>
+                  <option value="120">2 小时</option>
+                  <option value="180" selected>3 小时</option>
+                  <option value="240">4 小时</option>
+                </select>
+              </label>
+            </div>
+            <div>
+              <h3>不能改变的安排</h3>
+              <div id="lock-list" class="lock-list"></div>
+            </div>
+            <div class="button-row">
+              <button class="text-button" id="preview-replan" type="button">查看调整建议</button>
+            </div>
+            <div id="replan-status" class="status">演示情境默认是 Day 5 晚点 3 小时。</div>
+            <div id="replan-diff" class="diff-panel" hidden>
+              <h3>应用前确认</h3>
+              <div id="replan-diff-list" class="diff-list"></div>
+              <div class="button-row">
+                <button class="text-button primary" id="apply-replan" type="button">应用调整</button>
+                <button class="text-button" id="cancel-replan" type="button">取消</button>
+              </div>
+            </div>
+          </section>
+          <div class="preview-content">
+            <div id="summary-grid" class="summary-grid"></div>
+            <div id="preview-itinerary" class="preview-itinerary"></div>
+          </div>
+          <div id="change-log" class="change-log" hidden></div>
+        </div>
+
+        <div id="product-map-view" class="product-view" hidden>
           <div class="map-meta">
             <span>城市级相对方位 · 不替代导航</span>
             <span>N ↑</span>
           </div>
           <div id="map-preview" class="preview-map"><div class="empty">解析并补全地点后，这里会显示路线地图。</div></div>
-          <div class="preview-content">
-            <div id="summary-grid" class="summary-grid"></div>
-            <div id="preview-itinerary" class="preview-itinerary"></div>
-          </div>
           <div class="result-actions">
-            <button class="text-button primary" id="download-map-html" type="button" disabled>下载互动地图</button>
+            <button class="text-button primary" id="download-map-html" type="button" disabled>下载同行查看版</button>
             <select id="poster-day-select" aria-label="选择每日简报" disabled></select>
             <button class="text-button" id="download-day-poster" type="button" disabled>下载每日简报</button>
           </div>
           <details class="download-panel">
-            <summary>更多导出格式</summary>
+            <summary>更多导出</summary>
             <div class="download-grid">
               <button class="text-button" id="download-overview-poster" type="button" disabled>总行程 Poster</button>
               <button class="text-button" id="download-record-poster" type="button" disabled>旅行记录 Poster</button>
               <button class="text-button" id="download-json" type="button" disabled>行程 JSON</button>
             </div>
-            <p class="help-text">互动地图是独立离线 HTML，包含地图、明日简报、备注和 Poster 工具。</p>
+            <p class="help-text">地图、每日简报和下载内容始终读取当前已确认的行程。</p>
           </details>
+        </div>
       </section>
     </main>
   </div>
@@ -650,18 +850,78 @@ Day 2：浅草和上野
     const geocodeCandidates = document.getElementById("geocode-candidates");
     const confirmGeocode = document.getElementById("confirm-geocode");
     const missingCount = document.getElementById("missing-count");
+    const stepImport = document.getElementById("step-import");
     const stepConfirm = document.getElementById("step-confirm");
     const stepResult = document.getElementById("step-result");
     const importDetails = document.getElementById("import-details");
     const importSummary = document.getElementById("import-summary");
+    const productPlanView = document.getElementById("product-plan-view");
+    const productMapView = document.getElementById("product-map-view");
+    const replanPanel = document.getElementById("replan-panel");
+    const replanStatus = document.getElementById("replan-status");
+    const replanDiff = document.getElementById("replan-diff");
+    const replanDiffList = document.getElementById("replan-diff-list");
+    const disruptionType = document.getElementById("disruption-type");
+    const disruptionDay = document.getElementById("disruption-day");
+    const disruptionStop = document.getElementById("disruption-stop");
+    const disruptionDelay = document.getElementById("disruption-delay");
+    const lockList = document.getElementById("lock-list");
+    const changeBanner = document.getElementById("change-banner");
+    const changeLog = document.getElementById("change-log");
+    const REPLAN_STATE_PREFIX = "PixelTravelMap:replan:";
+    const REPLAN_LAST_KEY = "PixelTravelMap:replan:last:v1";
+    const EVENT_KEY = "PixelTravelMap:events:v1";
     let draft = emptyDraft();
     let activeTrip = null;
+    let originalTrip = null;
+    let previousTrip = null;
+    let pendingProposal = null;
+    let changeHistory = [];
     let hasParsed = false;
     let guideHistory = [];
     let currentGuideQuestion = null;
     let currentGeocodeTarget = null;
     let selectedGeocodeCandidate = null;
     let lastGeocodeAt = 0;
+
+    function clone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function anonymousTripId(trip) {
+      const value = `${trip.trip_title}|${trip.start_date}|${trip.end_date}`;
+      let hash = 2166136261;
+      for (let index = 0; index < value.length; index += 1) {
+        hash ^= value.charCodeAt(index);
+        hash = Math.imul(hash, 16777619);
+      }
+      return (hash >>> 0).toString(16);
+    }
+
+    function trackEvent(name, properties = {}) {
+      const allowed = new Set([
+        "demo_loaded", "trip_imported", "trip_generated", "disruption_reported",
+        "replan_proposed", "replan_applied", "replan_undone", "view_changed",
+        "briefing_downloaded", "artifact_downloaded"
+      ]);
+      if (!allowed.has(name)) return;
+      const safe = {
+        name,
+        at: new Date().toISOString(),
+        trip_id: activeTrip ? anonymousTripId(activeTrip) : null,
+        type: properties.type || null,
+        day: Number(properties.day) || null,
+        count: Number(properties.count) || null,
+        duration_ms: Number(properties.duration_ms) || null
+      };
+      try {
+        const events = JSON.parse(localStorage.getItem(EVENT_KEY) || "[]");
+        events.push(safe);
+        localStorage.setItem(EVENT_KEY, JSON.stringify(events.slice(-100)));
+      } catch {
+        // Storage can be unavailable in strict private browsing; product use still works.
+      }
+    }
 
     function emptyDraft() {
       const today = new Date().toISOString().slice(0, 10);
@@ -994,7 +1254,9 @@ Day 2：浅草和上野
         lon: fields.lon || "",
         category: CATEGORY_VALUES.includes(fields.category) ? fields.category : "landmark",
         duration_min: String(Math.max(0, Math.round(duration))),
-        arrival_time: fields.arrival || fields.arrival_time || "",
+        arrival_time: fields.arrival || fields.arrival_time || (timeRange
+          ? `${String(Number(timeRange[1])).padStart(2, "0")}:${timeRange[2]}`
+          : ""),
         reservation_required: ["true", "yes", "required", "1", "需要", "是"].includes(String(fields.reservation || "").toLowerCase()),
         reservation_time: fields.reservation_time || "",
         reservation_reference: fields.reservation_reference || "",
@@ -1576,6 +1838,331 @@ Day 2：浅草和上野
       };
     }
 
+    function draftFromTrip(trip) {
+      return {
+        trip_title: trip.trip_title,
+        start_date: trip.start_date,
+        end_date: trip.end_date,
+        transport: trip.transport,
+        days: trip.days.map(day => ({
+          day: day.day,
+          date: day.date,
+          summary: day.summary || "",
+          meeting_time: day.meeting_time || "",
+          meeting_point: day.meeting_point || "",
+          cautions: day.cautions || "",
+          stops: day.stops.map(stop => ({
+            name: stop.name,
+            city: stop.city,
+            country: stop.country,
+            lat: String(stop.lat),
+            lon: String(stop.lon),
+            category: stop.category,
+            duration_min: String(stop.duration_min),
+            arrival_time: stop.arrival_time || "",
+            reservation_required: Boolean(stop.reservation_required),
+            reservation_time: stop.reservation_time || "",
+            reservation_reference: stop.reservation_reference || "",
+            transit_buffer_min: String(stop.transit_buffer_min ?? 20),
+            cautions: stop.cautions || "",
+            notes: stop.notes || "",
+            source: stop.source || "user_builder_input",
+            source_url: stop.source_url || ""
+          }))
+        })),
+        _missing: { title: false, dates: false }
+      };
+    }
+
+    function tripStateKey(trip) {
+      return `${REPLAN_STATE_PREFIX}${anonymousTripId(trip)}:v1`;
+    }
+
+    function persistTripState() {
+      if (!activeTrip || !originalTrip) return;
+      const key = tripStateKey(originalTrip);
+      const payload = {
+        version: 1,
+        originalTrip,
+        activeTrip,
+        previousTrip,
+        changeHistory,
+        updatedAt: new Date().toISOString()
+      };
+      try {
+        localStorage.setItem(key, JSON.stringify(payload));
+        localStorage.setItem(REPLAN_LAST_KEY, key);
+      } catch {
+        // Local persistence is optional; downloads and the current session still work.
+      }
+    }
+
+    function clearCurrentStatePointer() {
+      try {
+        localStorage.removeItem(REPLAN_LAST_KEY);
+      } catch {
+        // Ignore unavailable storage.
+      }
+    }
+
+    function minutesFromTime(value) {
+      const match = String(value || "").match(/^([01]\d|2[0-3]):([0-5]\d)$/);
+      return match ? Number(match[1]) * 60 + Number(match[2]) : null;
+    }
+
+    function timeFromMinutes(value) {
+      const normalized = ((value % 1440) + 1440) % 1440;
+      return `${String(Math.floor(normalized / 60)).padStart(2, "0")}:${String(normalized % 60).padStart(2, "0")}`;
+    }
+
+    function showProductView(view, updateHash = true) {
+      const normalized = view === "map" ? "map" : "plan";
+      productPlanView.hidden = normalized !== "plan";
+      productMapView.hidden = normalized !== "map";
+      document.getElementById("plan-view-button").classList.toggle("active", normalized === "plan");
+      document.getElementById("map-view-button").classList.toggle("active", normalized === "map");
+      if (updateHash && location.hash !== `#${normalized}`) history.replaceState(null, "", `#${normalized}`);
+      trackEvent("view_changed", { type: normalized });
+    }
+
+    function setTripReady(trip, { preserveOriginal = false, track = true } = {}) {
+      activeTrip = clone(trip);
+      if (!preserveOriginal || !originalTrip) originalTrip = clone(trip);
+      previousTrip = null;
+      pendingProposal = null;
+      if (!preserveOriginal) changeHistory = [];
+      draft = draftFromTrip(activeTrip);
+      hasParsed = true;
+      stepImport.hidden = true;
+      stepConfirm.hidden = true;
+      renderDraft();
+      renderActivePreview();
+      renderChangeHistory();
+      showProductView("plan");
+      persistTripState();
+      if (track) trackEvent("trip_generated", { count: flattenStops(activeTrip).length });
+    }
+
+    function reservationLocks() {
+      if (!activeTrip) return [];
+      return flattenStops(activeTrip).filter(stop => stop.reservation_required);
+    }
+
+    function renderLockList() {
+      const locks = reservationLocks();
+      lockList.innerHTML = locks.length ? locks.map(stop => `
+        <label class="lock-item">
+          <input type="checkbox" value="${esc(stop.id)}" checked>
+          <span><strong>Day ${stop.day} · ${esc(stop.name)}</strong><br>${esc(stop.reservation_time || stop.arrival_time || "时间已确认")} · 固定安排</span>
+        </label>
+      `).join("") : `<p class="help-text">这份行程没有标记预约项目。你仍可以在应用前查看差异。</p>`;
+    }
+
+    function renderDisruptionStops(preferredName = "") {
+      const dayNumber = Number(disruptionDay.value);
+      const day = activeTrip && activeTrip.days.find(item => item.day === dayNumber);
+      disruptionStop.innerHTML = day
+        ? day.stops.map(stop => `<option value="${esc(stop.id)}">${esc(stop.arrival_time || "时间待定")} · ${esc(stop.name)}</option>`).join("")
+        : "";
+      if (preferredName && day) {
+        const preferred = day.stops.find(stop => stop.name.includes(preferredName));
+        if (preferred) disruptionStop.value = preferred.id;
+      }
+    }
+
+    function prepareDisruptionPanel(useDemoPreset = false) {
+      if (!activeTrip) return;
+      disruptionDay.innerHTML = activeTrip.days.map(day => `<option value="${day.day}">Day ${day.day} · ${esc(day.date)}</option>`).join("");
+      if (useDemoPreset) {
+        const dayFive = activeTrip.days.find(day => day.day === 5);
+        if (dayFive) disruptionDay.value = "5";
+        disruptionType.value = "delay";
+        disruptionDelay.value = "180";
+        renderDisruptionStops("乐山");
+      } else {
+        renderDisruptionStops();
+      }
+      document.getElementById("delay-field").hidden = disruptionType.value !== "delay";
+      renderLockList();
+      pendingProposal = null;
+      replanDiff.hidden = true;
+      setStatus(replanStatus, useDemoPreset
+        ? "演示情境已预设：Day 5 晚点 3 小时，优先保护 Day 6 固定动车。"
+        : "选择变化后查看建议；系统不会跨天移动地点。");
+      replanPanel.hidden = false;
+      trackEvent("disruption_reported", { type: disruptionType.value, day: disruptionDay.value });
+      replanPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function checkedLockIds() {
+      return new Set([...lockList.querySelectorAll('input[type="checkbox"]:checked')].map(input => input.value));
+    }
+
+    function proposalItem(kind, label, reason) {
+      return { kind, label, reason };
+    }
+
+    function buildReplanProposal() {
+      if (!activeTrip) throw new Error("请先生成行程。");
+      const type = disruptionType.value;
+      const dayNumber = Number(disruptionDay.value);
+      const dayIndex = activeTrip.days.findIndex(day => day.day === dayNumber);
+      if (dayIndex < 0) throw new Error("没有找到受影响的日期。");
+      const result = clone(activeTrip);
+      const resultDay = result.days[dayIndex];
+      const selectedId = disruptionStop.value;
+      const selectedIndex = resultDay.stops.findIndex(stop => stop.id === selectedId);
+      const lockedIds = checkedLockIds();
+      result.days.forEach(day => day.stops.forEach(stop => {
+        if (stop.reservation_required) lockedIds.add(stop.id);
+      }));
+      const diffs = [];
+      const lockedStop = resultDay.stops.find(stop => stop.id === selectedId && lockedIds.has(stop.id));
+      if (lockedStop && type !== "fatigue") {
+        throw new Error(`「${lockedStop.name}」是固定安排，自动调整已停止，请人工确认。`);
+      }
+
+      if (type === "closure" || type === "weather") {
+        if (selectedIndex < 0) throw new Error("请选择受影响地点。");
+        const removed = resultDay.stops.splice(selectedIndex, 1)[0];
+        const reason = type === "closure" ? "地点关闭，跳过该非固定项目" : "天气影响，跳过该非固定项目";
+        diffs.push(proposalItem("skip", removed.name, reason));
+      } else if (type === "fatigue") {
+        let removeIndex = -1;
+        for (let index = resultDay.stops.length - 1; index >= 0; index -= 1) {
+          if (!lockedIds.has(resultDay.stops[index].id)) {
+            removeIndex = index;
+            break;
+          }
+        }
+        if (removeIndex < 0) throw new Error("当天没有可自动移除的非固定地点。");
+        const removed = resultDay.stops.splice(removeIndex, 1)[0];
+        diffs.push(proposalItem("skip", removed.name, "体力不足，移除当天最后一个非固定地点"));
+      } else {
+        if (selectedIndex < 0) throw new Error("请选择受影响地点。");
+        const delay = Number(disruptionDelay.value);
+        const selected = resultDay.stops[selectedIndex];
+        if (!selected.arrival_time) throw new Error("受影响地点缺少时间，无法安全顺延，请人工确认。");
+        if (delay >= Math.max(120, selected.duration_min)) {
+          resultDay.stops.splice(selectedIndex, 1);
+          diffs.push(proposalItem("skip", selected.name, `晚点 ${delay} 分钟，跳过该非固定项目以保护后续安排`));
+        } else {
+          for (let index = selectedIndex; index < resultDay.stops.length; index += 1) {
+            const stop = resultDay.stops[index];
+            if (lockedIds.has(stop.id)) {
+              diffs.push(proposalItem("keep", stop.name, "固定预约保持不变"));
+              continue;
+            }
+            const originalMinutes = minutesFromTime(stop.arrival_time);
+            if (originalMinutes === null) throw new Error(`「${stop.name}」缺少时间，无法安全顺延，请人工确认。`);
+            stop.arrival_time = timeFromMinutes(originalMinutes + delay);
+            diffs.push(proposalItem("shift", stop.name, `${timeFromMinutes(originalMinutes)} 顺延至 ${stop.arrival_time}`));
+          }
+          const fixedStops = resultDay.stops.filter(stop => lockedIds.has(stop.id) && minutesFromTime(stop.reservation_time || stop.arrival_time) !== null);
+          for (const fixed of fixedStops) {
+            const fixedIndex = resultDay.stops.findIndex(stop => stop.id === fixed.id);
+            const fixedTime = minutesFromTime(fixed.reservation_time || fixed.arrival_time);
+            for (let index = 0; index < fixedIndex; index += 1) {
+              const stop = resultDay.stops[index];
+              const start = minutesFromTime(stop.arrival_time);
+              if (!lockedIds.has(stop.id) && start !== null && start + stop.duration_min + (stop.transit_buffer_min || 0) > fixedTime) {
+                throw new Error(`顺延后会与固定安排「${fixed.name}」冲突，自动应用已停止，请人工确认。`);
+              }
+            }
+          }
+        }
+      }
+
+      const unchangedFixed = flattenStops(result).filter(stop => lockedIds.has(stop.id));
+      unchangedFixed.forEach(stop => {
+        if (!diffs.some(item => item.label === stop.name)) {
+          diffs.push(proposalItem("keep", stop.name, `Day ${stop.day} 固定安排保持不变`));
+        }
+      });
+      resultDay.summary = `${resultDay.summary.replace(/（已调整）$/, "")}（已调整）`;
+      resultDay.cautions = [
+        resultDay.cautions,
+        type === "delay" ? `已按晚点 ${disruptionDelay.value} 分钟调整` :
+          type === "closure" ? "已按地点关闭调整" :
+          type === "weather" ? "已按天气影响调整" : "已按体力情况精简"
+      ].filter(Boolean).join("；");
+      return { trip: result, diffs, type, day: dayNumber, createdAt: new Date().toISOString() };
+    }
+
+    function renderProposal(proposal) {
+      replanDiffList.innerHTML = proposal.diffs.map(item => `
+        <div class="diff-item ${esc(item.kind)}">
+          <span class="diff-label">${item.kind === "skip" ? "跳过" : item.kind === "shift" ? "顺延" : "保留"}</span>
+          <span><strong>${esc(item.label)}</strong><br>${esc(item.reason)}</span>
+        </div>
+      `).join("");
+      replanDiff.hidden = false;
+    }
+
+    function renderChangeHistory() {
+      const hasChanges = changeHistory.length > 0;
+      document.getElementById("undo-replan").disabled = !previousTrip;
+      document.getElementById("reset-replan").disabled = !hasChanges;
+      changeBanner.hidden = !hasChanges;
+      changeLog.hidden = !hasChanges;
+      if (!hasChanges) return;
+      const latest = changeHistory[changeHistory.length - 1];
+      changeBanner.textContent = `当前地图与简报已同步应用 Day ${latest.day} 的调整。固定预约保持不变。`;
+      changeLog.innerHTML = `<strong>变化记录</strong><br>${changeHistory.map(item =>
+        `Day ${item.day} · ${item.type === "delay" ? "晚点" : item.type === "closure" ? "地点关闭" : item.type === "weather" ? "天气影响" : "体力不足"}：${item.diffs.filter(diff => diff.kind !== "keep").map(diff => `${diff.label}（${diff.reason}）`).join("；")}`
+      ).join("<br>")}`;
+    }
+
+    function applyPendingProposal() {
+      if (!pendingProposal) return;
+      previousTrip = clone(activeTrip);
+      activeTrip = clone(pendingProposal.trip);
+      draft = draftFromTrip(activeTrip);
+      changeHistory.push({
+        type: pendingProposal.type,
+        day: pendingProposal.day,
+        diffs: clone(pendingProposal.diffs),
+        appliedAt: new Date().toISOString()
+      });
+      trackEvent("replan_applied", {
+        type: pendingProposal.type,
+        day: pendingProposal.day,
+        count: pendingProposal.diffs.filter(item => item.kind !== "keep").length
+      });
+      pendingProposal = null;
+      replanPanel.hidden = true;
+      renderDraft();
+      renderActivePreview();
+      renderChangeHistory();
+      showProductView("plan");
+      persistTripState();
+    }
+
+    function restoreLastTripState() {
+      try {
+        const key = localStorage.getItem(REPLAN_LAST_KEY);
+        if (!key) return false;
+        const payload = JSON.parse(localStorage.getItem(key) || "null");
+        if (!payload || !payload.activeTrip || !payload.originalTrip) return false;
+        activeTrip = payload.activeTrip;
+        originalTrip = payload.originalTrip;
+        previousTrip = payload.previousTrip || null;
+        changeHistory = Array.isArray(payload.changeHistory) ? payload.changeHistory : [];
+        draft = draftFromTrip(activeTrip);
+        hasParsed = true;
+        stepImport.hidden = true;
+        stepConfirm.hidden = true;
+        renderDraft();
+        renderActivePreview();
+        renderChangeHistory();
+        const requested = location.hash === "#map" ? "map" : "plan";
+        showProductView(requested, false);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
     function flattenStops(trip) {
       const stops = [];
       let ordinal = 1;
@@ -1808,8 +2395,8 @@ Day 2：浅草和上野
       return trip.days.map(day => `
         <section>
           <h3>Day ${day.day} <span>${esc(day.date)}</span></h3>
-          <p>${esc(day.summary || "每日行程")}</p>
-          <ol>${day.stops.map(stop => `<li>${esc(stop.name)} · ${esc(stop.city)} · ${esc(stop.duration_min)} min</li>`).join("")}</ol>
+          <p>${esc(day.summary || "每日行程")}${day.cautions ? ` · ${esc(day.cautions)}` : ""}</p>
+          <ol>${day.stops.map(stop => `<li>${esc(stop.arrival_time || "时间待定")} · ${esc(stop.name)} · ${esc(stop.city)} · ${esc(stop.duration_min)} min${stop.reservation_required ? " · 固定预约" : ""}</li>`).join("")}</ol>
         </section>
       `).join("");
     }
@@ -2571,10 +3158,13 @@ initViewer();${closeScript}
     function renderActivePreview() {
       if (!activeTrip) return;
       stepResult.hidden = false;
+      document.getElementById("result-title").textContent = activeTrip.trip_title;
       mapPreview.innerHTML = renderMapSvg(activeTrip, false);
       summaryGrid.innerHTML = renderStatsHtml(activeTrip);
       previewItinerary.innerHTML = renderPreviewItinerary(activeTrip);
+      const previousDay = posterDaySelect.value;
       posterDaySelect.innerHTML = activeTrip.days.map(day => `<option value="${day.day}">Day ${day.day} · ${esc(day.date)}</option>`).join("");
+      if ([...posterDaySelect.options].some(option => option.value === previousDay)) posterDaySelect.value = previousDay;
       updateDownloads(true);
     }
 
@@ -2657,9 +3247,29 @@ initViewer();${closeScript}
     }
 
     document.getElementById("load-sample").addEventListener("click", () => {
-      textInput.value = document.getElementById("sample-trip-text").textContent.trim();
-      setStatus(parseStatus, "已填入示例，正在整理。", "ok");
-      document.getElementById("parse-input").click();
+      try {
+        textInput.value = document.getElementById("sample-trip-text").textContent.trim();
+        draft = parseDraftFromText(textInput.value);
+        draft.days.forEach(day => {
+          day.stops.forEach(stop => {
+            stop.source = "sanitized_demo_itinerary";
+            stop.notes = "公开脱敏演示数据；位置仅用于城市级路线关系。";
+          });
+          if (day.day === 5) day.cautions = "长途移动日；如出发明显晚点，优先保护后续固定交通。";
+          if (day.day === 6) {
+            day.meeting_time = "08:30";
+            day.meeting_point = "成都城区公共集合点";
+            day.cautions = "15:00 固定动车不可自动修改，请预留进站时间。";
+          }
+        });
+        hasParsed = true;
+        const trip = buildTripFromDraft();
+        setTripReady(trip);
+        setStatus(parseStatus, "已加载脱敏演示行程。", "ok");
+        trackEvent("demo_loaded", { count: flattenStops(trip).length });
+      } catch (error) {
+        setStatus(parseStatus, error.message, "error");
+      }
     });
 
     document.getElementById("parse-input").addEventListener("click", () => {
@@ -2681,6 +3291,7 @@ initViewer();${closeScript}
         importSummary.textContent = `已整理 ${draft.days.length} 天、${stopCount} 个地点 · 展开修改原始内容`;
         importDetails.open = false;
         stepConfirm.scrollIntoView({ behavior: "smooth", block: "start" });
+        history.replaceState(null, "", "#import");
       } catch (error) {
         setStatus(parseStatus, error.message, "error");
       }
@@ -2694,6 +3305,7 @@ initViewer();${closeScript}
         const text = await readDocxText(file);
         textInput.value = text;
         setStatus(docxStatus, `已读取 ${file.name}，可继续解析。`, "ok");
+        trackEvent("trip_imported", { type: "docx" });
       } catch (error) {
         setStatus(docxStatus, error.message, "error");
       }
@@ -2826,11 +3438,9 @@ initViewer();${closeScript}
 
     document.getElementById("build-preview").addEventListener("click", () => {
       try {
-        activeTrip = buildTripFromDraft();
-        renderDraft();
-        renderActivePreview();
-        setStatus(validationStatus, "旅行地图已生成。你可以下载互动地图或每日简报。", "ok");
-        stepResult.scrollIntoView({ behavior: "smooth", block: "start" });
+        const trip = buildTripFromDraft();
+        setTripReady(trip);
+        setStatus(validationStatus, "行程已生成。后续变化可从“行程有变”开始。", "ok");
       } catch (error) {
         setStatus(validationStatus, error.message, "error");
         activeTrip = null;
@@ -2838,33 +3448,163 @@ initViewer();${closeScript}
       }
     });
 
+    document.getElementById("plan-view-button").addEventListener("click", () => showProductView("plan"));
+    document.getElementById("map-view-button").addEventListener("click", () => showProductView("map"));
+
+    document.getElementById("open-disruption").addEventListener("click", () => {
+      const isDemo = flattenStops(activeTrip || { days: [] }).some(stop => stop.source === "sanitized_demo_itinerary");
+      prepareDisruptionPanel(isDemo);
+      if (isDemo) {
+        try {
+          const started = performance.now();
+          pendingProposal = buildReplanProposal();
+          renderProposal(pendingProposal);
+          setStatus(replanStatus, "建议已生成：跳过乐山绕行，直接前往成都；Day 6 固定动车保持不变。", "ok");
+          trackEvent("replan_proposed", {
+            type: pendingProposal.type,
+            day: pendingProposal.day,
+            count: pendingProposal.diffs.length,
+            duration_ms: performance.now() - started
+          });
+        } catch (error) {
+          setStatus(replanStatus, error.message, "error");
+        }
+      }
+    });
+
+    document.getElementById("close-disruption").addEventListener("click", () => {
+      replanPanel.hidden = true;
+      pendingProposal = null;
+    });
+
+    disruptionDay.addEventListener("change", () => {
+      renderDisruptionStops();
+      pendingProposal = null;
+      replanDiff.hidden = true;
+    });
+
+    disruptionType.addEventListener("change", () => {
+      document.getElementById("delay-field").hidden = disruptionType.value !== "delay";
+      pendingProposal = null;
+      replanDiff.hidden = true;
+    });
+
+    [disruptionStop, disruptionDelay].forEach(input => input.addEventListener("change", () => {
+      pendingProposal = null;
+      replanDiff.hidden = true;
+    }));
+
+    document.getElementById("preview-replan").addEventListener("click", () => {
+      try {
+        const started = performance.now();
+        pendingProposal = buildReplanProposal();
+        renderProposal(pendingProposal);
+        setStatus(replanStatus, "建议已生成。请核对保留、顺延和跳过项后再应用。", "ok");
+        trackEvent("replan_proposed", {
+          type: pendingProposal.type,
+          day: pendingProposal.day,
+          count: pendingProposal.diffs.length,
+          duration_ms: performance.now() - started
+        });
+      } catch (error) {
+        pendingProposal = null;
+        replanDiff.hidden = true;
+        setStatus(replanStatus, error.message, "error");
+      }
+    });
+
+    document.getElementById("apply-replan").addEventListener("click", applyPendingProposal);
+    document.getElementById("cancel-replan").addEventListener("click", () => {
+      pendingProposal = null;
+      replanDiff.hidden = true;
+      setStatus(replanStatus, "已取消本次建议，当前行程没有变化。");
+    });
+
+    document.getElementById("undo-replan").addEventListener("click", () => {
+      if (!previousTrip) return;
+      activeTrip = clone(previousTrip);
+      previousTrip = null;
+      changeHistory.pop();
+      draft = draftFromTrip(activeTrip);
+      renderDraft();
+      renderActivePreview();
+      renderChangeHistory();
+      persistTripState();
+      trackEvent("replan_undone", { count: 1 });
+    });
+
+    document.getElementById("reset-replan").addEventListener("click", () => {
+      if (!originalTrip) return;
+      previousTrip = clone(activeTrip);
+      activeTrip = clone(originalTrip);
+      changeHistory = [];
+      draft = draftFromTrip(activeTrip);
+      renderDraft();
+      renderActivePreview();
+      renderChangeHistory();
+      persistTripState();
+    });
+
+    document.getElementById("start-new-trip").addEventListener("click", () => {
+      clearCurrentStatePointer();
+      activeTrip = null;
+      originalTrip = null;
+      previousTrip = null;
+      pendingProposal = null;
+      changeHistory = [];
+      draft = emptyDraft();
+      textInput.value = "";
+      stepResult.hidden = true;
+      stepConfirm.hidden = true;
+      stepImport.hidden = false;
+      importDetails.open = true;
+      renderDraft();
+      updateDownloads(false);
+      history.replaceState(null, "", "#import");
+      stepImport.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
     document.getElementById("download-json").addEventListener("click", () => {
       if (!activeTrip) return;
       downloadText(`${fileSafe(activeTrip.trip_title)}.json`, JSON.stringify(activeTrip, null, 2), "application/json;charset=utf-8");
+      trackEvent("artifact_downloaded", { type: "json" });
     });
 
     document.getElementById("download-map-html").addEventListener("click", () => {
       if (!activeTrip) return;
       downloadText(`${fileSafe(activeTrip.trip_title)}.html`, renderViewerHtml(activeTrip), "text/html;charset=utf-8");
+      trackEvent("artifact_downloaded", { type: "viewer_html" });
     });
 
     document.getElementById("download-overview-poster").addEventListener("click", () => {
       if (!activeTrip) return;
       downloadSvg(`${fileSafe(activeTrip.trip_title)}-overview-poster.svg`, renderOverviewPosterSvgForTrip(activeTrip));
+      trackEvent("artifact_downloaded", { type: "overview_poster" });
     });
 
     document.getElementById("download-day-poster").addEventListener("click", () => {
       if (!activeTrip) return;
       downloadSvg(`${fileSafe(activeTrip.trip_title)}-day-${posterDaySelect.value}-briefing.svg`, renderDayPosterSvgForTrip(activeTrip, Number(posterDaySelect.value)));
+      trackEvent("briefing_downloaded", { day: posterDaySelect.value });
     });
 
     document.getElementById("download-record-poster").addEventListener("click", () => {
       if (!activeTrip) return;
       downloadSvg(`${fileSafe(activeTrip.trip_title)}-travel-record-poster.svg`, renderRecordPosterSvgForTrip(activeTrip));
+      trackEvent("artifact_downloaded", { type: "record_poster" });
     });
 
-    renderDraft();
-    updateDownloads(false);
+    window.addEventListener("hashchange", () => {
+      if (!activeTrip) return;
+      if (location.hash === "#plan") showProductView("plan", false);
+      if (location.hash === "#map") showProductView("map", false);
+    });
+
+    if (!restoreLastTripState()) {
+      renderDraft();
+      updateDownloads(false);
+      if (location.hash !== "#import") history.replaceState(null, "", "#import");
+    }
   </script>
 </body>
 </html>
