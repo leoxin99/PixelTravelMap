@@ -171,6 +171,15 @@ const dayPoster = renderDayPosterSvgForTrip(activeTrip, 5);
 if (!overviewPoster.includes("poster-paper-pattern") || !overviewPoster.includes("城市方位经视觉优化")) {
   throw new Error("overview poster did not use the ancient atlas layout");
 }
+const compactRows = [...overviewPoster.matchAll(/class="compact-row" transform="translate\\(120,(\\d+)\\)">\\s*<rect width="1360" height="(\\d+)"/g)]
+  .map(match => ({ y: Number(match[1]), height: Number(match[2]) }));
+if (compactRows.length !== activeTrip.days.length) throw new Error("overview poster is missing compact itinerary rows");
+for (let index = 1; index < compactRows.length; index += 1) {
+  if (compactRows[index - 1].y + compactRows[index - 1].height >= compactRows[index].y) {
+    throw new Error("overview poster itinerary rows overlap");
+  }
+}
+if (compactRows.at(-1).y + compactRows.at(-1).height > 1065) throw new Error("overview poster itinerary exceeds the page");
 if (dayPoster.includes("乐山大佛")) throw new Error("daily briefing did not use activeTrip");
 if (!dayPoster.includes("当天地点独立放大")) throw new Error("daily poster did not use an independent map layout");
 clickHandler("map-view-button");

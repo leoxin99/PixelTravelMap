@@ -500,8 +500,9 @@ function layoutRouteDistances(items, points, labels, width, height, mode = "over
           const labelHits = labelBoxes.filter(label => boxesOverlap(box, label, 4)).length;
           const distanceHits = placed.filter(other => boxesOverlap(box, other, 4)).length;
           const score = labelHits * 100000 + distanceHits * 50000 + candidateIndex * 20 + Math.hypot(dx, dy);
-          if (!best || score < best.score) best = { ...box, score };
+          if (!best || score < best.score) best = { ...box, score, blocked: labelHits > 0 || distanceHits > 0 };
         });
+        if (best.blocked) return null;
         placed.push(best);
         return {
           x: best.x + best.width / 2,
@@ -802,6 +803,21 @@ function itineraryRows(items, x, y, width, rowHeight, limit) {
       }).join("");
     }
 
+function compactItineraryRows(items, x, y, width, totalHeight, limit) {
+      const visibleItems = items.slice(0, limit);
+      const rowHeight = Math.floor(totalHeight / Math.max(visibleItems.length, 1));
+      return visibleItems.map((item, index) => {
+        const rowY = y + index * rowHeight;
+        const boxHeight = Math.max(24, rowHeight - 5);
+        const baseline = Math.floor(boxHeight / 2) + 6;
+        return `<g class="compact-row" transform="translate(${x},${rowY})">
+          <rect width="${width}" height="${boxHeight}" rx="4" class="row"/>
+          <text x="20" y="${baseline}" class="row-title">${esc(trimText(item.title, 24))}</text>
+          <text x="310" y="${baseline}" class="row-text">${esc(trimText(item.body, 74))}</text>
+        </g>`;
+      }).join("");
+    }
+
 function noteBox(label, note, x, y, width, height) {
       const content = text(note) || "暂无补充备注。";
       return `<g transform="translate(${x},${y})">
@@ -821,7 +837,7 @@ function renderOverviewPosterSvgForTrip(trip) {
       const body = `
         ${routeMapSvg(stops, 120, 220, 1360, 500, "总行程路线", "overview")}
         <text x="120" y="760" class="section">完整行程</text>
-        ${itineraryRows(rows, 120, 790, 1360, Math.min(58, Math.max(42, Math.floor(300 / trip.days.length))), trip.days.length)}
+        ${compactItineraryRows(rows, 120, 790, 1360, 270, trip.days.length)}
       `;
       return posterShell(`${trip.trip_title} · 总行程介绍`, subtitle, body);
     }
@@ -836,9 +852,9 @@ function renderDayPosterSvgForTrip(trip, dayNumber, notes = {}) {
       }));
       const note = noteValue(notes.days && notes.days[day.day]) || day.cautions || day.summary || "";
       const body = `
-        ${routeMapSvg(dayStops, 120, 220, 1360, 420, `Day ${day.day} 明日路线`, "day")}
-        <text x="120" y="690" class="section">明日具体行程</text>
-        ${itineraryRows(rows, 120, 720, 1360, 58, 6)}
+        ${routeMapSvg(dayStops, 120, 220, 1360, 380, `Day ${day.day} 明日路线`, "day")}
+        <text x="120" y="640" class="section">明日具体行程</text>
+        ${itineraryRows(rows, 120, 670, 1360, Math.min(58, Math.max(52, Math.floor(330 / Math.max(Math.min(rows.length, 6), 1)))), 6)}
         ${noteBox(`集合 ${day.meeting_time || "待确认"} · ${day.meeting_point || "集合地点待确认"}`, note, 120, 1010, 1360, 70)}
       `;
       return posterShell(`${trip.trip_title} · Day ${day.day} 简报`, `${day.date} · ${day.summary || "每日行程"} · ${dayStops.length} 个地点 · 约 ${totalKm(dayStops)} km 直线距离`, body);
@@ -856,10 +872,10 @@ function renderRecordPosterSvgForTrip(trip, notes = {}) {
         };
       });
       const body = `
-        ${routeMapSvg(stops, 120, 220, 1360, 450, "旅行记录路线", "overview")}
-        ${noteBox("全程总结", noteValue(notes.trip), 120, 700, 1360, 86)}
-        <text x="120" y="830" class="section">每日记录</text>
-        ${itineraryRows(rows, 120, 860, 1360, Math.min(54, Math.max(40, Math.floor(205 / trip.days.length))), trip.days.length)}
+        ${routeMapSvg(stops, 120, 220, 1360, 430, "旅行记录路线", "overview")}
+        ${noteBox("全程总结", noteValue(notes.trip), 120, 680, 1360, 78)}
+        <text x="120" y="800" class="section">每日记录</text>
+        ${compactItineraryRows(rows, 120, 825, 1360, 235, trip.days.length)}
       `;
       return posterShell(`${trip.trip_title} · 旅行记录`, `${trip.start_date} - ${trip.end_date} · 记录来自当前浏览器备注`, body);
     }

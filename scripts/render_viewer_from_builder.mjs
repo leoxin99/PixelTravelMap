@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import vm from "node:vm";
 
-const [, , sourcePath, outputPath] = process.argv;
+const [, , sourcePath, outputPath, posterTripPath, posterOutputPath] = process.argv;
 if (!sourcePath || !outputPath) {
   throw new Error("Usage: node render_viewer_from_builder.mjs <builder-html> <viewer-html>");
 }
@@ -110,3 +110,12 @@ const placeholder = {
 
 const viewerHtml = globalThis.renderViewerHtml(placeholder);
 fs.writeFileSync(outputPath, viewerHtml, "utf8");
+
+if (posterTripPath && posterOutputPath) {
+  const posterTrip = JSON.parse(fs.readFileSync(posterTripPath, "utf8"));
+  fs.writeFileSync(
+    posterOutputPath,
+    globalThis.renderOverviewPosterSvgForTrip(posterTrip),
+    "utf8"
+  );
+}
